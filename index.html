@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex"><!-- trial release: keep out of search results -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>NISAR Flood Explorer</title>
+  <link rel="icon" href="data:,"><!-- no favicon file: avoids a 404 request -->
+  <!-- Load-error box: inline so it is visible even if style.css fails to load -->
+  <style>
+    #load-error { display: none; margin: 12px; padding: 12px 14px; border: 2px solid #c92a2a; border-radius: 8px;
+      background: #fff5f5; color: #7a1010; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #load-error.show { display: block; }
+    #load-error code { background: #ffe3e3; padding: 1px 4px; border-radius: 3px; }
+  </style>
+  <script>
+    window.showLoadError = function (msg) {
+      var box = document.getElementById("load-error");
+      if (!box) { document.addEventListener("DOMContentLoaded", function () { window.showLoadError(msg); }); return; }
+      var li = document.createElement("li");
+      li.innerHTML = msg;
+      box.querySelector("ul").appendChild(li);
+      box.classList.add("show");
+    };
+    if (!/^https?:$/.test(location.protocol)) {
+      window.showLoadError("The page was opened as a file (address: <code>" + location.protocol + "</code>). " +
+        "Open it through its web address (http or https).");
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        onerror="showLoadError('The Leaflet stylesheet (cdnjs) could not be loaded; check your internet connection.')">
+  <link rel="stylesheet" href="style.css?v=37b" onerror="showLoadError('<code>style.css</code> could not be loaded.')">
+</head>
+<body>
+  <a class="skip" href="#explore">Skip to the explanation panel</a>
+  <div id="load-error" role="alert"><strong>The map could not be loaded.</strong><ul></ul></div>
+  <!-- Start screen: globe + list for choosing an event (shown when no event is given in the address) -->
+  <section id="intro" class="intro" aria-labelledby="intro-h" hidden>
+    <div class="intro-head">
+      <p class="eyebrow">NISAR Flood Explorer</p>
+      <h1 id="intro-h" tabindex="-1">Explore how Earth changes.</h1>
+      <p class="intro-sub">Choose an event to explore satellite observations.</p>
+    </div>
+    <div class="intro-body">
+      <div class="globe-wrap">
+        <div id="globe" class="globe" role="region" aria-label="Globe with event locations"></div>
+        <p id="globe-fallback" class="globe-fallback" role="status" hidden></p>
+        <p id="globe-loading" class="globe-loading" role="status" hidden>Loading the globe…</p>
+        <p id="globe-hint" class="globe-hint">Drag to rotate · Select a marker</p>
+        <!-- Shown during camera transitions between the globe and the analysis map -->
+        <div id="travel-bar" class="travel-bar" hidden>
+          <span id="travel-label" class="travel-label" role="status" aria-live="polite"></span>
+          <button type="button" id="travel-skip" class="btn btn-small">Skip animation</button>
+        </div>
+      </div>
+      <div class="intro-side">
+        <h2 class="intro-list-h" id="intro-list-h">Events</h2>
+        <ul id="intro-list" class="intro-list" aria-labelledby="intro-list-h"></ul>
+        <p class="intro-note">Showing selected case studies, not a complete disaster catalogue.</p>
+        <div id="intro-card" class="intro-card" aria-live="polite" hidden></div>
+        <p class="intro-credit">Globe imagery: NASA Blue Marble Shaded Relief and Bathymetry (MODIS). We acknowledge the use of imagery provided by
+          services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
+          The globe only helps you choose an event; the analysis map opens after you choose.</p>
+      </div>
+    </div>
+  </section>
+
+  <header class="top">
+    <div class="brand">
+      <button type="button" id="to-globe" class="btn btn-small to-globe">← Back to globe</button>
+      <p class="eyebrow">NISAR Flood Explorer</p>
+      <h1 id="title">NISAR Flood Explorer</h1>
+      <p id="subtitle" class="muted"></p>
+    </div>
+    <div class="badges">
+      <button type="button" id="maturity-badge" class="badge badge-maturity" aria-expanded="false" aria-controls="maturity-info"></button>
+      <span id="warning-badge" class="badge" role="note"></span>
+    </div>
+    <p id="maturity-info" class="maturity-info" hidden></p>
+  </header>
+
+  <main class="layout">
+    <div class="map-col">
+    <!-- Simple view: layer choice and date pair right above the map (filled from app.js; hidden otherwise) -->
+    <div id="simple-bar" class="simple-bar" hidden></div>
+    <section class="map-wrap" aria-label="Map with before–after comparison">
+      <div id="map"></div>
+      <span id="label-before" class="tag tag-left"></span>
+      <span id="label-after" class="tag tag-right"></span>
+      <span id="change-label" class="tag tag-center" hidden></span>
+      <div id="divider" role="slider" tabindex="0" aria-label="Before–after divider: left is before, right is after"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <span class="handle" aria-hidden="true">◀ ▶</span>
+        <span class="drag-hint" aria-hidden="true">Slide to compare</span>
+      </div>
+      <!-- Map view choice (separate from the before–after divider) -->
+      <div id="view-switch" class="view-switch" role="group" aria-label="Map view">
+        <button type="button" data-view="satellite" aria-pressed="true">Satellite</button>
+        <button type="button" data-view="analysis" aria-pressed="false">Street map</button>
+      </div>
+      <div class="map-tools">
+        <button type="button" id="return-aoi" class="btn btn-small map-btn">Return to study area</button>
+        <button type="button" id="to-text" class="btn btn-small map-btn mobile-only">Read more ↓</button>
+      </div>
+      <div id="sat-error" class="sat-error" role="alert" hidden>
+        Satellite imagery could not be loaded.
+        <button type="button" id="use-street" class="btn btn-small">Use street map instead</button>
+      </div>
+      <div id="map-status" class="map-status" role="status" aria-live="polite" hidden></div>
+      <!-- Always-visible small legend: active layer, its dates and the study-area note -->
+      <div id="map-legend" class="map-legend" aria-live="polite"></div>
+    </section>
+    </div>
+
+    <aside class="panel">
+      <!-- 1. Event choice: short cards, collapsed once an event is selected -->
+      <section class="events" aria-labelledby="events-h">
+        <div class="events-strip">
+          <div class="strip-text">
+            <h2 id="events-h">Event</h2>
+            <span id="current-event" class="current-event"></span>
+          </div>
+          <button type="button" id="events-toggle" class="btn btn-small" aria-expanded="false" aria-controls="event-cards">Change event</button>
+        </div>
+        <div id="event-cards" class="cards" role="group" aria-label="Choose an event" hidden></div>
+      </section>
+
+      <!-- Simple view (default): the result first, few controls -->
+      <section id="simple-card" class="simple-card" aria-labelledby="simple-title" hidden></section>
+
+      <!-- 2. Three-step guided exploration -->
+      <section id="explore" class="explore" aria-label="Explore the evidence">
+        <div class="evidence-bar">
+          <button type="button" id="to-simple" class="btn btn-small">← Back to simple view</button>
+          <span class="evidence-h">Explore the evidence</span>
+        </div>
+        <div class="steps" role="tablist" aria-label="Exploration steps" id="step-tabs"></div>
+        <div id="step-panel" role="tabpanel" tabindex="0">
+          <h2 id="step-title" class="step-title"></h2>
+          <p id="step-lead" class="step-lead"></p>
+          <p id="step-dates" class="step-dates" hidden></p>
+          <p id="step-action" class="step-action" hidden></p>
+          <ol id="step-focus" class="focus-list" aria-label="Show me on the map"></ol>
+          <div id="custom-view" class="custom" hidden>
+            <span>You changed the map in “Explore the data”.</span>
+            <button type="button" id="reset-view" class="linkish">Back to this step’s map</button>
+          </div>
+          <div id="step-summary" class="step-summary" hidden></div>
+          <details class="fold inline-fold" id="more-detail">
+            <summary><h3 class="more-h">For curious explorers: scientific details</h3></summary>
+            <div id="step-body" class="step-body"></div>
+            <div id="step-notes" class="notes"></div>
+            <div id="not-this" class="not-this" hidden></div>
+            <p id="step-sources" class="src-files"></p>
+          </details>
+        </div>
+      </section>
+
+      <details class="fold" id="tech">
+        <summary><h2>Explore the data</h2></summary>
+        <p class="small-note">Optional controls for the radar images and sources. The story steps work without them.</p>
+        <!-- "What changed?": two mutually exclusive presentations of the same date pair -->
+        <div id="mode-switch" class="mode-switch" role="radiogroup" aria-label="How to show the change" hidden>
+          <button type="button" role="radio" data-mode="change" aria-checked="true">Change map</button>
+          <button type="button" role="radio" data-mode="compare" aria-checked="false">Compare radar</button>
+        </div>
+        <p id="mode-reason" class="chip-reason" hidden></p>
+        <p id="mode-hint" class="small-note" hidden></p>
+        <div id="step-offer" class="chips" role="group" aria-label="Sources to show on the map"></div>
+        <div id="evidence-box" class="evidence-box panel-controls">
+          <label class="map-check"><input type="checkbox" id="show-evidence" autocomplete="off"> Grey radar image</label>
+          <label class="map-check ev-opacity" id="ev-opacity-row" hidden><span>Radar opacity</span>
+            <input type="range" id="ev-opacity" min="20" max="100" step="5" value="60" autocomplete="off" aria-label="Radar opacity">
+            <span id="ev-opacity-val">60%</span></label>
+          <label class="map-check ev-opacity" id="cand-opacity-row" hidden><span>Candidate opacity</span>
+            <input type="range" id="cand-opacity" min="10" max="100" step="5" value="80" autocomplete="off" aria-label="Water candidate opacity">
+            <span id="cand-opacity-val">80%</span></label>
+        </div>
+        <p id="compare-info" class="compare-info" aria-live="polite"></p>
+        <h3>Dates and radar channel</h3>
+        <label for="sel-pair">Observation pair (left of the divider is before, right is after)</label>
+        <select id="sel-pair" autocomplete="off"></select>
+        <div class="seg" role="radiogroup" aria-label="Radar polarisation">
+          <label><input type="radio" name="pol" value="HH" checked autocomplete="off"> HH</label>
+          <label><input type="radio" name="pol" value="HV" autocomplete="off"> HV</label>
+        </div>
+        <p class="hint">HV: no noise correction was applied and the unit of the noise layer could not be verified; low HV values and their changes are for visual comparison only and cannot be read quantitatively.</p>
+        <p id="date-warning" class="warn" hidden></p>
+        <h3>All layers</h3>
+        <div id="layer-list"></div>
+        <h3>Layer meanings</h3>
+        <div id="legend"></div>
+        <p id="size-note" class="small-note"></p>
+        <p id="rule-note" class="small-note"></p>
+        <details class="details">
+          <summary>Exact observation times (UTC) and products</summary>
+          <div id="obs-details"></div>
+        </details>
+        <label class="map-check tech-check"><input type="checkbox" id="show-outline" checked autocomplete="off"> Show study area outline (thin dashed line)</label>
+        <p id="proj-note" class="small-note"></p>
+      </details>
+
+      <details class="fold" id="sources-wrap">
+        <summary><h2>Sources &amp; limitations</h2></summary>
+        <h3>Product status</h3>
+        <p id="product-status" class="small-note"></p>
+        <h3>Sources</h3>
+        <div id="sources"></div>
+        <h3>Scientific limitations</h3>
+        <ul id="uncertainty" class="small"></ul>
+      </details>
+
+      <details class="fold" id="event-info-wrap">
+        <summary><h2>About this event</h2></summary>
+        <div id="event-info"></div>
+      </details>
+
+      <!-- Step navigation stays reachable at the bottom of the panel -->
+      <div class="step-nav sticky-nav">
+        <button type="button" id="step-prev" class="btn">← Back</button>
+        <button type="button" id="to-map" class="btn mobile-only">Map ↑</button>
+        <button type="button" id="step-next" class="btn btn-primary">Next →</button>
+      </div>
+    </aside>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+          onerror="showLoadError('The Leaflet library (cdnjs) could not be loaded; check your internet connection.')"></script>
+  <script src="intro.js?v=30b"></script>
+  <!-- Public settings (optional ArcGIS API key restricted to this site) -->
+  <script src="config.js"></script>
+  <script src="app.js?v=42" onerror="showLoadError('<code>app.js</code> could not be loaded.')"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+{
+ "event_id": "moz-flood-2026-01",
+ "lang": "en",
+ "generated_from": "pipeline/export/build_text_en.py (display text only; numbers from existing outputs; no new analysis)",
+ "event": {
+  "title": "Mozambique — January 2026 floods",
+  "area_name": "Chokwe / Limpopo River",
+  "place": "Mozambique · Chokwe",
+  "lede": "Floods along the Limpopo River; a 135.7 km² study area around the main built-up area of Chókwè and the river next to it.",
+  "facts": [
+   "2 NISAR observations: 5 January, 17 January 2026",
+   "Radar and change only; no water candidate"
+  ],
+  "dates": "5 Jan – 17 Jan 2026 · 2 observations",
+  "thumb": "moz-flood-2026-01/radar_2026-01-17_HH.png",
+  "thumb_alt": "This project's NISAR HH radar preview, 17 January 2026"
+ },
+ "maturity": {
+  "label": "BETA",
+  "text": "BETA is the maturity label NASA gives this product; it is not a final, validated release. From the product metadata: product specification 1.4.0; RFI mitigation disabled; partial frame (isFullFrame = False); no noise correction applied (noiseCorrectionApplied = False)."
+ },
+ "steps": [
+  {
+   "id": "find",
+   "title": "Find the place",
+   "lead": "This is Chokwe, a town in Mozambique. The outlined area covers its main built-up area and the Limpopo River beside it.",
+   "view": {
+    "pair": [
+     "2026-01-05",
+     "2026-01-17"
+    ],
+    "pol": "HH",
+    "swipe": 1,
+    "layers": []
+   },
+   "body": [
+    "First NISAR image (5 January 2026); not assumed to be dry or pre-flood. No inspection areas are registered for this event.",
+    "Dark areas are low backscatter (smooth surfaces; can be open water); bright areas are high backscatter.",
+    "Along the Limpopo, in the north-east of the study area, the low-backscatter river channel is already visible on this date.",
+    "Study area: 135.7 km² = the ADM3 unit that contains the town (51.0 km²; not an official city boundary), the built-up area contiguous with it (16.6 km², from OSM buildings, approximate) and the Limpopo surroundings next to the town (68.0 km²). None of these lines is a flood boundary."
+   ],
+   "notes": [
+    "Water under vegetation is not captured by this open-water approach."
+   ],
+   "sources": [
+    "catalog/aoi/moz-flood-2026-01.study-area.geojson",
+    "docs/moz-city-report.md"
+   ],
+   "offer": [],
+   "show_me": [],
+   "focus": false
+  },
+  {
+   "id": "dates",
+   "title": "Look at two dates",
+   "lead": "This satellite picture uses radar signals. It is not a normal photo.",
+   "view": {
+    "pair": [
+     "2026-01-05",
+     "2026-01-17"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [],
+    "mode": "compare"
+   },
+   "body": [
+    "First NISAR image (5 January 2026); not assumed to be dry or pre-flood. No inspection areas are registered for this event.",
+    "Dark areas are low backscatter (smooth surfaces; can be open water); bright areas are high backscatter.",
+    "Along the Limpopo, in the north-east of the study area, the low-backscatter river channel is already visible on this date.",
+    "Study area: 135.7 km² = the ADM3 unit that contains the town (51.0 km²; not an official city boundary), the built-up area contiguous with it (16.6 km², from OSM buildings, approximate) and the Limpopo surroundings next to the town (68.0 km²). None of these lines is a flood boundary.",
+    "Strong decrease on the river side; increase over the built-up area."
+   ],
+   "notes": [
+    "Water under vegetation is not captured by this open-water approach."
+   ],
+   "sources": [
+    "catalog/aoi/moz-flood-2026-01.study-area.geojson",
+    "docs/moz-city-report.md"
+   ],
+   "offer": [],
+   "show_me": [],
+   "focus": false,
+   "action": "Slide to compare.",
+   "dates_line": "Left: 5 January 2026 · Right: 17 January 2026",
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 5 January, right 17 January (grey radar, HH)."
+   }
+  },
+  {
+   "id": "change",
+   "title": "Spot the change",
+   "lead": "Blue means the radar signal became weaker. The river side of the area, to the north-east, turned blue.",
+   "view": {
+    "pair": [
+     "2026-01-05",
+     "2026-01-17"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "change"
+    ],
+    "mode": "change"
+   },
+   "body": [
+    "Strong decrease on the river side; increase over the built-up area.",
+    "40% of the study area: HH signal down > 3 dB — Share of the whole 135.7 km² study area where the HH radar signal decreased by more than 3 dB (50 m). Not the share of flooded area. The cause of the increase over the built-up area is unknown.",
+    "In “Compare radar”, the divider compares the grey images: left 5 January, right 17 January. A northwest–southeast line splits the study area: strong backscatter decrease on the river (north-east) side, increase over the built-up area to the south-west and in the built-up belt to the south-east.",
+    "At 50 m scale (10 m grid), the HH radar signal fell by more than 3 dB over 40% of the 135.7 km² study area and rose by more than 3 dB over 18% (denominator: all 1,356,813 pixels, valid on both dates). By part: town unit 38% down / 19% up; contiguous built-up area 2% / 57%; Limpopo surroundings 50% / 7%. These are shares of radar signal change, not shares of flooded area and not a water classification.",
+    "Earlier 5 × 5 km trial (centre of the town): 43% down > 3 dB. Recomputed from the new rasters it gives the same value; it describes only that smaller box, not the whole town.",
+    "The cause of the increase over the built-up area is unknown; without evidence it is not interpreted as flooding or damage.",
+    "Between 5 January and 17 January the HH signal of the whole NISAR image also rose by about 3.0 dB (frame QA statistics); over the town's built-up core it rose by 3.25 dB (median). Much of the increase over the town therefore matches this image-wide level difference between the two BETA images; its cause (calibration or wide-area moisture) is not known."
+   ],
+   "notes": [
+    "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+    "The radar images are 2 separate observations; switching between them is not a real-time view of flood progression."
+   ],
+   "sources": [
+    "data/manifests/moz-flood-2026-01.city-compare.json",
+    "docs/moz-city-report.md"
+   ],
+   "offer": [
+    "change"
+   ],
+   "show_me": [],
+   "focus": false,
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 5 January, right 17 January (grey radar, HH)."
+   }
+  },
+  {
+   "id": "meaning",
+   "title": "What could it mean?",
+   "lead": "Water can make the radar signal weaker. But this change alone does not prove a flood.",
+   "view": {
+    "pair": [
+     "2026-01-05",
+     "2026-01-17"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "change"
+    ],
+    "mode": "change"
+   },
+   "body": [
+    "40% of the study area: HH signal down > 3 dB — Share of the whole 135.7 km² study area where the HH radar signal decreased by more than 3 dB (50 m). Not the share of flooded area. The cause of the increase over the built-up area is unknown.",
+    "In “Compare radar”, the divider compares the grey images: left 5 January, right 17 January. A northwest–southeast line splits the study area: strong backscatter decrease on the river (north-east) side, increase over the built-up area to the south-west and in the built-up belt to the south-east.",
+    "At 50 m scale (10 m grid), the HH radar signal fell by more than 3 dB over 40% of the 135.7 km² study area and rose by more than 3 dB over 18% (denominator: all 1,356,813 pixels, valid on both dates). By part: town unit 38% down / 19% up; contiguous built-up area 2% / 57%; Limpopo surroundings 50% / 7%. These are shares of radar signal change, not shares of flooded area and not a water classification.",
+    "Earlier 5 × 5 km trial (centre of the town): 43% down > 3 dB. Recomputed from the new rasters it gives the same value; it describes only that smaller box, not the whole town.",
+    "The cause of the increase over the built-up area is unknown; without evidence it is not interpreted as flooding or damage.",
+    "Between 5 January and 17 January the HH signal of the whole NISAR image also rose by about 3.0 dB (frame QA statistics); over the town's built-up core it rose by 3.25 dB (median). Much of the increase over the town therefore matches this image-wide level difference between the two BETA images; its cause (calibration or wide-area moisture) is not known."
+   ],
+   "notes": [
+    "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+    "The radar images are 2 separate observations; switching between them is not a real-time view of flood progression."
+   ],
+   "sources": [
+    "data/manifests/moz-flood-2026-01.city-compare.json",
+    "docs/moz-city-report.md"
+   ],
+   "offer": [
+    "change"
+   ],
+   "show_me": [],
+   "focus": false,
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 5 January, right 17 January (grey radar, HH)."
+   }
+  },
+  {
+   "id": "more",
+   "title": "What else do we know?",
+   "lead": "Clouds covered the area around 17 January, so no normal photo from space could check it. A flood map from another radar satellite (GFM) could check about three quarters of the area.",
+   "view": {
+    "pair": [
+     "2026-01-05",
+     "2026-01-17"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "change"
+    ],
+    "mode": "change"
+   },
+   "body": [
+    "No usable optical image near 17 January.",
+    "Copernicus GFM (17 January, 03:18 UTC) was checked over the whole study area as a separate reference (descriptive consistency, not an accuracy measure). It is not shown on this map.",
+    "Optical images within 7 days of 17 January: 8 scenes; the best one observed 0% of the study area clearly (provider mask and the experimental haze screen), so independent optical checking was not possible.",
+    "Copernicus GFM (Sentinel-1) observed 24 minutes before NISAR (03:18 UTC). In the study area GFM could observe 73% (excluded 27%, no GFM data 0.6%; both GFM tiles of this pass); in the town unit 63%. Where it could observe, it marked flooding in 24% of those places (18% of the whole study area). The three GFM algorithms disagree strongly here (flooded share of the observable area: DLR 3%, LIST 25%, TUW 55%), and GFM's advisory flag is set on 40% of the study area.",
+    "Among the pixels with NISAR's strongest decrease (lowest 10% inside the study area; ΔHH below −8.3 dB), GFM marked flooding in 35% of the places it could observe. This was computed with only one of the two GFM tiles of this pass (it could observe 52% of these pixels) and was not recomputed with both.",
+    "This is descriptive consistency between two radar products, not an accuracy measure. GFM is not shown as a map layer for this event.",
+    "Later maps (UNOSAT 4232: Sentinel-1, 23–24 January; Copernicus EMS EMSR857, image date not verified) were not used as the 17 January boundary. NASA SVS 5661 uses the same NISAR data and is not an independent check.",
+    "No water candidate, flood boundary or flood area was produced for this event."
+   ],
+   "notes": [
+    "This event is a two-date radar comparison only: no water candidate, flood boundary or flood area was produced."
+   ],
+   "sources": [
+    "data/manifests/moz-flood-2026-01.city-reference-check.json"
+   ],
+   "offer": [
+    "change"
+   ],
+   "show_me": [],
+   "focus": false,
+   "summary": {
+    "found": [
+     "The radar signal became much weaker on the river side, to the north-east.",
+     "Over the built-up part of the town, the radar signal became stronger.",
+     "GFM looked 24 minutes before our radar satellite. Where our signal dropped the most, it marked flooding in about one in three of the places it could check."
+    ],
+    "unknown": [
+     "Why the radar signal became stronger over the built-up part of the town. The whole radar image was about 3 dB stronger on 17 January, so much of this may not be a local change.",
+     "Whether every blue place was flooded.",
+     "How big the flooded area was. We did not calculate it.",
+     "Many places in the town: GFM could not check them."
+    ]
+   },
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 5 January, right 17 January (grey radar, HH)."
+   }
+  }
+ ],
+ "not_this": [
+  "It is not a flood boundary or a validated flood area.",
+  "No flood depth was produced.",
+  "Areas that could not be observed (cloud, no data, excluded) do not mean “no water”.",
+  "Moving between separate observations is not a real-time view of the flood."
+ ],
+ "simple": {
+  "title": "Satellite signals changed",
+  "lines": [
+   "Between 5 and 17 January 2026.",
+   "Radar change, not mapped floodwater."
+  ],
+  "small": "Uncoloured places are not marked. That does not mean nothing changed there.",
+  "layers": [],
+  "place_label": {
+   "lat": -24.5249,
+   "lon": 33.0037,
+   "text": "Chokwe (town)"
+  },
+  "classes": [
+   {
+    "key": "decrease",
+    "label": "Signal decreased"
+   },
+   {
+    "key": "increase",
+    "label": "Signal increased"
+   }
+  ],
+  "default_class": "decrease",
+  "legend_short": {
+   "decrease": "Blue: weaker radar signal — not confirmed water.",
+   "increase": "Red: stronger radar signal — not confirmed water. Much of it matches a whole-image brightening (~3 dB) on 17 Jan."
+  },
+  "evidence": [
+   {
+    "label": "Explore the evidence",
+    "step": 0
+   }
+  ]
+ },
+ "layers": {},
+ "regions": {},
+ "sources": [
+  {
+   "kind": "NASA visualization",
+   "note": "Ready-made NASA image based on the same NISAR data; not this project's analysis and not an independent check.",
+   "findings": "NASA/JPL image (6 Aug 2026), 5 and 17 January 2026 NISAR GCOV HH/HV composites; close-ups of Chokwe and Macia."
+  },
+  {
+   "kind": "reference map",
+   "note": "UNOSAT observation dates must be compared with the NISAR dates.",
+   "findings": "Published 26 Jan 2026; Sentinel-1 23–24 Jan cumulative water extent; ~4,800 km² of water in a ~64,000 km² analysis area; preliminary, not field-validated; may under-represent water in built-up/dense vegetation. 6–7 days after the 17 Jan NISAR observation."
+  },
+  {
+   "kind": "Charter activation",
+   "note": "",
+   "findings": "Activated 25 January 2026, after the 17 January NISAR observation. The 'Floods Mozambique - Limpopo River (Chokwe)' product is dated 5 February 2026; no sensor or image date."
+  },
+  {
+   "kind": "rapid mapping activation",
+   "note": "",
+   "findings": "Event time: night of 10 Jan 2026 (UTC); activated 17 Jan 07:38 UTC (~4 h after NISAR); 17 AOIs, 37 products, 58 maps. The image date of the Chokwe product was not verified."
+  }
+ ],
+ "reference_maps": [
+  {
+   "producer": "Copernicus EMS GFM (Sentinel-1 VV)",
+   "when": "2026-01-17 03:18 UTC (24 min before NISAR)",
+   "note": "Radar-based; 73% of the 135.7 km² study area observable, 63% of the town unit (two tiles; mainly the exclusion mask); not ground truth."
+  },
+  {
+   "producer": "UNOSAT 4232",
+   "when": "Sentinel-1, 23–24 January 2026",
+   "note": "After 17 January; not used as the 17 January boundary."
+  }
+ ],
+ "uncertainty": [
+  "The radar images are 2 separate observations; switching between them is not a real-time view of flood progression.",
+  "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+  "Water under vegetation is not captured by this open-water approach.",
+  "NISAR data are a BETA release; no noise correction was applied.",
+  "HV noise floor: the product's noise layer is given in DN² with an unspecified normalisation. Because it could not be confirmed to be in the same unit as the measured γ⁰, no HV mask was applied. How much low HV values are affected by noise is unknown.",
+  "This event is a two-date radar comparison only: no water candidate, flood boundary or flood area was produced.",
+  "No usable optical image near 17 January 2026 (scenes around that date are almost fully cloudy over the study area).",
+  "Copernicus GFM observed 24 min before NISAR; it is not shown as a layer here and was not used as a flood boundary. GFM could observe 73% of the study area and 63% of the town unit (exclusion mask, mostly built-up; both GFM tiles). Its three algorithms disagree strongly on 17 January (DLR 3%, LIST 25%, TUW 55% flooded of the observable area).",
+  "Between 5 January and 17 January the HH signal of the whole NISAR image also rose by about 3.0 dB (frame QA statistics); over the town's built-up core it rose by 3.25 dB (median). Much of the increase over the town therefore matches this image-wide level difference between the two BETA images; its cause (calibration or wide-area moisture) is not known.",
+  "The cause of the backscatter increase over the built-up area is unknown; without evidence it must not be interpreted as flooding or damage.",
+  "UNOSAT and Copernicus EMS products are based on images after 17 January; they cannot be used as the 17 January boundary.",
+  "The products are BETA (CRID X05010): no inputDataExceptionMask, RFI mitigation disabled at L1, partial frame. Validity is from the 'mask' layer only.",
+  "The city part of the study area is the ADM3 administrative unit that contains the town (INE/OCHA 2021 via geoBoundaries); it was not checked against the municipal boundary. The contiguous built-up area is approximate (OSM buildings). The Limpopo surroundings are an a-priori 2 km corridor, not a floodplain.",
+  "Results apply only to the 135.7 km² study area and cannot be generalised beyond it."
+ ],
+ "projection_note": "Layers reprojected from EPSG:32736 (10 m) to EPSG:3857, bilinear for continuous layers and nearest neighbour for classes.",
+ "smoothing": "5×5 pixels (50 m) in linear power"
+}

@@ -1,0 +1,491 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "title": "Bangladeş — Temmuz 2026 ani sel ve heyelanları",
+ "area_name": "Habiganj çevresi (Sylhet bölümü)",
+ "maturity": "PROVISIONAL",
+ "bounds_latlon": [
+  [
+   24.352230815993785,
+   91.39002299178837
+  ],
+  [
+   24.3978887462838,
+   91.43987949005701
+  ]
+ ],
+ "projection_note": "Katmanlar EPSG:32646 (10 m) kaynaktan EPSG:3857'ye bilineer (sürekli) / en yakın komşu (sınıf) ile yeniden izdüşürüldü.",
+ "hv_reliability": null,
+ "dates": [
+  {
+   "label": "2026-06-30",
+   "start_utc": "2026-06-30T23:21:34.000000Z",
+   "granule": "G4248910017-ASF",
+   "product": "NISAR_L2_PR_GCOV_024_069_A_014_4005_DHDH_A_20260630T232134_20260630T232209_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14"
+  },
+  {
+   "label": "2026-07-12",
+   "start_utc": "2026-07-12T23:21:34.000000Z",
+   "granule": "G4252846523-ASF",
+   "product": "NISAR_L2_PR_GCOV_025_069_A_014_4005_DHDH_A_20260712T232134_20260712T232208_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14"
+  },
+  {
+   "label": "2026-07-24",
+   "start_utc": "2026-07-24T23:21:33.000000Z",
+   "granule": "G4261131483-ASF",
+   "product": "NISAR_L2_PR_GCOV_026_069_A_014_4005_DHDH_A_20260724T232133_20260724T232208_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14"
+  }
+ ],
+ "radar": {
+  "2026-06-30|HH": {
+   "file": "bgd-flood-2026-07/radar_2026-06-30_HH.png",
+   "scale_db": [
+    -25.0,
+    0.0
+   ]
+  },
+  "2026-06-30|HV": {
+   "file": "bgd-flood-2026-07/radar_2026-06-30_HV.png",
+   "scale_db": [
+    -30.0,
+    -5.0
+   ]
+  },
+  "2026-07-12|HH": {
+   "file": "bgd-flood-2026-07/radar_2026-07-12_HH.png",
+   "scale_db": [
+    -25.0,
+    0.0
+   ]
+  },
+  "2026-07-12|HV": {
+   "file": "bgd-flood-2026-07/radar_2026-07-12_HV.png",
+   "scale_db": [
+    -30.0,
+    -5.0
+   ]
+  },
+  "2026-07-24|HH": {
+   "file": "bgd-flood-2026-07/radar_2026-07-24_HH.png",
+   "scale_db": [
+    -25.0,
+    0.0
+   ]
+  },
+  "2026-07-24|HV": {
+   "file": "bgd-flood-2026-07/radar_2026-07-24_HV.png",
+   "scale_db": [
+    -30.0,
+    -5.0
+   ]
+  }
+ },
+ "change": {
+  "2026-06-30|2026-07-12|HH": {
+   "file": "bgd-flood-2026-07/change_2026-07-12_minus_2026-06-30_HH.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  },
+  "2026-06-30|2026-07-12|HV": {
+   "file": "bgd-flood-2026-07/change_2026-07-12_minus_2026-06-30_HV.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  },
+  "2026-06-30|2026-07-24|HH": {
+   "file": "bgd-flood-2026-07/change_2026-07-24_minus_2026-06-30_HH.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  },
+  "2026-06-30|2026-07-24|HV": {
+   "file": "bgd-flood-2026-07/change_2026-07-24_minus_2026-06-30_HV.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  },
+  "2026-07-12|2026-07-24|HH": {
+   "file": "bgd-flood-2026-07/change_2026-07-24_minus_2026-07-12_HH.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  },
+  "2026-07-12|2026-07-24|HV": {
+   "file": "bgd-flood-2026-07/change_2026-07-24_minus_2026-07-12_HV.png",
+   "range_db": [
+    -6.0,
+    6.0
+   ],
+   "smoothing": "5×5 piksel (50 m) doğrusal güçte"
+  }
+ },
+ "support": [
+  {
+   "id": "nisar_candidate",
+   "period": [
+    "2026-06-30",
+    "2026-07-12"
+   ],
+   "title": "NISAR değişim adayı (tek kaynak)",
+   "description": "DENEYSEL: 5×5 piksel (50 m) doğrusal ortalama; ΔHH ≤ -3.0 dB ve 12 Tem HH ≤ -15.0 dB (HH eşikleri önceden sabitlendi, doğrulanmış su ayırımı değildir). HV karar için kullanılmıyor: gürültü katmanının birimi doğrulanamadı.",
+   "sources": [
+    "NISAR GCOV 2026-06-30 23:21 UTC → 2026-07-12 23:21 UTC; maske: mask ∉ {0,255}, inputDataExceptionMask = 0"
+   ],
+   "classes": {
+    "1": {
+     "label": "NISAR adayı (açık su ile uyumlu düşüş)",
+     "color": "#1e5eff99",
+     "short": "su adayı"
+    },
+    "0": {
+     "label": "Aday değil (geçerli)",
+     "color": "#00000000",
+     "show_in_legend": false,
+     "short": "Aday değil (geçerli)"
+    }
+   },
+   "title_short": "Deneysel su adayı (NISAR, tek kaynak)",
+   "meaning": "DENEYSEL: önceden sabitlenmiş HH eşikleriyle (ΔHH ≤ −3 dB, sonra HH ≤ −15 dB) açık suya benzeyebilecek düşüş. Eşikler doğrulanmış bir su ayırımı değildir; doğruluk ve yanlış pozitif oranı bilinmiyor. Tek kaynak.",
+   "file": "bgd-flood-2026-07/nisar_candidate.png"
+  },
+  {
+   "id": "landsat_support",
+   "period": [
+    "2026-06-30",
+    "2026-07-12"
+   ],
+   "title": "Landsat desteği (MNDWI)",
+   "description": "14 Tem 04:17 UTC (NISAR'dan ~29 saat sonra). Gri: bulut/pus/gölge — su yok demek değildir.",
+   "sources": [
+    "Landsat 9 2026-06-27T04:23 UTC, Landsat 8 2026-07-14T04:17 UTC (USGS C2 L2, Planetary Computer)"
+   ],
+   "classes": {
+    "1": {
+     "label": "Su 14 Tem; 27 Haz gözlendi ve su değildi (yeni)",
+     "color": "#d6336c",
+     "short": "yeni su"
+    },
+    "2": {
+     "label": "Su 14 Tem; 27 Haz gözlenemedi",
+     "color": "#f783ac",
+     "short": "su (27 Haz gözlenemedi)"
+    },
+    "3": {
+     "label": "Su 14 Tem ve 27 Haz (önceden su)",
+     "color": "#5f3dc4",
+     "short": "önceden de su"
+    },
+    "4": {
+     "label": "Su değil 14 Tem (gözlendi)",
+     "color": "#f1efe6b0",
+     "short": "su değil"
+    },
+    "255": {
+     "label": "Gözlenemedi (bulut, pus, gölge, 60 m tampon)",
+     "color": "#8a8a8aa0",
+     "short": "gözlenemedi"
+    }
+   },
+   "title_short": "Landsat desteği (optik, 14 Temmuz)",
+   "meaning": "Optik su indeksi (MNDWI), NISAR'dan ~29 saat sonra. Bulut/pus elemesi (QA + mavi < 0,05 + 60 m tampon) deneyseldir, doğrulanmış bir yöntem değildir; açık pikselleri de eleyebilir. Elenen alanlar gözlenemedi olarak gösterilir.",
+   "file": "bgd-flood-2026-07/landsat_support.png"
+  },
+  {
+   "id": "gfm_support",
+   "period": [
+    "2026-06-30",
+    "2026-07-12"
+   ],
+   "title": "GFM desteği (Copernicus, Sentinel-1)",
+   "description": "10 Tem 23:47 UTC (NISAR'dan 47,6 saat önce) ve 13 Tem 12:04 UTC (12,7 saat sonra) ayrı gösterilir.",
+   "sources": [
+    "GFM 2026-07-10T23:47 UTC (ENSEMBLE_FLOOD_20260710T234704_VV_AS020M_E039N021T3)",
+    "GFM 2026-07-13T12:04 UTC (ENSEMBLE_FLOOD_20260713T120408_VV_AS020M_E039N021T3)"
+   ],
+   "classes": {
+    "1": {
+     "label": "Sel: 10 Tem ve 13 Tem",
+     "color": "#0b7285",
+     "short": "sel: iki tarih"
+    },
+    "2": {
+     "label": "Sel: yalnız 10 Tem",
+     "color": "#3bc9db",
+     "short": "sel: 10 Tem"
+    },
+    "3": {
+     "label": "Sel: yalnız 13 Tem",
+     "color": "#99e9f2",
+     "short": "sel: 13 Tem"
+    },
+    "4": {
+     "label": "Sel değil (gözlenen tarihlerde)",
+     "color": "#f1efe6b0",
+     "short": "sel değil"
+    },
+    "5": {
+     "label": "GFM Temmuz referans suyu (kalıcı/mevsimsel)",
+     "color": "#5f3dc4",
+     "short": "referans su"
+    },
+    "255": {
+     "label": "Gözlenemedi / dışlanmış",
+     "color": "#8a8a8aa0",
+     "short": "gözlenemedi"
+    }
+   },
+   "title_short": "GFM desteği (Sentinel-1, 10 ve 13 Temmuz)",
+   "meaning": "Copernicus GFM sel ürünü (C-bant radar); 10 Tem NISAR'dan 47,6 saat önce, 13 Tem 12,7 saat sonra. Contains modified Copernicus Emergency Management Service information 2026.",
+   "file": "bgd-flood-2026-07/gfm_support.png"
+  },
+  {
+   "id": "multi_source",
+   "period": [
+    "2026-06-30",
+    "2026-07-12"
+   ],
+   "title": "Birden fazla kaynakla desteklenen aday",
+   "description": "NISAR adayı ∩ Landsat 14 Tem su (önceden su değil) ∩ GFM sel (10 veya 13 Tem). Dışında kalan yerler sel olmadığı anlamına gelmez.",
+   "sources": [
+    "NISAR + Landsat + GFM (GFM girdidir; doğrulama değildir)"
+   ],
+   "classes": {
+    "1": {
+     "label": "Birden fazla kaynakla desteklenen aday",
+     "color": "#0a0f3de6",
+     "short": "üç kaynağın kesişimi"
+    },
+    "0": {
+     "label": "Kesişim dışı (sel yok demek değil)",
+     "color": "#00000000",
+     "show_in_legend": false,
+     "short": "Kesişim dışı (sel yok demek değil)"
+    }
+   },
+   "title_short": "Birden fazla kaynakla desteklenen aday",
+   "meaning": "NISAR adayı, Landsat suyu ve GFM selinin kesişimi. Dışında kalan yerler için \"sel değil\" sonucu çıkarılamaz.",
+   "file": "bgd-flood-2026-07/multi_source.png"
+  }
+ ],
+ "regions": [
+  {
+   "id": "ne_change",
+   "label": "Kuzeydoğu değişim alanı",
+   "role": "inspection",
+   "corners_lonlat": [
+    [
+     91.43159,
+     24.38463
+    ],
+    [
+     91.43553,
+     24.38467
+    ],
+    [
+     91.43558,
+     24.38106
+    ],
+    [
+     91.43164,
+     24.38101
+    ]
+   ],
+   "status": null,
+   "note": null,
+   "short_label": "Kuzeydoğu inceleme alanı"
+  },
+  {
+   "id": "sw_change",
+   "label": "Güneybatı değişim alanı",
+   "role": "inspection",
+   "corners_lonlat": [
+    [
+     91.39413,
+     24.36924
+    ],
+    [
+     91.39807,
+     24.36929
+    ],
+    [
+     91.39811,
+     24.36567
+    ],
+    [
+     91.39417,
+     24.36563
+    ]
+   ],
+   "status": null,
+   "note": null,
+   "short_label": "Güneybatı inceleme alanı"
+  },
+  {
+   "id": "control",
+   "label": "Görece kararlı kontrol alanı",
+   "role": "control",
+   "corners_lonlat": [
+    [
+     91.39173,
+     24.39504
+    ],
+    [
+     91.39567,
+     24.39508
+    ],
+    [
+     91.39572,
+     24.39147
+    ],
+    [
+     91.39177,
+     24.39143
+    ]
+   ],
+   "status": "not_valid_as_control",
+   "note": "2026-11-06: kutunun batı kenarı tutarlı bir su parçası içeriyor (NISAR adayı %16, 24 Tem'de de gözlendi (yalnızca süreklilik gözlemi), GFM 8/10/13 Tem işaretli). Ortalama tabanlı seçim zıt değişimleri gizledi; yanlış pozitif kontrolü olarak kullanılamaz. Bkz. data/manifests/bgd-flood-2026-07.control-candidates.json",
+   "short_label": "Eski kontrol alanı (geçersiz)"
+  }
+ ],
+ "sources": [
+  {
+   "kind": "situation_report",
+   "publisher": "UN Bangladesh",
+   "url": "https://bangladesh.un.org/en/319868-bangladesh-situation-report-2-flash-flood-and-landslides-23-july-2026",
+   "verified": true,
+   "checked": "2026-11-02",
+   "findings": "23 Temmuz 2026 tarihli SitRep #2: 7 ilçede 1,28 milyon etkilenen, 59 ölüm (22 Temmuz itibarıyla). Sayfa metni Habiganj/Sylhet'i adlandırmıyor; ekli PDF'in metni çıkarılamadı."
+  },
+  {
+   "kind": "charter_activation",
+   "publisher": "International Charter Space and Major Disasters",
+   "activation_id": 1042,
+   "url": "https://upload.disasterscharter.org/activations/flood-in-bangladesh-activation-1042-",
+   "verified": true,
+   "checked": "2026-11-02",
+   "activation_date": "2026-07-13",
+   "findings": "Habiganj, Sylhet ve Moulvibazar'ın da etkilendiği belirtiliyor. 22 Temmuz 2026 tarihli UNOSAT ön sel kapsamı ürünü Habiganj'ı kapsıyor; sensör ve görüntü tarihi sayfada yok. Sel sularının Temmuz sonunda birçok yerde çekildiği belirtiliyor."
+  },
+  {
+   "publisher": "Copernicus EMS GFM",
+   "kind": "kullanım koşulları",
+   "url": "https://global-flood.emergency.copernicus.eu/terms-of-service/",
+   "note": "Contains modified Copernicus Emergency Management Service information 2026 (yeniden izdüşürüldü ve sınıflandırıldı). Bilgi amaçlıdır; erken uyarı değildir."
+  }
+ ],
+ "reference_maps": [
+  {
+   "producer": "UNOSAT / UNITAR (Charter 1042)",
+   "title": "Preliminary Satellite-derived Flood Impact Assessment, Flood Extent and associated statistics for Khagrachari, Rangamati, Bandarban, Cox's Bazar, Chattogram, Moulvibazar and Habiganj Districts of Bangladesh",
+   "publication_date": "2026-07-22",
+   "publication_date_source": "Charter 1042 etkinleştirme sayfasındaki ürün tarihi",
+   "map_heading": "Bangladesh Floods (5–18 July 2026): UNOSAT FloodAI Analysis Using Sentinel-1",
+   "sensor": "Sentinel-1 (haritanın başlığından ve lejandından; tek tek sahneler belirtilmemiş)",
+   "acquisition_date": null,
+   "acquisition_window": {
+    "start": "2026-07-05",
+    "end": "2026-07-18",
+    "note": "Lejand: 'Satellite detected water (5–18 July 2026)'. Bu, bir dönemin birleşik su kapsamı; tekil Sentinel-1 görüntü tarihleri, yörünge ve yön haritada yazmıyor."
+   },
+   "method": "UNOSAT FloodAI (otomatik)",
+   "coverage": {
+    "map_extent": "Bangladeş ülke geneli (ülke ölçeğinde harita)",
+    "habiganj_district": "kapsanıyor: başlıkta adı geçiyor; ilçe istatistiğinde Habiganj taşkın alanı 632 km²",
+    "habiganj_town_trial_aoi": "belirsiz: ülke ölçeğindeki harita 5 × 5 km'lik deneme alanında piksel düzeyinde okunamıyor"
+   },
+   "nisar_date_alignment": {
+    "2026-06-30": "pencereden önce",
+    "2026-07-12": "pencere içinde (5–18 Temmuz)",
+    "2026-07-24": "pencereden sonra",
+    "note": "Referans tek bir anlık görüntü değil, 14 günlük bir birleşim. 12 Temmuz NISAR gözlemi bu pencereye düşüyor, ama aynı anı göstermiyor."
+   },
+   "data_obtained": false,
+   "vector_data": "bulunamadı (Charter sayfasında indirme bağlantısı yok)",
+   "sources_read": [
+    "https://disasterscharter.org/activations/flood-in-bangladesh-activation-1042-",
+    "https://disasterscharter.org/cos-api/api/file/public/article-image/37518526 (ürünün 2. sayfa görseli)"
+   ],
+   "checked": "2026-11-02",
+   "unverified": [
+    "tekil Sentinel-1 görüntü tarihleri",
+    "Habiganj kenti çevresindeki piksel düzeyi kapsam",
+    "ürün sürüm numarası / analist bilgisi",
+    "vektör veri"
+   ]
+  },
+  {
+   "producer": "Copernicus EMS Global Flood Monitoring (GFM)",
+   "source": "https://stac.eodc.eu/api/v1 (collection GFM)",
+   "sensor": "Sentinel-1 VV, 20 m",
+   "acquisition_dates_used": [
+    "2026-06-28T23:47Z",
+    "2026-07-10T23:47Z",
+    "2026-07-13T12:04Z"
+   ],
+   "data_obtained": true,
+   "comparison": "data/manifests/bgd-flood-2026-07.gfm-compare.json",
+   "note": "Radar tabanlı; yer gerçeği değil. ToS otomatik okunamadı."
+  }
+ ],
+ "candidate_rule": "DENEYSEL: 5×5 piksel (50 m) doğrusal ortalama; ΔHH ≤ -3.0 dB ve 12 Tem HH ≤ -15.0 dB (HH eşikleri önceden sabitlendi, doğrulanmış su ayırımı değildir). HV karar için kullanılmıyor: gürültü katmanının birimi doğrulanamadı.",
+ "candidate_geometric_size": {
+  "pixel_true_area_m2": 100.016,
+  "trial_aoi_valid_km2": 25.004,
+  "nisar_candidate_km2": 2.451,
+  "multi_source_km2": 0.381,
+  "nisar_candidate_km2_range_over_sensitivity": [
+   1.013,
+   5.138
+  ],
+  "multi_source_km2_range_over_sensitivity": [
+   0.3,
+   0.388
+  ],
+  "naming": "Deneysel aday katmanının geometrik büyüklüğü — doğrulanmış sel alanı değildir; doğruluk/yanlış pozitif oranı bilinmiyor.",
+  "method": "10 m piksel sayısı × gerçek piksel alanı (UTM alan ölçek faktörü alan merkezinde)."
+ },
+ "candidate_sensitivity": {
+  "nisar_candidate_share": [
+   0.0405,
+   0.2055
+  ],
+  "multi_source_share": [
+   0.012,
+   0.0155
+  ],
+  "n_combinations": 48
+ },
+ "false_positive_rate": {
+  "value": "bilinmiyor",
+  "reason": "Ölçütü sağlayan 200 m kare yok (0 < 2); Landsat 14 Tem alanın yalnızca %3,4'ünde gözlendi ve su değil.",
+  "protocol": "docs/control-selection-protocol.md"
+ },
+ "uncertainty": [
+  "Radar görüntüleri 3 ayrık gözlemdir; aralarındaki geçiş gerçek zamanlı sel ilerlemesi değildir.",
+  "Geri saçılım azalması açık su ile uyumludur ama tek başına sel kanıtı değildir (ıslak toprak, tarla suyu, hasat).",
+  "Bitki örtüsü altındaki su açık su yöntemiyle yakalanmaz.",
+  "NISAR verisi PROVISIONAL sürümdür; gürültü düzeltmesi uygulanmamış.",
+  "HV gürültü tabanı: ürünün gürültü katmanı DN² biriminde ve normalizasyonu belirtilmemiş; ölçülen γ⁰ ile aynı birimde olduğu doğrulanamadığı için HV maskesi uygulanmadı. Düşük HV değerlerinin gürültüden ne kadar etkilendiği bilinmiyor.",
+  "Gözlenemeyen (bulut, veri yok, dışlanmış) alanlar 'su yok' anlamına gelmez.",
+  "Aday katmanları sel sınırı veya sel alanı değildir; sel derinliği üretilmedi.",
+  "Aday eşikleri deneyseldir ve doğrulanmış su ayırımı değildir; doğruluk oranı bilinmiyor. 48 eşik bileşiminde aday payı %4.0–%20.5, çoklu kaynak payı %1.2–%1.6 arasında değişiyor.",
+  "NISAR adayının yanlış pozitif oranı bilinmiyor: önceden kayıtlı kontrol protokolü, bağımsız görüntülerde yeterli geçerli gözlem olmadığı için uygun kontrol alanı bulamadı.",
+  "Sonuçlar yalnızca 5 × 5 km deneme alanı içindir; alan dışına genellenemez."
+ ]
+}

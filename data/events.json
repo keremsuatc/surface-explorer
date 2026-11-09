@@ -1,0 +1,22 @@
+{
+ "events": [
+  {
+   "id": "bgd-flood-2026-07",
+   "title": "Bangladeş — Temmuz 2026 ani sel ve heyelanları",
+   "area_name": "Habiganj çevresi (Sylhet bölümü)",
+   "maturity": "PROVISIONAL",
+   "hazard": "flood",
+   "priority": 1,
+   "layers": "bgd-flood-2026-07/layers.json"
+  },
+  {
+   "id": "moz-flood-2026-01",
+   "title": "Mozambik — Ocak 2026 selleri",
+   "area_name": "Chokwe / Limpopo nehri",
+   "maturity": "BETA",
+   "hazard": "flood",
+   "priority": 2,
+   "layers": "moz-flood-2026-01/layers.json"
+  }
+ ]
+}

@@ -1,0 +1,443 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "lang": "en",
+ "generated_from": "pipeline/export/build_text_en.py (display text only; numbers from existing outputs; no new analysis)",
+ "event": {
+  "title": "Bangladesh — July 2026 flash floods and landslides",
+  "area_name": "Around Habiganj (Sylhet Division)",
+  "place": "Bangladesh · Habiganj",
+  "lede": "Flash floods and landslides; a 5 × 5 km study area around Habiganj.",
+  "facts": [
+   "3 NISAR observations: 30 June, 12 July, 24 July 2026",
+   "Radar, change, experimental water candidate, Landsat and GFM support"
+  ],
+  "dates": "30 Jun – 24 Jul 2026 · 3 observations",
+  "thumb": "bgd-flood-2026-07/radar_2026-07-12_HH.png",
+  "thumb_alt": "This project's NISAR HH radar preview, 12 July 2026"
+ },
+ "maturity": {
+  "label": "PROVISIONAL",
+  "text": "PROVISIONAL is the maturity label NASA gives this product; it is not a final, validated release. From the product metadata: product specification 1.5.0; RFI mitigation tone-rank; full frame; no noise correction applied (noiseCorrectionApplied = False)."
+ },
+ "steps": [
+  {
+   "id": "find",
+   "title": "Find the place",
+   "lead": "The dashed box is around Habiganj, a town in Bangladesh. Floods hit this region in July 2026.",
+   "view": {
+    "pair": [
+     "2026-06-30",
+     "2026-07-12"
+    ],
+    "pol": "HH",
+    "swipe": 1,
+    "layers": []
+   },
+   "body": [
+    "First NISAR image (30 June 2026); not assumed to be dry or pre-flood. The numbered points are the inspection areas.",
+    "Grey tones are the radar signal returned from the surface: dark means low backscatter (smooth surfaces; can be open water), bright means high backscatter (vegetation, buildings).",
+    "Dark areas in this image can also be wet soil or smooth, flat fields, so this date is not labelled “dry”."
+   ],
+   "notes": [
+    "Water under vegetation is not captured by this open-water approach."
+   ],
+   "sources": [
+    "web/data/bgd-flood-2026-07/layers.json (dates, radar)",
+    "data/manifests/bgd-flood-2026-07.inspection-regions.json"
+   ],
+   "offer": [],
+   "show_me": [],
+   "focus": false
+  },
+  {
+   "id": "dates",
+   "title": "Look at two dates",
+   "lead": "This satellite picture uses radar signals. It is not a normal photo.",
+   "view": {
+    "pair": [
+     "2026-06-30",
+     "2026-07-12"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [],
+    "mode": "compare"
+   },
+   "body": [
+    "First NISAR image (30 June 2026); not assumed to be dry or pre-flood. The numbered points are the inspection areas.",
+    "Grey tones are the radar signal returned from the surface: dark means low backscatter (smooth surfaces; can be open water), bright means high backscatter (vegetation, buildings).",
+    "Dark areas in this image can also be wet soil or smooth, flat fields, so this date is not labelled “dry”.",
+    "The radar signal decreased in the northeast inspection area."
+   ],
+   "notes": [
+    "Water under vegetation is not captured by this open-water approach."
+   ],
+   "sources": [
+    "web/data/bgd-flood-2026-07/layers.json (dates, radar)",
+    "data/manifests/bgd-flood-2026-07.inspection-regions.json"
+   ],
+   "offer": [],
+   "show_me": [],
+   "focus": false,
+   "action": "Slide to compare.",
+   "dates_line": "Left: 30 June 2026 · Right: 12 July 2026",
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 30 June, right 12 July (grey radar, HH)."
+   }
+  },
+  {
+   "id": "change",
+   "title": "Spot the change",
+   "lead": "Blue means the radar signal became weaker. The biggest change is in box 1, in the top-right part.",
+   "view": {
+    "pair": [
+     "2026-06-30",
+     "2026-07-12"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "change"
+    ],
+    "mode": "change"
+   },
+   "body": [
+    "The radar signal decreased in the northeast inspection area.",
+    "8.9 dB decrease — Consistent with open water; not proof of flooding.",
+    "In “Compare radar” (under “Explore the data”), the divider compares the grey images: left 30 June, right 12 July. In the northeast inspection area the mean HH went from −9.0 dB to −17.9 dB (difference −8.9 dB). This strong drop is consistent with open water appearing.",
+    "In the southwest inspection area the drop is weaker (difference −4.3 dB) and its cause is uncertain: partial water, wet soil or field work are all possible.",
+    "On 24 July the northeast area's mean was −14.1 dB. This is only a continuity observation; what happened in between is unknown.",
+    "The inspection areas were chosen where the change was strongest; they are not an unbiased sample."
+   ],
+   "notes": [
+    "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+    "The radar images are 3 separate observations; switching between them is not a real-time view of flood progression."
+   ],
+   "sources": [
+    "data/manifests/bgd-flood-2026-07.inspection-regions.json",
+    "docs/bgd-inspection-regions.md"
+   ],
+   "offer": [
+    "change",
+    "regions"
+   ],
+   "show_me": [
+    "ne_change"
+   ],
+   "focus": true,
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 30 June, right 12 July (grey radar, HH)."
+   }
+  },
+  {
+   "id": "meaning",
+   "title": "What could it mean?",
+   "lead": "Water can make the radar signal weaker. But this change alone does not prove a flood.",
+   "view": {
+    "pair": [
+     "2026-06-30",
+     "2026-07-12"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "change"
+    ],
+    "mode": "change"
+   },
+   "body": [
+    "8.9 dB decrease — Consistent with open water; not proof of flooding.",
+    "In “Compare radar” (under “Explore the data”), the divider compares the grey images: left 30 June, right 12 July. In the northeast inspection area the mean HH went from −9.0 dB to −17.9 dB (difference −8.9 dB). This strong drop is consistent with open water appearing.",
+    "In the southwest inspection area the drop is weaker (difference −4.3 dB) and its cause is uncertain: partial water, wet soil or field work are all possible.",
+    "On 24 July the northeast area's mean was −14.1 dB. This is only a continuity observation; what happened in between is unknown.",
+    "The inspection areas were chosen where the change was strongest; they are not an unbiased sample."
+   ],
+   "notes": [
+    "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+    "The radar images are 3 separate observations; switching between them is not a real-time view of flood progression."
+   ],
+   "sources": [
+    "data/manifests/bgd-flood-2026-07.inspection-regions.json",
+    "docs/bgd-inspection-regions.md"
+   ],
+   "offer": [
+    "change",
+    "regions"
+   ],
+   "show_me": [],
+   "focus": false,
+   "mode_hints": {
+    "change": "Blue: decrease · red: increase. Computed difference, not a flood boundary.",
+    "compare": "Drag the divider: left 30 June, right 12 July (grey radar, HH)."
+   }
+  },
+  {
+   "id": "more",
+   "title": "What else do we know?",
+   "lead": "Two other satellites also saw signs of water in the top-right part, on nearby days. The blue patches show possible water — not confirmed flooding.",
+   "view": {
+    "pair": [
+     "2026-06-30",
+     "2026-07-12"
+    ],
+    "pol": "HH",
+    "swipe": 0.5,
+    "layers": [
+     "nisar_candidate"
+    ]
+   },
+   "body": [
+    "Experimental water candidate; not a validated flood boundary. It is derived from the change between the 30 June and 12 July NISAR observations; it is not an independent water map of either date.",
+    "Landsat and Copernicus GFM also show water signals in the northeast. The blue candidate is experimental; its accuracy is unknown.",
+    "Three sources point the same way in the northeast inspection area:",
+    "• NISAR (L-band radar): mean HH changed by −8.9 dB between 30 June and 12 July.",
+    "• Landsat (optical): share with a water signal (MNDWI > 0) was 8% on 27 June and 100% on 14 July (about 29 hours after NISAR).",
+    "• Copernicus GFM (Sentinel-1): flood share was 0% on 21 June and 85% on 10 July.",
+    "• Disagreement: in the GFM observation closest to NISAR (13 July) the flood share was only 11%; this is unresolved.",
+    "At field scale: in 162 pixels (30 m) seen clearly on both Landsat dates and not water before, 100% of the new optical water matched a radar drop, and 85% of the radar drop matched optical water. The sample is small and depends on an experimental haze screen.",
+    "Experimental NISAR water candidate (semi-transparent blue): 9.8% of the study area, geometric size 2.45 km² (1.01–5.14 km² depending on the thresholds). Candidate supported by more than one source: 0.38 km². These are not validated flood areas.",
+    "False-positive rate: unknown. GFM and Landsat are inputs to the intersection layer, so agreeing with them is not an accuracy measure."
+   ],
+   "notes": [
+    "The candidate thresholds are experimental and not a validated water separation; accuracy is unknown. Across 48 threshold combinations the candidate share ranges 4.0%–20.5% and the multi-source share 1.2%–1.6%.",
+    "Places outside the intersection do not mean “not flooded”."
+   ],
+   "sources": [
+    "data/manifests/bgd-flood-2026-07.optical-check.json",
+    "data/manifests/bgd-flood-2026-07.gfm-compare.json",
+    "data/manifests/bgd-flood-2026-07.field-scale-compare.json",
+    "data/manifests/bgd-flood-2026-07.candidates.json"
+   ],
+   "offer": [
+    "nisar_candidate",
+    "landsat_support",
+    "gfm_support",
+    "multi_source"
+   ],
+   "show_me": [
+    "ne_change"
+   ],
+   "focus": true,
+   "summary": {
+    "found": [
+     "The radar signal became much weaker in box 1, between 30 June and 12 July.",
+     "Landsat (a satellite that takes normal photos) saw water there on 14 July.",
+     "GFM (a flood map from another radar satellite) marked flooding there on 10 July."
+    ],
+    "unknown": [
+     "The GFM map from 13 July shows little flooding in box 1. We do not know why.",
+     "Whether the possible water is flood water or water in fields.",
+     "How often the possible-water map is wrong.",
+     "Many places we could not check, because clouds and haze hid them from Landsat."
+    ]
+   }
+  }
+ ],
+ "not_this": [
+  "It is not a flood boundary or a validated flood area.",
+  "No flood depth was produced.",
+  "Areas that could not be observed (cloud, no data, excluded) do not mean “no water”.",
+  "Moving between separate observations is not a real-time view of the flood."
+ ],
+ "simple": {
+  "title": "Possible water",
+  "lines": [
+   "Estimated from satellite changes between 30 June and 12 July 2026.",
+   "Flooding is not confirmed."
+  ],
+  "small": "Where there is no blue, we cannot say the land was dry. Some places could not be checked.",
+  "layers": [
+   "nisar_candidate"
+  ],
+  "toggle": {
+   "layer": "nisar_candidate",
+   "show": "Show possible water",
+   "hide": "Hide possible water"
+  },
+  "legend": "Possible water",
+  "focus": [
+   {
+    "region": "ne_change",
+    "label": "Look closer: top-right area",
+    "note": "Area to inspect (where the radar change was strongest)"
+   }
+  ],
+  "evidence": [
+   {
+    "label": "Explore the evidence",
+    "step": 0
+   }
+  ]
+ },
+ "layers": {
+  "nisar_candidate": {
+   "title": "Experimental water candidate (NISAR, single source)",
+   "dates": "Derived from the NISAR 30 Jun → 12 Jul 2026 pair (HH)",
+   "meaning": "EXPERIMENTAL: a drop that may resemble open water, using HH thresholds fixed in advance (ΔHH ≤ −3 dB, then HH ≤ −15 dB). The thresholds are not a validated water separation; accuracy and false-positive rate are unknown. Single source.",
+   "sources": [
+    "NISAR GCOV 2026-06-30 23:21 UTC → 2026-07-12 23:21 UTC; mask: mask ∉ {0,255}, inputDataExceptionMask = 0"
+   ],
+   "classes": {
+    "1": {
+     "label": "NISAR candidate (drop consistent with open water)",
+     "short": "water candidate"
+    }
+   },
+   "plain": "Possible water — not confirmed flooding",
+   "plain_detail": "Possible water detected from changes between 30 June and 12 July"
+  },
+  "landsat_support": {
+   "title": "Landsat support (optical, 27 Jun / 14 Jul)",
+   "independent": true,
+   "dates": "Landsat 9 · 27 Jun 04:23 UTC and Landsat 8 · 14 Jul 04:17 UTC",
+   "coverage": "Observed: 13.6% of the study area on 27 Jun, 5.8% on 14 Jul. Everything else is not observed (unknown).",
+   "meaning": "Classes describe 14 Jul; 27 Jun is used only to tell new from existing water. Water = optical water index MNDWI > 0. The cloud/haze screen (QA + blue < 0.05 + 60 m buffer) is experimental, not a validated method, and can also remove clear pixels; screened pixels are shown as not observed. USGS Collection 2 Level-2.",
+   "sources": [
+    "Landsat 9 2026-06-27T04:23 UTC (LC09_L2SP_137043_20260627_02_T1), Landsat 8 2026-07-14T04:17 UTC (LC08_L2SP_136043_20260714_02_T1) — USGS C2 L2, Planetary Computer"
+   ],
+   "classes": {
+    "1": {
+     "label": "Water on 14 Jul; observed and not water on 27 Jun (new water)",
+     "short": "new water (27 Jun dry)"
+    },
+    "2": {
+     "label": "Water on 14 Jul; 27 Jun not observed, so it is not known whether it is new",
+     "short": "water, 27 Jun not observed"
+    },
+    "3": {
+     "label": "Water on 14 Jul and already water on 27 Jun (not new)",
+     "short": "water on both dates"
+    },
+    "4": {
+     "label": "Observed on 14 Jul and not water",
+     "short": "not water (observed 14 Jul)"
+    },
+    "255": {
+     "label": "Not observed on 14 Jul (cloud, haze, shadow or 60 m buffer): unknown, not “no water”",
+     "short": "not observed (unknown)"
+    }
+   },
+   "plain": "Water seen by Landsat"
+  },
+  "gfm_support": {
+   "title": "GFM support (Sentinel-1, 10 / 13 Jul)",
+   "independent": true,
+   "dates": "Copernicus GFM · 10 Jul 23:47 UTC and 13 Jul 12:04 UTC",
+   "coverage": "Observable: 71.2% of the study area on 10 Jul, 71.2% on 13 Jul (the rest is excluded or has no data: unknown).",
+   "meaning": "Copernicus GFM flood product (Sentinel-1 C-band radar). “Reference water” is a separate class: permanent or seasonal water for the month, which GFM by definition does not count as flood. Contains modified Copernicus Emergency Management Service information 2026.",
+   "sources": [
+    "GFM 2026-07-10T23:47 UTC (ENSEMBLE_FLOOD_20260710T234704_VV_AS020M_E039N021T3)",
+    "GFM 2026-07-13T12:04 UTC (ENSEMBLE_FLOOD_20260713T120408_VV_AS020M_E039N021T3)"
+   ],
+   "classes": {
+    "1": {
+     "label": "Flood on 10 Jul and on 13 Jul",
+     "short": "flood: both dates"
+    },
+    "2": {
+     "label": "Flood on 10 Jul only (13 Jul: no flood or not observed)",
+     "short": "flood: 10 Jul"
+    },
+    "3": {
+     "label": "Flood on 13 Jul only (10 Jul: no flood or not observed)",
+     "short": "flood: 13 Jul"
+    },
+    "4": {
+     "label": "No flood detected where observed (observed on at least one date; the other may be unobserved)",
+     "short": "no flood detected (where observed)"
+    },
+    "5": {
+     "label": "GFM reference water (permanent or seasonal for the month; not counted as flood)",
+     "short": "reference water"
+    },
+    "255": {
+     "label": "Not observed or excluded on both dates: unknown, not “no flood”",
+     "short": "not observed (unknown)"
+    }
+   },
+   "plain": "Flood map from another radar satellite (GFM)"
+  },
+  "multi_source": {
+   "title": "Candidate supported by more than one source",
+   "dates": "NISAR 30 Jun → 12 Jul candidate ∩ Landsat 14 Jul water ∩ GFM 10/13 Jul flood",
+   "meaning": "Intersection of the NISAR candidate, Landsat water and GFM flood. No “not flooded” conclusion can be drawn for places outside it.",
+   "sources": [
+    "NISAR + Landsat + GFM (GFM is an input; this is not validation)"
+   ],
+   "classes": {
+    "1": {
+     "label": "Candidate supported by more than one source",
+     "short": "three-source intersection"
+    }
+   },
+   "plain": "Possible water also seen by Landsat and GFM",
+   "plain_detail": "Where the possible water, Landsat water (14 Jul) and the GFM flood map (10/13 Jul) all overlap"
+  }
+ },
+ "regions": {
+  "ne_change": {
+   "label": "Northeast inspection area",
+   "plain": "Box 1 (top-right part)",
+   "first_hh": "Mean HH on 30 June: −9.0 dB."
+  },
+  "sw_change": {
+   "label": "Southwest inspection area",
+   "plain": "Box 2 (bottom-left part)",
+   "first_hh": "Mean HH on 30 June: −8.9 dB."
+  },
+  "control": {
+   "label": "Old control area (invalid)",
+   "note": "2026-11-06: the west edge of this box contains a consistent patch of water (NISAR candidate 16%, also seen on 24 Jul as a continuity observation only; GFM flagged on 8/10/13 Jul). Mean-based selection hid opposite changes, so it cannot be used as a false-positive control."
+  }
+ },
+ "sources": [
+  {
+   "kind": "situation report",
+   "note": "",
+   "findings": "SitRep #2 dated 23 July 2026: 1.28 million people affected in 7 districts, 59 deaths (as of 22 July). The page text does not name Habiganj/Sylhet; the attached PDF text could not be extracted."
+  },
+  {
+   "kind": "Charter activation",
+   "note": "",
+   "findings": "States that Habiganj, Sylhet and Moulvibazar were also affected. A UNOSAT preliminary flood extent product dated 22 July 2026 covers Habiganj; sensor and image date are not on the page."
+  },
+  {
+   "kind": "terms of use",
+   "note": "Contains modified Copernicus Emergency Management Service information 2026 (reprojected and reclassified). For information only; not an early warning.",
+   "findings": ""
+  }
+ ],
+ "reference_maps": [
+  {
+   "producer": "UNOSAT / UNITAR (Charter 1042)",
+   "when": "Sentinel-1, combined 5–18 July 2026; published 22 July 2026",
+   "note": "A 14-day composite, not a single snapshot; individual Sentinel-1 dates are not given. A country-scale map that cannot be read at pixel level in the 5 × 5 km study area. Not used as validation."
+  },
+  {
+   "producer": "Copernicus EMS Global Flood Monitoring (GFM)",
+   "when": "Sentinel-1 VV, 20 m",
+   "note": "Radar-based; not ground truth."
+  }
+ ],
+ "uncertainty": [
+  "The radar images are 3 separate observations; switching between them is not a real-time view of flood progression.",
+  "A drop in backscatter is consistent with open water but is not, on its own, evidence of flooding (wet soil, flooded fields, harvest).",
+  "Water under vegetation is not captured by this open-water approach.",
+  "NISAR data are a PROVISIONAL release; no noise correction was applied.",
+  "HV noise floor: the product's noise layer is given in DN² with an unspecified normalisation. Because it could not be confirmed to be in the same unit as the measured γ⁰, no HV mask was applied. How much low HV values are affected by noise is unknown.",
+  "Areas that could not be observed (cloud, no data, excluded) do not mean “no water”.",
+  "Candidate layers are not a flood boundary or flood area; no flood depth was produced.",
+  "The candidate thresholds are experimental and not a validated water separation; accuracy is unknown. Across 48 threshold combinations the candidate share ranges 4.0%–20.5% and the multi-source share 1.2%–1.6%.",
+  "The NISAR candidate's false-positive rate is unknown: the pre-registered control protocol found no suitable control area because the independent images had too few valid observations.",
+  "Results apply only to the 5 × 5 km study area and cannot be generalised beyond it."
+ ],
+ "projection_note": "Layers reprojected from EPSG:32646 (10 m) to EPSG:3857, bilinear for continuous layers and nearest neighbour for classes.",
+ "smoothing": "5×5 pixels (50 m) in linear power",
+ "candidate_rule": "EXPERIMENTAL: 5×5 pixel (50 m) linear mean; ΔHH ≤ −3.0 dB and 12 Jul HH ≤ −15.0 dB (HH thresholds fixed in advance; not a validated water separation). HV is not used in the decision: the unit of the noise layer could not be verified.",
+ "fpr": {
+  "value": "unknown",
+  "reason": "No 200 m tile met the criteria (0 < 2); Landsat on 14 Jul observed only 3.4% of the area as clear and not water."
+ }
+}
