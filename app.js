@@ -309,11 +309,21 @@
       b.addEventListener("click", () => {
         setCardsOpen(false);
         // another event: camera transition through the globe (intro.js); same event: nothing to do
-        if (!meta || meta.event_id !== e.id) (window.NFEIntro && window.NFEIntro.travel ? window.NFEIntro.travel(e.id) : loadEvent(e.id));
+        if (!meta || meta.event_id !== e.id) {
+          // new history entry, so the browser's Back button returns to the previous event (handled by the hashchange listener)
+          if (eventInHash() !== e.id) history.pushState(null, "", `#event=${e.id}&view=${state.view}`);
+          switchEvent(e.id);
+        }
         $("step-panel").focus({ preventScroll: true });
       });
       box.appendChild(b);
     }
+  }
+  let requestedId = null; // last event asked for (set when loading starts; meta is null until it has loaded)
+  function eventInHash() { return (location.hash.match(/(?:event|olay)=([\w-]+)/) || [])[1]; }
+  // Same path for "Change event", a changed address and Back/Forward: the start-screen camera transition when available
+  function switchEvent(id) {
+    return window.NFEIntro && window.NFEIntro.travel ? window.NFEIntro.travel(id) : loadEvent(id);
   }
   function setCardsOpen(open) {
     $("event-cards").hidden = !open;
@@ -326,6 +336,7 @@
   // opts.move === false: the caller (start-screen camera transition) moves the map itself
   async function loadEvent(id, opts = {}) {
     const entry = index.events.find((e) => e.id === id) || index.events[0];
+    requestedId = entry.id;
     const seq = ++loadSeq;
     const t = texts[entry.id];
     clearEventLayers();
@@ -1239,4 +1250,24 @@
   // Direct links (#event=… or the older #olay=…) open the analysis as before; otherwise the start screen is shown
   if (fromHash || !intro) await loadEvent(fromHash || index.events[0].id);
   else intro.show();
+
+  // The address changed in the same tab (a pasted/clicked #event=… link, or Back/Forward): show that event and view.
+  // The app's own address updates use replaceState/pushState, which do not fire hashchange.
+  window.addEventListener("hashchange", () => {
+    const id = eventInHash();
+    const v = (location.hash.match(/view=(satellite|analysis)/) || [])[1];
+    const introOpen = intro && !$("intro").hidden;
+    if (!id) { // address without an event: the start screen (as after "Back to globe")
+      if (intro && !introOpen) intro.show();
+      return;
+    }
+    if (!index.events.some((e) => e.id === id)) return; // unknown event id: keep what is shown
+    if (id !== requestedId || introOpen) { // requestedId: also covers an event that is still loading
+      if (v) state.view = v; // the new event opens in the requested view
+      setCardsOpen(false);
+      switchEvent(id);
+    } else if (v && v !== state.view) {
+      setView(v);
+    }
+  });
 })();
