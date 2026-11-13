@@ -1,0 +1,92 @@
+{
+ "event_id": "moz-flood-2026-01",
+ "bounds_latlon": [
+  [
+   -24.611729966989778,
+   32.94092343913174
+  ],
+  [
+   -24.439859371097906,
+   33.09803878232424
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "checked": "Sentinel-2 scenes 9–22 Jan 2026 are mostly cloudy; 7 Jan and 27 Jan are clear inside the study area",
+ "esri_wayback": "Esri Wayback releases 2024-06-06 … 2026-10-29: captures 18 Jul 2023 (WV02) and 5 Jan 2025 (LG02) only — before the flood",
+ "change": "On 27 Jan brown floodwater covers wide parts of the Limpopo floodplain on both banks, and dark water stands in the fields south of the town. On 7 Jan the river was in its channel.",
+ "after_timing": "during the flood, 17 days after the event start given by Copernicus EMS",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 1591,
+  "height": 1913,
+  "ground_m_per_px": [
+   10.0,
+   10.0
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "pair": [
+  {
+   "side": "before",
+   "label": "2026-01-07",
+   "datetime_utc": "2026-01-07T08:06:55.706000Z",
+   "scene": "S2B_36JVT_20260107_0_L2A",
+   "tile": "MGRS-36JVT",
+   "platform": "sentinel-2b",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 0.043981,
+   "inside_study_area": {
+    "clear_share": 0.9914,
+    "cloud_share": 0.0086,
+    "water_share_scl": 0.0667,
+    "pixels": 339254
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+   "source_window_px": [
+    1593,
+    1903
+   ],
+   "file": "moz-flood-2026-01/optical_2026-01-07.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_36JVT_20260107_0_L2A",
+   "edge_filled_from_same_acquisition": [
+    {
+     "scene": "S2B_36JWT_20260107_0_L2A",
+     "pixels": 32706
+    }
+   ]
+  },
+  {
+   "side": "after",
+   "label": "2026-01-27",
+   "datetime_utc": "2026-01-27T08:06:53.415000Z",
+   "scene": "S2B_36JVT_20260127_0_L2A",
+   "tile": "MGRS-36JVT",
+   "platform": "sentinel-2b",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 32.101211,
+   "inside_study_area": {
+    "clear_share": 0.974,
+    "cloud_share": 0.026,
+    "water_share_scl": 0.3028,
+    "pixels": 339254
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+   "source_window_px": [
+    1593,
+    1903
+   ],
+   "file": "moz-flood-2026-01/optical_2026-01-27.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_36JVT_20260127_0_L2A",
+   "edge_filled_from_same_acquisition": [
+    {
+     "scene": "S2B_36JWT_20260127_0_L2A",
+     "pixels": 32706
+    }
+   ]
+  }
+ ]
+}

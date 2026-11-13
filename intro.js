@@ -2,6 +2,8 @@
 // The globe is only for choosing an event; the Leaflet analysis map is not touched here.
 // Event names, dates, descriptions and product status come from web/data (events.json, <event>/text.en.json, <event>/layers.json).
 (function () {
+  const I = window.I18N;
+  const t = (k, v) => I.t(k, v);
   const LIB = "https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.6.0/";
   // NASA Blue Marble Shaded Relief and Bathymetry (MODIS) via NASA GIBS, EPSG:3857, max level 8
   const TILES = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg";
@@ -16,7 +18,10 @@
   let selected = null;
   let globe = null;        // the single MapLibre map (created once, reused)
   let libPromise = null;   // the library is requested once
-  let globeState = "idle"; // idle | loading | ready | failed
+  let globeState = "idle"; // idle | loading | ready | failed  ("ready" = map created; its style and imagery may still be loading)
+  let travelling = false;  // a start-screen → analysis or event → event transition owns the globe camera
+  const SELECT_Z = 3.2;    // globe zoom when an event is chosen on the start screen
+  let globeImagery = "pending"; // pending | ok | failed: first Blue Marble tiles shown (needed for a visible flight)
   const markers = {};
 
   function webglAvailable() {
@@ -54,8 +59,10 @@
     $("globe-hint").hidden = true;
     const box = $("globe-fallback");
     box.hidden = false;
-    box.textContent = `The 3D globe is not available here (${reason}). Use the list to choose an event.`;
+    failReason = reason;
+    box.textContent = t("The 3D globe is not available here ({reason}). Use the list to choose an event.", { reason: t(reason) });
   }
+  let failReason = null;
 
   // Diameter of the globe on screen, from the projected limb along the equator through the current centre
   function globeDiameter() {
@@ -88,7 +95,7 @@
     $("globe-fallback").hidden = true;
     $("globe").hidden = false;
     let ml;
-    try { ml = await loadLibrary(); } catch (e) { return globeFailed(`the globe library ${e.message}`); }
+    try { ml = await loadLibrary(); } catch (e) { return globeFailed("the globe library could not be loaded"); }
     // Start size: the globe fills about 90 % of the shorter side of its box.
     // Start size: the globe fills about 90 % of the shorter side of its box. The on-screen size of a MapLibre globe is not a simple
     // function of zoom, so the zoom is found by measuring the projected edge of the globe (fitGlobe, after the style has loaded).
@@ -114,13 +121,26 @@
     } catch (e) { return globeFailed("the globe could not start"); }
     window.nfeGlobe = globe; // for debugging (like window.nisarMap)
     globe.addControl(new ml.NavigationControl({ showCompass: false }), "top-right");
+    // Movement hint, shown once the globe exists. With cooperative gestures (phones) one finger scrolls the page and only
+    // two fingers turn the globe, so the hint says exactly that instead of "Drag to rotate".
+    const coop = !!(globe.cooperativeGestures && globe.cooperativeGestures.isEnabled());
+    globeHint = () => {
+      $("globe-hint").textContent = coop ? t("Use two fingers to turn the globe.") : t("Drag to rotate · Select a marker");
+      // v66: MapLibre's own two-finger / Ctrl+scroll messages, in the chosen language (they are English by default)
+      const box = globe.getContainer();
+      const mob = box.querySelector(".maplibregl-mobile-message"), desk = box.querySelector(".maplibregl-desktop-message");
+      if (mob) mob.textContent = t("Use two fingers to move the map");
+      if (desk) desk.textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? t("Use ⌘ + scroll to zoom the map") : t("Use Ctrl + scroll to zoom the map");
+    };
+    globeHint();
+    $("globe-hint").hidden = false;
 
     // Loading message: removed only when imagery tiles have really loaded, or replaced by an error message
     const t0 = performance.now();
     let tilesOk = 0, tilesErr = 0, loadDone = false;
     window.nfeGlobeTiming = { started: Math.round(t0) };
     $("globe-loading").hidden = false;
-    $("globe-loading").textContent = "Loading the globe…";
+    $("globe-loading").textContent = t("Loading the globe…");
     globe.on("sourcedata", (e) => {
       if (e.sourceId === "bluemarble" && e.tile && !tilesOk++) window.nfeGlobeTiming.firstTileMs = Math.round(performance.now() - t0);
     });
@@ -132,23 +152,37 @@
       if (loadDone) return;
       if (tilesOk > 0) {
         loadDone = true;
+        globeImagery = "ok";
         window.nfeGlobeTiming.loadedMs = Math.round(performance.now() - t0);
         $("globe-loading").hidden = true;
       } else if (tilesErr > 0) {
         loadDone = true;
+        globeImagery = "failed";
         window.nfeGlobeTiming.failedMs = Math.round(performance.now() - t0);
-        $("globe-loading").textContent = "The globe imagery could not be loaded. The markers and the event list still work.";
+        $("globe-loading").textContent = t("The globe imagery could not be loaded. The markers and the event list still work.");
       }
     };
     globe.on("idle", onIdle);
-    globe.getCanvas().setAttribute("aria-label", "Globe. Drag to turn it, use the + and − buttons or the arrow keys to move. The event list next to it does the same.");
+    globeAria = () => {
+      globe.getCanvas().setAttribute("aria-label", t("Globe. Drag to turn it, use the + and − buttons or the arrow keys to move. The event list next to it does the same."));
+      for (const [sel, k] of [[".maplibregl-ctrl-zoom-in", "Zoom in"], [".maplibregl-ctrl-zoom-out", "Zoom out"]]) {
+        const b = globe.getContainer().querySelector(sel);
+        if (b) { b.title = t(k); b.setAttribute("aria-label", t(k)); }
+      }
+      for (const it of items) if (markers[it.id]) {
+        const el = markers[it.id].getElement();
+        el.setAttribute("aria-label", t("{place}: open this event", { place: it.text.event.place }));
+        el.querySelector(".gm-label").textContent = it.text.event.place;
+      }
+    };
+    globeAria();
 
     // Markers: the element is only the dot, centred exactly on the study-area centre; the label sits beside it (CSS)
     for (const it of items) {
       const el = document.createElement("button");
       el.type = "button";
       el.className = "globe-marker";
-      el.setAttribute("aria-label", `${it.text.event.place}: show event details`);
+      el.setAttribute("aria-label", t("{place}: open this event", { place: it.text.event.place }));
       el.innerHTML = `<span class="gm-label" aria-hidden="true">${esc(it.text.event.place)}</span>`;
       el.addEventListener("click", (ev) => { ev.stopPropagation(); select(it.id, { from: "marker" }); });
       markers[it.id] = new ml.Marker({ element: el, anchor: "center", opacityWhenCovered: "0" }).setLngLat(it.center).addTo(globe);
@@ -175,9 +209,18 @@
     };
     globe.on("move", syncCovered);
     globe.on("render", syncCovered);
-    globe.once("load", () => { fitGlobe(); syncCovered(); });
+    // First load: fit the whole globe only while nothing is chosen. An event chosen before the globe finished loading keeps its
+    // view (no jump back to the start view), and a running transition keeps full control of the camera.
+    globe.once("load", () => {
+      syncCovered();
+      if (travelling) return;
+      if (!selected) { fitGlobe(); return; }
+      const it = itemOf(selected);
+      if (it && !globe.isMoving()) globe.jumpTo({ center: it.center, zoom: SELECT_Z });
+    });
     // box size changed (window resized, phone rotated): keep the whole globe in view while no event is selected
-    globe.on("resize", () => { if (!selected && globe.isStyleLoaded()) { fitGlobe(); syncCovered(); } });
+    // (not during a transition: the globe box is resized there on purpose and fitGlobe would cut the flight short)
+    globe.on("resize", () => { if (!selected && !travelling && !stageOn && globe.isStyleLoaded()) { fitGlobe(); syncCovered(); } });
     globeState = "ready";
     syncPressed();
   }
@@ -191,31 +234,63 @@
     }
   }
 
-  function select(id, opts = {}) {
+  // v58: one tap on an event card (or its globe marker) opens that event. No second button: the card shows "Opening…" while the
+  // map loads, and further taps are ignored until the event is open (or the start screen is shown again).
+  let opening = null;
+  // v61 (design of v57): choosing an event (list or globe marker) opens a short preview on the same screen —
+  // place, short date, one sentence and one button. Only "Open map" starts the move to the map.
+  function setCardsBusy(id) {
+    opening = id;
+    for (const b of document.querySelectorAll("#intro-list .intro-item")) b.setAttribute("aria-disabled", String(!!id));
+    const ob = $("intro-open");
+    if (ob) { ob.disabled = !!id; ob.textContent = id ? t("Opening…") : t("Open map"); if (id) ob.setAttribute("aria-busy", "true"); else ob.removeAttribute("aria-busy"); }
+  }
+  function renderPreview() {
+    const box = $("intro-card");
+    const it = items.find((x) => x.id === selected);
+    if (!it) { box.hidden = true; box.innerHTML = ""; document.body.classList.remove("preview-open"); return; }
+    const ev = it.text.event;
+    box.hidden = false;
+    document.body.classList.add("preview-open");
+    box.innerHTML = `<button type="button" class="ic-close" aria-label="${esc(t("Close preview"))}">×</button>` +
+      `<p class="ic-place" id="intro-card-title">${esc(ev.place.replace(" · ", ", "))}</p>` +
+      `<p class="ic-dates">${esc(it.eventDate ? I.fmt.day(it.eventDate) : cap(I.fmt.month(it.lastDate)))}</p>` + // v65: a one-day event shows its day
+      `<p class="ic-lede">${esc(ev.lede)}</p>` +
+      `<button type="button" id="intro-open" class="btn btn-primary">${esc(opening === it.id ? t("Opening…") : t("Open map"))}</button>`;
+    $("intro-open").addEventListener("click", () => openCard(it.id));
+    box.querySelector(".ic-close").addEventListener("click", closePreview);
+    if (opening) setCardsBusy(opening);
+  }
+  function closePreview() {
+    if (opening) return;
+    const id = selected;
+    selected = null;
+    syncPressed();
+    renderPreview();
+    const li = id && document.querySelector(`#intro-list [data-id="${id}"]`);
+    if (li) li.focus({ preventScroll: true });
+  }
+  function openCard(id) {
+    if (opening) return;                // double tap while the map opens
     const it = items.find((x) => x.id === id);
     if (!it) return;
     selected = id;
-    const ev = it.text.event;
-    const status = it.text.maturity.text.split(". ")[0] + ".";
-    $("intro-card").hidden = false;
-    $("intro-card").innerHTML =
-      `<p class="ic-place">${esc(ev.place)}</p>` +
-      `<h3 class="ic-title" id="intro-card-title">${esc(ev.title)}</h3>` +
-      `<p class="ic-dates">${esc(ev.facts[0])}</p>` +
-      `<p class="ic-lede">${esc(ev.lede)}</p>` +
-      `<p class="ic-status"><span class="c-badge ${it.entry.maturity === "BETA" ? "beta" : ""}">${esc(it.entry.maturity)}</span> ${esc(status)}</p>` +
-      `<button type="button" id="intro-explore" class="btn btn-primary">Explore event →</button>`;
-    $("intro-explore").addEventListener("click", () => explore(id));
     syncPressed();
+    setCardsBusy(id);
+    explore(id);
+  }
+  function select(id) {
+    if (opening) return;
+    const it = items.find((x) => x.id === id);
+    if (!it) return;
+    selected = id;
+    syncPressed();
+    renderPreview();
     if (globe && globeState === "ready") {
-      const to = { center: it.center, zoom: 3.2 };
+      const to = { center: it.center, zoom: SELECT_Z };
       reducedMotion.matches || document.hidden ? globe.jumpTo(to) : globe.flyTo({ ...to, duration: 1600, essential: false });
     }
-    if (opts.from === "marker" || opts.from === "list") {
-      // keep the card in view on small screens without covering the globe
-      if (narrow.matches) $("intro-card").scrollIntoView({ block: "nearest", behavior: reducedMotion.matches ? "auto" : "smooth" });
-      if (opts.from === "marker") $("intro-explore").focus({ preventScroll: true });
-    }
+    $("intro-open").focus({ preventScroll: true });
   }
 
   function setAppInert(on) {
@@ -227,10 +302,14 @@
 
   function show() {
     travelToken++;          // cancel any running transition
+    travelling = false;
     if (stageOn) clearStage();
     $("intro").hidden = false;
+    setCardsBusy(null);
+    selected = null; syncPressed(); renderPreview();
     setAppInert(true);
     history.replaceState(null, "", location.pathname + location.search); // the start screen has no event in the address
+    document.title = t("Surface Explorer — NISAR flood observations");
     $("intro-h").focus({ preventScroll: true });
     window.scrollTo(0, 0);
     $("intro").scrollTop = 0;
@@ -253,6 +332,32 @@
   const FADE_MS = 300;
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const GLOBE_WAIT_MS = 4000; // longest wait for the globe before an event opens directly instead
+
+  // The globe can show a flight: map created, style loaded and the first imagery tiles drawn
+  const globeFlyable = () => globeState === "ready" && !!globe && globe.isStyleLoaded() && globeImagery === "ok";
+  // Waits (with a short message) until the globe can fly; false if it fails, is too slow, or a newer choice was made
+  async function waitForGlobe(tok, it) {
+    if (globeFlyable()) return true;
+    if (globeState === "idle") initGlobe();
+    // On the start screen the button itself shows the message (the floating bar would cover the event card on phones);
+    // the bar stays in the page as a status line for screen readers. From the analysis the bar is shown as usual.
+    const onStart = !$("intro").hidden && !stageOn;
+    const bar = $("travel-bar");
+    bar.hidden = false;
+    bar.classList.toggle("sr-status", onStart);
+    setLabel(t("Preparing the globe for {place}…", { place: placeName(it) }), false);
+    const btn = null; // v58: the event card itself says "Opening…"
+    const t0 = performance.now();
+    while (!globeFlyable()) {
+      if (tok !== travelToken || globeState === "failed" || globeImagery === "failed" || performance.now() - t0 > GLOBE_WAIT_MS) break;
+      await sleep(100);
+    }
+    if (window.nfeTravelLog) window.nfeTravelLog.push({ name: globeFlyable() ? "globe-wait-ok" : "globe-wait-gave-up", ms: Math.round(performance.now() - t0) });
+    void btn;
+    bar.classList.remove("sr-status");
+    return globeFlyable();
+  }
   let travelToken = 0;
   let stageOn = false;       // globe box shown over the analysis map
   let travelTarget = null;
@@ -276,6 +381,19 @@
   // Waits for a map's moveend, with a safety timeout (animations stall in background tabs)
   const waitMoveEnd = (m, ms) => new Promise((res) => { let done = false; const f = () => { if (!done) { done = true; res(); } }; m.once("moveend", f); setTimeout(f, ms); });
   const waitTransition = (ms) => sleep(ms + 30);
+  // Resolves when the loaded Leaflet tiles on screen have finished their fade-in (or after maxMs)
+  async function tilesShown(m, maxMs) {
+    const t0 = performance.now(), box = m.getContainer().getBoundingClientRect();
+    while (performance.now() - t0 < maxMs) {
+      const fading = [...m.getContainer().querySelectorAll(".leaflet-tile.leaflet-tile-loaded")].some((t) => {
+        const r = t.getBoundingClientRect();
+        return r.right > box.left && r.left < box.right && r.bottom > box.top && r.top < box.bottom && +getComputedStyle(t).opacity < 0.99;
+      });
+      if (!fading) return true;
+      await sleep(30);
+    }
+    return false;
+  }
 
   // Globe scale at its centre: pixels per degree of latitude (the globe is locally conformal)
   function globePxPerDegLat() {
@@ -339,11 +457,16 @@
   }
   // Leaves the transition: analysis visible and usable, focus on the story panel
   function finishToAnalysis() {
+    travelling = false;
     clearStage();
     $("intro").hidden = true;
     setAppInert(false);
     if (globe) requestAnimationFrame(() => globe.resize());
-    $("step-panel").focus({ preventScroll: true });
+    setCardsBusy(null);
+    document.body.classList.remove("preview-open");
+    // v58: the event screen starts at the top, with focus on its title (place name first, then the map description, then the map)
+    window.scrollTo(0, 0);
+    $("title").focus({ preventScroll: true });
   }
   const fadeStage = async (to) => {
     const wrap = document.querySelector(".globe-wrap");
@@ -358,7 +481,7 @@
     if (!$("intro").hidden && !stageOn) { // from the start screen: label, then a short fade
       $("intro").classList.add("fading");
     }
-    if (it) { $("travel-bar").hidden = !stageOn; setLabel(`Opening ${placeName(it)}…`, false); }
+    if (it) { $("travel-bar").hidden = !stageOn; setLabel(t("Opening {place}…", { place: placeName(it) }), false); }
     await api.openEvent(id); // moves the map without animation when motion is reduced
     if (tok !== travelToken) return;
     await sleep(reducedMotion.matches ? 150 : 0);
@@ -373,7 +496,7 @@
     const tok = ++travelToken;
     if (globe) globe.stop();
     api.leaflet.stop();
-    setLabel(`Opening ${placeName(itemOf(id))}…`, false);
+    setLabel(t("Opening {place}…", { place: placeName(itemOf(id)) }), false);
     try {
       await (loading || api.openEvent(id, { move: false }));
       if (api.currentEvent() !== id) await api.openEvent(id, { move: false });
@@ -388,6 +511,7 @@
     if (!it) return api.openEvent(id);
     const tok = ++travelToken;
     travelTarget = id;
+    travelling = true; // cleared by finishToAnalysis (every completed path) or show()
     const fromGlobe = !$("intro").hidden && !stageOn;   // start screen visible
     const midFlight = stageOn;                            // a transition is already showing the globe
     if (globe) globe.stop();
@@ -401,17 +525,16 @@
     try {
       // No flight: reduced motion, hidden tab, or no usable globe (an analysis → analysis switch without a globe is direct)
       if (reducedMotion.matches || document.hidden) return quickOpen(id, tok);
-      if (globeState !== "ready" && !fromGlobe) {
-        initGlobe();
-        const t0 = performance.now();
-        while (globeState === "loading" && performance.now() - t0 < 4000) await sleep(100);
-        if (tok !== travelToken) return;
-        if (globeState !== "ready" || !globe.isStyleLoaded()) return quickOpen(id, tok);
-      }
-      if (globeState !== "ready") return quickOpen(id, tok);
-      $("travel-bar").hidden = false;
-      setLabel(`Travelling to ${placeName(it)}…`);
       window.nfeTravelLog = [];
+      // Globe still loading (e.g. "Explore event" right after the page opened): wait briefly, else open directly.
+      // No WebGL / library failed: globeState "failed" → direct open.
+      if (!(await waitForGlobe(tok, it))) {
+        if (tok !== travelToken) return;
+        return quickOpen(id, tok);
+      }
+      if (tok !== travelToken) return;
+      $("travel-bar").hidden = false;
+      setLabel(t("Travelling to {place}…", { place: placeName(it) }));
       logPhase(tok, fromGlobe ? "start:globe" : midFlight ? "start:mid-flight" : "start:analysis");
       const rect = () => api.leaflet.rect();
       window.scrollTo(0, 0);
@@ -446,7 +569,10 @@
 
       // 3) the globe flies to the target (from the analysis: an arc that rises to a whole-globe view)
       const dur = fromGlobe ? 1700 : 2400;
-      globe.flyTo({ center: it.center, zoom: HANDOFF_Z, duration: dur, easing: easeInOut, essential: true,
+      const gc0 = globe.getCenter();
+      const atHandoff = Math.abs(globe.getZoom() - HANDOFF_Z) < 0.01 &&
+        Math.abs(gc0.lng - it.center[0]) < 1e-5 && Math.abs(gc0.lat - it.center[1]) < 1e-5;
+      if (!atHandoff) globe.flyTo({ center: it.center, zoom: HANDOFF_Z, duration: dur, easing: easeInOut, essential: true,
         ...(fromGlobe ? {} : { minZoom: 1.8 }) });
       // pre-position Leaflet at the expected hand-off view so its tiles load during the flight
       loading.then(() => {
@@ -455,14 +581,15 @@
         followMapRect(true);
         leafletSetExact({ lng: it.center[0], lat: it.center[1] }, HANDOFF_Z + 1);
       });
-      await waitMoveEnd(globe, dur + 2500);
+      // Already at the hand-off view (no flight started, or it ended at once): no moveend will come, so do not wait for one
+      if (globe.isMoving()) await waitMoveEnd(globe, dur + 2500);
       if (tok !== travelToken) return;
-      logPhase(tok, "globe-arrived");
+      logPhase(tok, globe.isMoving() ? "globe-arrived-timeout" : "globe-arrived");
       // 4) data not ready yet: stay here and say so
       let ready = false;
       loading.then(() => { ready = true; });
       await sleep(0);
-      if (!ready) setLabel(`Loading ${placeName(it)}…`);
+      if (!ready) setLabel(t("Loading {place}…", { place: placeName(it) }));
       await loading;
       if (tok !== travelToken) return;
       if (api.currentEvent() !== id) return quickOpen(id, tok);
@@ -482,12 +609,18 @@
           centreOffsetPx: +Math.hypot(cg.x - sizeL.x / 2, cg.y - sizeL.y / 2).toFixed(2),
           boxDiffPx: Math.round(Math.abs(globe.getContainer().clientWidth - sizeL.x) + Math.abs(globe.getContainer().clientHeight - sizeL.y)) });
       }
-      // 6) cross-fade to the analysis map and fly into the study area
-      api.leaflet.fitArea(true, 0.9);
+      // Leaflet fades newly placed tiles in (~200 ms). Wait until they are fully shown, otherwise the globe fades out over
+      // half-transparent tiles and the empty map background shows through in the middle of the cross-fade.
+      await tilesShown(api.leaflet.map, 400);
+      if (tok !== travelToken) return;
+      // 6) cross-fade while both cameras stand still at the same centre and scale; only when the globe has fully faded out
+      //    does the last Leaflet zoom into the study area start
       await fadeStage(0);
       if (tok !== travelToken) return;
       logPhase(tok, "handoff-done");
       finishToAnalysis();
+      logPhase(tok, "leaflet-zoom-start");
+      api.leaflet.fitArea(true, 0.9);
       await waitMoveEnd(api.leaflet.map, 2500);
       logPhase(tok, "arrived");
     } catch (err) {
@@ -498,27 +631,37 @@
     }
   }
 
-  async function init(a) {
-    api = a;
-    items = (await Promise.all(api.events.map(async (entry) => {
-      const text = api.texts[entry.id];
-      if (!text) return null;
-      try {
-        const lay = await api.getLayers(entry.id);
-        const [[s, w], [n, e]] = lay.bounds_latlon; // registered study area
-        return { id: entry.id, entry, text, center: [(w + e) / 2, (s + n) / 2] };
-      } catch (err) { return null; }
-    }))).filter(Boolean);
+  // Short date on the card: month and year of the last observation, in the chosen language ("July 2026", "Temmuz 2026" …)
+  let globeHint = () => {}, globeAria = () => {};
+  const cap = (x) => x.charAt(0).toLocaleUpperCase(I.lang) + x.slice(1); // "juillet 2026" → "Juillet 2026" at the start of a line
+  function renderList() {
     const list = $("intro-list");
     list.innerHTML = "";
     for (const it of items) {
       const li = document.createElement("li");
-      li.innerHTML = `<button type="button" class="intro-item" data-id="${esc(it.id)}" aria-pressed="false" aria-controls="intro-card">` +
-        `<span class="ii-place">${esc(it.text.event.place)}</span><span class="ii-dates">${esc(it.text.event.dates)}</span>` +
-        `<span class="c-badge ${it.entry.maturity === "BETA" ? "beta" : ""}">${esc(it.entry.maturity)}</span></button>`;
-      li.querySelector("button").addEventListener("click", () => select(it.id, { from: "list" }));
+      // v57 card: place, dates, product label; choosing it opens the preview (the map opens from the preview's button)
+      li.innerHTML = `<button type="button" class="intro-item" data-id="${esc(it.id)}" aria-pressed="${it.id === selected}" aria-controls="intro-card">` +
+        `<span class="ii-place">${esc(it.text.event.place)}</span><span class="ii-dates">${esc(it.text.event.dates)}</span></button>`; // v64: no product label by the event name
+      li.querySelector("button").addEventListener("click", () => select(it.id));
       list.appendChild(li);
     }
+    renderPreview();
+  }
+  async function init(a) {
+    api = a;
+    items = (await Promise.all(api.events.map(async (entry) => {
+      if (!api.texts[entry.id]) return null;
+      try {
+        const lay = await api.getLayers(entry.id);
+        const [[s, w], [n, e]] = lay.bounds_latlon; // registered study area
+        // text: the event text in the current language (read again after every language change)
+        return { id: entry.id, entry, get text() { return api.text(entry.id); }, lastDate: lay.dates.length ? lay.dates[lay.dates.length - 1].label : lay.event_date, eventDate: lay.event_date || null, center: [(w + e) / 2, (s + n) / 2] };
+      } catch (err) { return null; }
+    }))).filter(Boolean);
+    renderList();
+    I.onChange(() => {
+      if (failReason) $("globe-fallback").textContent = t("The 3D globe is not available here ({reason}). Use the list to choose an event.", { reason: t(failReason) });
+      renderList(); globeHint(); globeAria(); if (!$("intro").hidden) document.title = t("Surface Explorer — NISAR flood observations"); });
     $("to-globe").addEventListener("click", show);
     $("travel-skip").addEventListener("click", skip);
   }

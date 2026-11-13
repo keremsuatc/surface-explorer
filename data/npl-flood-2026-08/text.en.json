@@ -1,0 +1,51 @@
+{
+ "event_id": "npl-flood-2026-08",
+ "lang": "en",
+ "generated_from": "catalog/events/npl-flood-2026-08.json via pipeline/export/build_event_web.py",
+ "event": {
+  "title": "Gyirong–Rasuwa flood",
+  "place": "Gyirong–Rasuwa flood · Tibet–Nepal border",
+  "area_name": "Betrawati–Gerkhu, Trishuli valley",
+  "dates": "26 Aug 2026",
+  "lede": "On 26 August 2026 rock and ice broke off Langtang Lirung and a debris-laden flood swept down the border valley into Nepal.",
+  "facts": [
+   "Collapse at about 8:37 am Nepal time on the northern flank of the Langtang Lirung massif (ICIMOD).",
+   "The flood reached Betrawati at about 9:20 am (ICIMOD)."
+  ]
+ },
+ "maturity": {
+  "text": "No NISAR analysis for this event yet; it comes in a later stage. The images are Copernicus Sentinel-2 true colour made here, and images and maps published by ESA and UNOSAT."
+ },
+ "steps": [],
+ "not_this": [],
+ "layers": {},
+ "regions": [],
+ "sources": [],
+ "uncertainty": [],
+ "simple": {
+  "title": "Gyirong–Rasuwa flood",
+  "lines": [],
+  "small": "",
+  "layers": [],
+  "evidence": [],
+  "shows": {
+   "off": "True-colour satellite images."
+  },
+  "finding": {
+   "text": "UNOSAT data of 2 September 2026: about 65 km² of the roughly 1,246 km² it examined appears to be affected by the flood.",
+   "step": null
+  },
+  "place_labels": [
+   {
+    "lat": 27.97311,
+    "lon": 85.18595,
+    "text": "Betrawati"
+   },
+   {
+    "lat": 27.9521,
+    "lon": 85.18613,
+    "text": "Gerkhu"
+   }
+  ]
+ }
+}

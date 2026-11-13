@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Follow the Water — Surface Explorer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="follow.css?v=68">
+</head>
+<body>
+  <header class="fw-head">
+    <a data-i18n id="fw-back" class="fw-btn" href="./">← Back to satellite evidence</a>
+    <div class="fw-titles">
+      <p class="fw-eyebrow">NISAR Flood Explorer</p>
+      <h1 data-i18n>Follow the Water</h1>
+      <p id="fw-sub" class="fw-sub"></p>
+    </div>
+    <div id="fw-lang" class="fw-lang"></div>
+    <span id="fw-badge" class="fw-badge">Animation</span>
+  </header>
+
+  <main class="fw-main">
+    <div id="fw-stage" class="fw-stage">
+      <div id="fw-map" class="fw-map" role="img" aria-label="3D terrain view" data-i18n-attr="aria-label"></div>
+      <canvas id="fw-rain" class="fw-rain" aria-hidden="true"></canvas>
+      <p data-i18n id="fw-loading" class="fw-loading">Loading the terrain…</p>
+      <p id="fw-obs" class="fw-obs" aria-hidden="true"></p>
+      <ul class="fw-key" aria-label="Map key" data-i18n-attr="aria-label">
+        <li id="fw-key-river"><i class="k-river"></i><span data-i18n>River (mapped)</span></li>
+        <li id="fw-key-flow"><i class="k-flow"></i><span data-i18n>Sample downhill lines (illustrative)</span></li>
+        <li><i class="k-area"></i><span data-i18n>NISAR study area</span></li>
+        <li id="fw-key-spread" class="k-late"><i class="k-spread"></i><span data-i18n>Illustrative flood spread (not observed)</span></li>
+        <li id="fw-key-obs" class="k-late"><i class="k-nisar"></i><span></span></li>
+        <li id="fw-credit" class="fw-credit" lang="en"></li><!-- provider credits, in the wording the providers ask for -->
+      </ul>
+      <div id="fw-fallback" class="fw-fallback" role="alert" hidden>
+        <h2 data-i18n id="fw-fallback-title">The 3D scene could not be loaded</h2>
+        <p id="fw-fallback-why" data-i18n>This device or connection could not show the terrain view.</p>
+        <p data-i18n>Nothing is lost: the satellite map works without it.</p>
+        <a data-i18n id="fw-fallback-link" class="fw-btn fw-btn-primary" href="./">Back to satellite evidence</a>
+      </div>
+    </div>
+
+    <section id="fw-controls" class="fw-controls" aria-label="Timeline" data-i18n-attr="aria-label">
+      <p id="fw-caption" class="fw-caption" aria-live="polite"><span class="fw-mode">Animation</span> <span id="fw-caption-text"></span></p>
+      <div id="fw-stages" class="fw-stages" role="group" aria-label="Stage" data-i18n-attr="aria-label"></div>
+      <label data-i18n class="fw-vh" for="fw-time">Timeline: drag to move forward or back through the scene</label>
+      <input id="fw-time" class="fw-time" type="range" min="0" max="1000" step="1" value="0">
+      <div id="fw-ticks" class="fw-ticks" aria-hidden="true"></div>
+    </section>
+
+    <section class="fw-more" aria-label="More about this scene" data-i18n-attr="aria-label">
+      <section id="fw-media" class="fw-media" aria-labelledby="fw-media-h" hidden>
+        <h2 data-i18n id="fw-media-h">Event images</h2>
+        <div id="fw-media-list" class="fw-media-list"></div>
+        <ul id="fw-media-links" class="fw-media-links"></ul>
+      </section>
+      <details id="fw-sources" class="fw-sources">
+        <summary data-i18n>Sources &amp; method</summary>
+        <div id="fw-sources-body"></div>
+      </details>
+    </section>
+  </main>
+  <script src="i18n.js?v=68"></script>
+  <script src="follow.js?v=68"></script>
+</body>
+</html>

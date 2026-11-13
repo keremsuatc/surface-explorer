@@ -1,0 +1,81 @@
+{
+ "event_id": "npl-flood-2026-08",
+ "bounds_latlon": [
+  [
+   27.9469,
+   85.1614
+  ],
+  [
+   27.9919,
+   85.1981
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "checked": "Sentinel-2 scenes 17–24 August 2026 are 51–100 % cloud over the scene; 12 August is clear and 27 August is 91 % clear inside the frame",
+ "esri_wayback": null,
+ "change": "On 27 August a wide band of pale brown deposits covers the valley floor along the river at Betrawati and Gerkhu; on 12 August the river ran in a narrow channel. Clouds cover part of the east.",
+ "after_timing": "the day after the flood of 26 August",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 361,
+  "height": 501,
+  "ground_m_per_px": [
+   10.0,
+   10.0
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "pair": [
+  {
+   "side": "before",
+   "label": "2026-08-12",
+   "datetime_utc": "2026-08-12T05:10:48.070000Z",
+   "scene": "S2C_45RUM_20260812_0_L2A",
+   "tile": "MGRS-45RUM",
+   "platform": "sentinel-2c",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 18.746611,
+   "inside_study_area": {
+    "clear_share": 1.0,
+    "cloud_share": 0.0,
+    "water_share_scl": 0.0089,
+    "pixels": 45014
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32645",
+   "source_window_px": [
+    368,
+    504
+   ],
+   "file": "npl-flood-2026-08/optical_2026-08-12.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2C_45RUM_20260812_0_L2A"
+  },
+  {
+   "side": "after",
+   "label": "2026-08-27",
+   "datetime_utc": "2026-08-27T05:10:45.885000Z",
+   "scene": "S2B_45RUM_20260827_0_L2A",
+   "tile": "MGRS-45RUM",
+   "platform": "sentinel-2b",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 78.471315,
+   "inside_study_area": {
+    "clear_share": 0.9048,
+    "cloud_share": 0.0952,
+    "water_share_scl": 0.015,
+    "pixels": 45014
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32645",
+   "source_window_px": [
+    368,
+    504
+   ],
+   "file": "npl-flood-2026-08/optical_2026-08-27.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_45RUM_20260827_0_L2A"
+  }
+ ],
+ "hint": "Drag the line and look at the pale brown traces around the river."
+}

@@ -1,0 +1,209 @@
+{
+ "event_id": "moz-flood-2026-01",
+ "bounds_latlon": [
+  [
+   -24.611729966989778,
+   32.94092343913174
+  ],
+  [
+   -24.439859371097906,
+   33.09803878232424
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "period": {
+  "start": "2026-01-10",
+  "end": null,
+  "summary": "Floods in Mozambique from late December 2025; Copernicus EMS gives 10 January 2026 as the event time for the Limpopo (EMSR857). No end date in the sources used.",
+  "sources": [
+   {
+    "date": "2026-01-10",
+    "says": "Flood event time of the rapid mapping activation EMSR857.",
+    "publisher": "Copernicus Emergency Management Service",
+    "url": "https://mapping.emergency.copernicus.eu/activations/EMSR857/"
+   },
+   {
+    "date": "2026-10-23",
+    "says": "Flooding began in late December 2025; Chókwè among the hardest-hit cities; no date for the water receding.",
+    "publisher": "Wikipedia, 2025–26 Mozambique floods",
+    "url": "https://en.wikipedia.org/wiki/2025%E2%80%9326_Mozambique_floods"
+   },
+   {
+    "date": null,
+    "says": "Title: Flooding in Mozambique, December 2025 to February 2026.",
+    "publisher": "Copernicus Global Flood Monitoring",
+    "url": "https://global-flood.emergency.copernicus.eu/news/231-Flooding%20in%20Mozambique,%20December%202025%20to%20February%202026/"
+   }
+  ]
+ },
+ "searched": "All 85 Sentinel-2 L2A scenes covering the study area, 1 December 2025 – 31 May 2026",
+ "rule": "A stage gets an image only when its capture date and what it shows support the stage. No image is used twice and no frame is made between captures.",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 1591,
+  "height": 1913,
+  "ground_m_per_px": [
+   10.0,
+   10.0
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "stages": [
+  {
+   "id": "before",
+   "title": "Before the flood",
+   "chip": "Before",
+   "frame": {
+    "label": "2026-01-07",
+    "datetime_utc": "2026-01-07T08:06:55.706000Z",
+    "scene": "S2B_36JVT_20260107_0_L2A",
+    "tile": "MGRS-36JVT",
+    "platform": "sentinel-2b",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 0.043981,
+    "inside_study_area": {
+     "clear_share": 0.9914,
+     "cloud_share": 0.0086,
+     "water_share_scl": 0.0667,
+     "pixels": 339254
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+    "source_window_px": [
+     1593,
+     1903
+    ],
+    "file": "moz-flood-2026-01/optical_2026-01-07.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_36JVT_20260107_0_L2A",
+    "edge_filled_from_same_acquisition": [
+     {
+      "scene": "S2B_36JWT_20260107_0_L2A",
+      "pixels": 32706
+     }
+    ],
+    "heading": "Before the flood",
+    "sentence": "The Limpopo flows in its channel past the town.",
+    "why": "Last clear image before the flood reached the study area (9–19 January: 99–100 % cloud).",
+    "location": "Chókwè",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  },
+  {
+   "id": "start",
+   "title": "Flood begins",
+   "chip": "During",
+   "frame": {
+    "label": "2026-01-24",
+    "datetime_utc": "2026-01-24T07:56:58.760000Z",
+    "scene": "S2B_36JVT_20260124_0_L2A",
+    "tile": "MGRS-36JVT",
+    "platform": "sentinel-2b",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 27.192721,
+    "inside_study_area": {
+     "clear_share": 0.8088,
+     "cloud_share": 0.1912,
+     "water_share_scl": 0.3532,
+     "pixels": 339254
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+    "source_window_px": [
+     1593,
+     1903
+    ],
+    "file": "moz-flood-2026-01/optical_2026-01-24.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_36JVT_20260124_0_L2A",
+    "edge_filled_from_same_acquisition": [
+     {
+      "scene": "S2B_36JWT_20260124_0_L2A",
+      "pixels": 32706
+     }
+    ],
+    "heading": "First clear image during the flood",
+    "sentence": "First clear image of the flood: brown water covers the floodplain on both banks, up to the edge of the town.",
+    "why": "The flood began before any clear image: 22 January already shows floodwater but is half cloud (47 % clear); 24 January is 81 % clear.",
+    "location": "Chókwè",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  },
+  {
+   "id": "late",
+   "title": "Towards the end of the flood",
+   "chip": "Towards the end",
+   "frame": {
+    "label": "2026-02-08",
+    "datetime_utc": "2026-02-08T07:57:03.721000Z",
+    "scene": "S2C_36JVT_20260208_0_L2A",
+    "tile": "MGRS-36JVT",
+    "platform": "sentinel-2c",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 0.131076,
+    "inside_study_area": {
+     "clear_share": 0.9971,
+     "cloud_share": 0.0029,
+     "water_share_scl": 0.145,
+     "pixels": 339254
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+    "source_window_px": [
+     1593,
+     1903
+    ],
+    "file": "moz-flood-2026-01/optical_2026-02-08.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2C_36JVT_20260208_0_L2A",
+    "edge_filled_from_same_acquisition": [
+     {
+      "scene": "S2C_36JWT_20260208_0_L2A",
+      "pixels": 32706
+     }
+    ],
+    "heading": null,
+    "sentence": "The river is still wide and standing water remains in the floodplain beside the town.",
+    "why": "Water is going down (scene classification: 35 % water on 24 January, 15 % on 8 February). The end is not confirmed, so the image is labelled with its date.",
+    "location": "Chókwè",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  },
+  {
+   "id": "after",
+   "title": "After the flood",
+   "chip": "After",
+   "frame": {
+    "label": "2026-04-27",
+    "datetime_utc": "2026-04-27T08:06:54.298000Z",
+    "scene": "S2B_36JVT_20260427_0_L2A",
+    "tile": "MGRS-36JVT",
+    "platform": "sentinel-2b",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 2.7e-05,
+    "inside_study_area": {
+     "clear_share": 1.0,
+     "cloud_share": 0.0,
+     "water_share_scl": 0.067,
+     "pixels": 339254
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32736",
+    "source_window_px": [
+     1593,
+     1903
+    ],
+    "file": "moz-flood-2026-01/optical_2026-04-27.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_36JVT_20260427_0_L2A",
+    "edge_filled_from_same_acquisition": [
+     {
+      "scene": "S2B_36JWT_20260427_0_L2A",
+      "pixels": 32706
+     }
+    ],
+    "heading": "After the flood",
+    "sentence": "Taken after the second rise in March: the Limpopo is back in its channel and the floodplain is green.",
+    "why": "Water rose on the floodplain again in March (20 March image); from 12 April the river is back in its channel. 27 April is fully clear.",
+    "location": "Chókwè",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  }
+ ]
+}

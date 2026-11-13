@@ -256,7 +256,14 @@
    "show": "Show possible water",
    "hide": "Hide possible water"
   },
-  "legend": "Possible water",
+  "legend": "Possible water from satellite observations",
+  "shows": {
+   "on": "Blue marks possible water.",
+   "off": "The possible-water layer is off."
+  },
+  "key_note": {
+   "on": "not confirmed flooding"
+  },
   "focus": [
    {
     "region": "ne_change",
@@ -269,7 +276,11 @@
     "label": "Explore the evidence",
     "step": 0
    }
-  ]
+  ],
+  "finding": {
+   "text": "Between 30 June and 12 July the radar signal dropped sharply in the top-right part of the area, and two other satellites also saw water there.",
+   "step": 4
+  }
  },
  "layers": {
   "nisar_candidate": {

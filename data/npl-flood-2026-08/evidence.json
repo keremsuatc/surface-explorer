@@ -1,0 +1,122 @@
+{
+ "event_id": "npl-flood-2026-08",
+ "finding": "UNOSAT data of 2 September 2026: about 65 km² of the roughly 1,246 km² it examined appears to be affected by the flood.",
+ "layer": {
+  "file": "npl-flood-2026-08/unosat_extent.geojson"
+ },
+ "background": "npl-flood-2026-08/optical_2026-08-27.jpg",
+ "measurement": {
+  "source": "UNOSAT geodatabase FL20260826NPL (layers AnalysisExtent and FloodExtent)",
+  "source_url": "https://unosat.org/static/unosat_filesystem/4259/FL20260826NPL.gdb.zip",
+  "data_url": "https://data.humdata.org/dataset/mudflow-rockflow-impact-assessment-in-rasuwa-nuwakot-districts-bagmati-province-nepal-as-o",
+  "version": "2026-09-02",
+  "published": "2026-09-04",
+  "analysed_km2": 1245.6,
+  "affected_km2": 65.66,
+  "check": {
+   "analysed_km2": 1245.6,
+   "affected_km2": 64.9,
+   "method": "geodesic area on WGS84 (pyproj Geod) of the same polygons; 100 % of the affected area lies inside the analysed area"
+  },
+  "scope": "UNOSAT's whole analysis area (Rasuwa and Nuwakot districts). The app draws the full layer, simplified by about 5 m (not clipped); the image frame shows only a small part of it (about 2.3 km² of the affected area).",
+  "imagery": "Sentinel-2 (27 August 2026) and PlanetScope (26 August 2026)",
+  "status": "Preliminary assessment: UNOSAT says it has not been validated in the field.",
+  "licence": "CC BY-SA"
+ },
+ "official_map": {
+  "id": 4259,
+  "url": "https://unosat.org/products/4259/"
+ },
+ "history": [
+  {
+   "version": "2026-08-28",
+   "what": "UNOSAT map 4259 printed about 37 km² affected within about 350 km² analysed, for the analysis as of 28 August 2026.",
+   "url": "https://data.humdata.org/dataset/mudflow-rockflow-impact-assessment-in-rasuwa-nuwakot-districts-bagmati-province-nepal-as-o"
+  }
+ ],
+ "sources": [
+  {
+   "publisher": "UNOSAT data on HDX (CC BY-SA)",
+   "url": "https://data.humdata.org/dataset/mudflow-rockflow-impact-assessment-in-rasuwa-nuwakot-districts-bagmati-province-nepal-as-o"
+  },
+  {
+   "publisher": "UNOSAT map 4259",
+   "url": "https://unosat.org/products/4259/"
+  },
+  {
+   "publisher": "UNOSAT map 4260",
+   "url": "https://unosat.org/products/4260"
+  },
+  {
+   "publisher": "UNOSAT lake data on HDX (CC BY-SA)",
+   "url": "https://data.humdata.org/dataset/newly-formed-barrier-lakes-following-an-ice-rock-avalanche-in-rasuwa-district-nepal-as-of-"
+  },
+  {
+   "publisher": "EU Space: Aftermath of Nepal flash flood",
+   "url": "https://eu-space.europa.eu/components/earth-observation-copernicus/image-of-the-day/aftermath-nepal-flash-flood"
+  },
+  {
+   "publisher": "ESA: Sentinel-2 captures before and after Nepal flash flood",
+   "url": "https://www.esa.int/media/sentinel-2-captures-before-and-after-nepal-flash-flood"
+  },
+  {
+   "publisher": "ESA: Nepal glacier collapse and flood – before and after",
+   "url": "https://www.esa.int/media/nepal-glacier-collapse-and-flood-before-and-after"
+  },
+  {
+   "publisher": "Reuters: Nepal lake breaks banks (28 August 2026)",
+   "url": "https://www.reuters.com/business/environment/nepal-lake-breaks-banks-water-level-rising-district-official-says-2026-08-28/"
+  },
+  {
+   "publisher": "ICIMOD: Understanding the Gyirong–Rasuwa disaster of 26 August 2026",
+   "url": "https://lib.icimod.org/records/qdvc1-tc123"
+  }
+ ],
+ "score": {
+  "_doc": "Evidence score: how well the evidence supports the finding, 25 points per criterion (levels 25 / 15 / 5 / 0). points null = assessment incomplete. Not a map accuracy percentage.",
+  "criteria": [
+   {
+    "id": "coverage",
+    "name": "Coverage",
+    "points": 15,
+    "max": 25,
+    "rule": "25: the analysed area contains at least 95 % of the image frame and the whole collapse area; 15: at least 75 %; 5: at least 25 %; 0: less.",
+    "reason": "UNOSAT's analysed area contains the whole collapse area and the two lakes, but only 88 % of the Betrawati–Gerkhu frame (measured here); all of the affected area in the frame lies inside it."
+   },
+   {
+    "id": "timing",
+    "name": "Timing of the images",
+    "points": 25,
+    "max": 25,
+    "rule": "25: imagery from the day of the event or the day after; 15: within 7 days; 5: within 30 days; 0: later, or before the event.",
+    "reason": "UNOSAT used PlanetScope images of 26 August (the day of the flood) and Sentinel-2 of 27 August."
+   },
+   {
+    "id": "comparability",
+    "name": "Comparability",
+    "points": 15,
+    "max": 25,
+    "rule": "25: same sensor and date as the app's image, method documented; 15: same date but other sensors added or the method only briefly described; 5: other dates or sensors only; 0: cannot be compared.",
+    "reason": "Same Sentinel-2 date (27 August) as the app's after image, but UNOSAT also used PlanetScope and describes its method only briefly."
+   },
+   {
+    "id": "independent",
+    "name": "Independent support",
+    "points": 15,
+    "max": 25,
+    "rule": "25: an independent map of the same area was compared here and agrees; 15: independent maps of the same area exist but were not compared here; 5: only reports or photos; 0: none.",
+    "reason": "ICIMOD mapped the flood extent along the same valley (Landsat, Sentinel-2, PlanetScope) and Copernicus EMS mapped it under activation EMSR927; neither was compared with UNOSAT's outline here."
+   }
+  ],
+  "sources": [
+   {
+    "publisher": "ICIMOD preliminary synthesis, Figure 14",
+    "url": "https://lib.icimod.org/records/qdvc1-tc123"
+   },
+   {
+    "publisher": "Copernicus EMS EMSR927 on HDX",
+    "url": "https://data.humdata.org/dataset/npl-flood-emsr927"
+   }
+  ]
+ }
+}

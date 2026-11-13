@@ -1,0 +1,25 @@
+{
+ "event_id": "npl-flood-2026-08",
+ "nisar": false,
+ "note": "Built from catalog/events/npl-flood-2026-08.json (web) by build_event_web.py.",
+ "bounds_latlon": [
+  [
+   27.9469,
+   85.1614
+  ],
+  [
+   27.9919,
+   85.1981
+  ]
+ ],
+ "frame_reference": "Copernicus image of the day 'Aftermath of Nepal flash flood' (EU Space, 27 Aug 2026): centre 27°58'10\" N, 85°10'47\" E, about 3.6 × 5 km",
+ "event_date": "2026-08-26",
+ "maturity": null,
+ "dates": [],
+ "radar": {},
+ "change": {},
+ "support": [],
+ "regions": [],
+ "sources": [],
+ "reference_maps": []
+}

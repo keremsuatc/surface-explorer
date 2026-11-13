@@ -1,0 +1,100 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+ "scale_db": [
+  -25.0,
+  0.0
+ ],
+ "bounds_latlon": [
+  [
+   24.352230815993785,
+   91.39002299178837
+  ],
+  [
+   24.3978887462838,
+   91.43987949005701
+  ]
+ ],
+ "analysed_pair": [
+  "2026-06-30",
+  "2026-07-12"
+ ],
+ "frames": [
+  {
+   "label": "2026-06-18",
+   "start_utc": "2026-06-18T23:21:35.000000Z",
+   "granule": "G4240316601-ASF",
+   "product": "NISAR_L2_PR_GCOV_023_069_A_014_4005_DHDH_A_20260618T232135_20260618T232210_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14",
+   "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+   "file": "bgd-flood-2026-07/timeline_radar_2026-06-18_HH.png",
+   "origin": "added v60 from the same stack (timeline only; not used in any analysis)",
+   "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+   "valid_share_in_view": 1.0,
+   "source": "NASA CMR / ASF DAAC, NISAR_L2_GCOV_PROVISIONAL_V1 (doi 10.5067/NIL2GCOV-P1)"
+  },
+  {
+   "label": "2026-06-30",
+   "start_utc": "2026-06-30T23:21:34.000000Z",
+   "granule": "G4248910017-ASF",
+   "product": "NISAR_L2_PR_GCOV_024_069_A_014_4005_DHDH_A_20260630T232134_20260630T232209_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14",
+   "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+   "file": "bgd-flood-2026-07/radar_2026-06-30_HH.png",
+   "origin": "layers.json (analysed dates)"
+  },
+  {
+   "label": "2026-07-12",
+   "start_utc": "2026-07-12T23:21:34.000000Z",
+   "granule": "G4252846523-ASF",
+   "product": "NISAR_L2_PR_GCOV_025_069_A_014_4005_DHDH_A_20260712T232134_20260712T232208_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14",
+   "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+   "file": "bgd-flood-2026-07/radar_2026-07-12_HH.png",
+   "origin": "layers.json (analysed dates)"
+  },
+  {
+   "label": "2026-07-24",
+   "start_utc": "2026-07-24T23:21:33.000000Z",
+   "granule": "G4261131483-ASF",
+   "product": "NISAR_L2_PR_GCOV_026_069_A_014_4005_DHDH_A_20260724T232133_20260724T232208_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14",
+   "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+   "file": "bgd-flood-2026-07/radar_2026-07-24_HH.png",
+   "origin": "layers.json (analysed dates)"
+  },
+  {
+   "label": "2026-08-17",
+   "start_utc": "2026-08-17T23:21:32.000000Z",
+   "granule": "G4285744971-ASF",
+   "product": "NISAR_L2_PR_GCOV_028_069_A_014_4005_DHDH_A_20260817T232132_20260817T232206_P05023_N_F_J_001",
+   "maturity": "PROVISIONAL",
+   "track_frame": "track 69 ASCENDING frame 14",
+   "sensor": "NISAR L-band SAR (L2 GCOV, HH)",
+   "file": "bgd-flood-2026-07/timeline_radar_2026-08-17_HH.png",
+   "origin": "added v60 from the same stack (timeline only; not used in any analysis)",
+   "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+   "valid_share_in_view": 1.0,
+   "source": "NASA CMR / ASF DAAC, NISAR_L2_GCOV_PROVISIONAL_V1 (doi 10.5067/NIL2GCOV-P1)"
+  }
+ ],
+ "not_added": [
+  {
+   "label": "2026-08-05",
+   "why": "no acquisition of this track and frame in CMR between 24 July and 17 August 2026"
+  }
+ ],
+ "event_dates": {
+  "start": "2026-07-09",
+  "start_what": "Khowai embankment breach reported at Kaliganj, Laskarpur Union (about 21:30 local time)",
+  "start_source": "The Daily Star (news report)",
+  "start_url": "https://www.thedailystar.net/news/environment/climate-crisis/news/30000-marooned-habiganj-floods-breach-khowai-river-embankment-4220571",
+  "end": null,
+  "end_note": "no end date in the sources used"
+ },
+ "note": "Separate observations of the same place. Moving from one to the next is not a view of water moving in real time."
+}

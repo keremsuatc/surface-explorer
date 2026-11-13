@@ -268,7 +268,23 @@
     "label": "Explore the evidence",
     "step": 0
    }
-  ]
+  ],
+  "shows": {
+   "decrease": "Blue marks places where the radar signal got weaker.",
+   "increase": "Red marks places where the radar signal got stronger.",
+   "off": "No radar layer is shown. Choose one below."
+  },
+  "key_note": {
+   "decrease": "radar change, not confirmed flooding",
+   "increase": "radar change, not confirmed flooding"
+  },
+  "notes": {
+   "increase": "Much of the red matches a whole-image brightening (~3 dB) on 17 Jan."
+  },
+  "finding": {
+   "text": "Between 5 and 17 January the radar signal dropped sharply on the river side of the area: a sign of possible floodwater, not a confirmed flood.",
+   "step": 2
+  }
  },
  "layers": {},
  "regions": {},

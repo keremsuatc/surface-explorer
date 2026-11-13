@@ -1,0 +1,86 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "bounds_latlon": [
+  [
+   24.352230815993785,
+   91.39002299178837
+  ],
+  [
+   24.3978887462838,
+   91.43987949005701
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "checked": "Sentinel-2 scenes 4 Jun – 13 Aug 2026 are 90–100 % cloud inside the study area; 23 Aug 51 %; first clear scene after the breach: 14 Sep 2026",
+ "esri_wayback": "Esri Wayback releases 2024-06-06 … 2026-10-29: captures 11 Apr 2023 (WV02) and 11 Apr 2024 (WV03) only — before the flood",
+ "change": "On 14 Sep the Khowai carries brown, muddy water and looks wider than on 7 Apr. No flooded fields can be told apart at 10 m. Clouds and haze cover the south-west corner.",
+ "after_timing": "about two months after the July embankment breach",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 506,
+  "height": 508,
+  "ground_m_per_px": [
+   9.99,
+   10.01
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "pair": [
+  {
+   "side": "before",
+   "label": "2026-04-07",
+   "datetime_utc": "2026-04-07T04:41:59.900000Z",
+   "scene": "S2A_46RCN_20260407_1_L2A",
+   "tile": "MGRS-46RCN",
+   "platform": "sentinel-2a",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 16.699652,
+   "inside_study_area": {
+    "clear_share": 1.0,
+    "cloud_share": 0.0,
+    "water_share_scl": 0.0003,
+    "pixels": 63947
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32646",
+   "source_window_px": [
+    512,
+    511
+   ],
+   "file": "bgd-flood-2026-07/optical_2026-04-07.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_46RCN_20260407_1_L2A"
+  },
+  {
+   "side": "after",
+   "label": "2026-09-14",
+   "datetime_utc": "2026-09-14T04:41:53.415000Z",
+   "scene": "S2A_46RCN_20260914_1_L2A",
+   "tile": "MGRS-46RCN",
+   "platform": "sentinel-2a",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 7.700183,
+   "inside_study_area": {
+    "clear_share": 0.9505,
+    "cloud_share": 0.0495,
+    "water_share_scl": 0.0088,
+    "pixels": 63947
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32646",
+   "source_window_px": [
+    512,
+    511
+   ],
+   "file": "bgd-flood-2026-07/optical_2026-09-14.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_46RCN_20260914_1_L2A",
+   "edge_filled_from_same_acquisition": [
+    {
+     "scene": "S2A_46QCM_20260914_1_L2A",
+     "pixels": 1
+    }
+   ]
+  }
+ ]
+}

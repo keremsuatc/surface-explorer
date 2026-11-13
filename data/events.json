@@ -17,6 +17,16 @@
    "hazard": "flood",
    "priority": 2,
    "layers": "moz-flood-2026-01/layers.json"
+  },
+  {
+   "id": "npl-flood-2026-08",
+   "title": "Gyirong–Rasuwa seli",
+   "area_name": "Tibet–Nepal sınırı (Betrawati–Gerkhu)",
+   "maturity": null,
+   "hazard": "flood",
+   "priority": 3,
+   "nisar": false,
+   "layers": "npl-flood-2026-08/layers.json"
   }
  ]
 }

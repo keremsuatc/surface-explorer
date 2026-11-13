@@ -1,0 +1,159 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "bounds_latlon": [
+  [
+   24.352230815993785,
+   91.39002299178837
+  ],
+  [
+   24.3978887462838,
+   91.43987949005701
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "period": {
+  "start": "2026-07-09",
+  "end": null,
+  "summary": "Flood from the Khowai embankment breach of 9 July 2026; the embankment breached again on 23 August and the area flooded a third time on 28 August. No end date in the sources used.",
+  "sources": [
+   {
+    "date": "2026-07-16",
+    "says": "Breach at Kaliganj, Laskarpur union, on the night of 9 July; floodwaters have begun to recede (no date given).",
+    "publisher": "The Daily Star",
+    "url": "https://www.thedailystar.net/news/monsoon-misery/news/flood-recedes-leaves-nothing-behind-habiganj-and-moulvibazar-families-return-ruins-4225346"
+   },
+   {
+    "date": "2026-09-05",
+    "says": "Breaches on 9 July and 23 August, third flooding on 28 August; repairs delayed by daily rain.",
+    "publisher": "The Daily Star",
+    "url": "https://www.thedailystar.net/news/environment/natural-disaster/news/three-floods-two-months-and-no-time-recover-4265286"
+   }
+  ]
+ },
+ "searched": "All 79 Sentinel-2 L2A scenes covering the study area, 1 June – 10 November 2026",
+ "rule": "A stage gets an image only when its capture date and what it shows support the stage. No image is used twice and no frame is made between captures.",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 506,
+  "height": 508,
+  "ground_m_per_px": [
+   9.99,
+   10.01
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "stages": [
+  {
+   "id": "before",
+   "title": "Before the flood",
+   "chip": "Before",
+   "frame": {
+    "label": "2026-04-07",
+    "datetime_utc": "2026-04-07T04:41:59.900000Z",
+    "scene": "S2A_46RCN_20260407_1_L2A",
+    "tile": "MGRS-46RCN",
+    "platform": "sentinel-2a",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 16.699652,
+    "inside_study_area": {
+     "clear_share": 1.0,
+     "cloud_share": 0.0,
+     "water_share_scl": 0.0003,
+     "pixels": 63947
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32646",
+    "source_window_px": [
+     512,
+     511
+    ],
+    "file": "bgd-flood-2026-07/optical_2026-04-07.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_46RCN_20260407_1_L2A",
+    "heading": "Before the flood",
+    "sentence": "Dry season: the Khowai runs in a narrow channel around the town.",
+    "why": "Clear dry-season image three months before the breach; June scenes are 80–100 % cloud.",
+    "location": "Habiganj",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  },
+  {
+   "id": "start",
+   "title": "Flood begins",
+   "chip": "Flood begins",
+   "missing": "Every Sentinel-2 image from 4 July to 19 August 2026 is 90–100 % cloud over the study area; 24 July shows only small gaps in the cloud."
+  },
+  {
+   "id": "late",
+   "title": "Towards the end of the flood",
+   "chip": "Towards the end",
+   "frame": {
+    "label": "2026-09-14",
+    "datetime_utc": "2026-09-14T04:41:53.415000Z",
+    "scene": "S2A_46RCN_20260914_1_L2A",
+    "tile": "MGRS-46RCN",
+    "platform": "sentinel-2a",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 7.700183,
+    "inside_study_area": {
+     "clear_share": 0.9505,
+     "cloud_share": 0.0495,
+     "water_share_scl": 0.0088,
+     "pixels": 63947
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32646",
+    "source_window_px": [
+     512,
+     511
+    ],
+    "file": "bgd-flood-2026-07/optical_2026-09-14.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_46RCN_20260914_1_L2A",
+    "edge_filled_from_same_acquisition": [
+     {
+      "scene": "S2A_46QCM_20260914_1_L2A",
+      "pixels": 1
+     }
+    ],
+    "heading": null,
+    "sentence": "The Khowai is wide and brown with muddy water; no flooded fields can be told apart at 10 m.",
+    "why": "First clear image after the third flooding (28 August). The end of the flood is not confirmed, so the image is labelled with its date.",
+    "location": "Habiganj",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  },
+  {
+   "id": "after",
+   "title": "After the flood",
+   "chip": "After",
+   "frame": {
+    "label": "2026-10-27",
+    "datetime_utc": "2026-10-27T04:41:40.290000Z",
+    "scene": "S2B_46RCN_20261027_0_L2A",
+    "tile": "MGRS-46RCN",
+    "platform": "sentinel-2b",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 7.467092,
+    "inside_study_area": {
+     "clear_share": 1.0,
+     "cloud_share": 0.0,
+     "water_share_scl": 0.0015,
+     "pixels": 63947
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32646",
+    "source_window_px": [
+     512,
+     511
+    ],
+    "file": "bgd-flood-2026-07/optical_2026-10-27.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_46RCN_20261027_0_L2A",
+    "heading": "After the flood",
+    "sentence": "The Khowai is narrower again and no standing water is visible around the town.",
+    "why": "Latest fully clear image; the river is visibly narrower than on 14 September (also on 12 and 22 October).",
+    "location": "Habiganj",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a"
+   }
+  }
+ ]
+}
