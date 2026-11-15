@@ -1,0 +1,26 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "nisar": false,
+ "note": "Built from catalog/events/usa-wildfire-2025-01.json (web) by build_event_web.py.",
+ "bounds_latlon": [
+  [
+   34.015,
+   -118.7
+  ],
+  [
+   34.14,
+   -118.49
+  ]
+ ],
+ "frame_reference": "Official perimeter (NIFC WFIGS 2025-CALFD-000738) and the coast from Pacific Palisades to Malibu",
+ "event_date": "2025-01-07",
+ "maturity": null,
+ "dates": [],
+ "radar": {},
+ "change": {},
+ "support": [],
+ "regions": [],
+ "sources": [],
+ "reference_maps": [],
+ "basemap": "usgs"
+}

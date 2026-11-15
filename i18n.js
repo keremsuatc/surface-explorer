@@ -14,7 +14,7 @@
   const CODES = LANGS.map((l) => l.code);
   const KEY = "surface-explorer.lang";
   const FILES = ["ui", "data"];
-  const V = "68";
+  const V = "94";
   let memory = null;      // used when storage is not available (private mode, blocked storage)
   let lang = "en", dict = {};
   const cache = {};
@@ -130,18 +130,39 @@
     listeners.push(sync);
     sync();
   }
-  // First visit: a plain welcome screen with the five languages; one tap saves the choice and goes on to where the person was going
+  // First visit: the five languages, each in its own language, on a dark centred panel; one tap saves the choice and goes on
+  // to where the person was going. v75: a one-line note under the choices, in the visitor's language (and in the language
+  // of the option they point at or focus), and a short fade in and out (none when reduced motion is preferred).
+  const NOTE = {
+    en: "We wrote this site in English first. Please excuse any slips in the translations.",
+    tr: "Siteyi önce İngilizce hazırladık. Çevirilerde gözümüzden kaçan yerler için kusura bakmayın.",
+    fr: "Nous avons d’abord écrit ce site en anglais. Pardonnez les maladresses restées dans les traductions.",
+    de: "Wir haben diese Seite zuerst auf Englisch geschrieben. Bitte entschuldigen Sie Fehler in den Übersetzungen.",
+    es: "Escribimos este sitio primero en inglés. Disculpa los errores que queden en las traducciones.",
+  };
+  function browserLang() {
+    for (const l of (navigator.languages || [navigator.language || ""])) { const c = String(l).slice(0, 2).toLowerCase(); if (CODES.includes(c)) return c; }
+    return "en";
+  }
+  const calm = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function chooser() {
     return new Promise((resolve) => {
       const s = document.createElement("section");
       s.className = "lang-screen";
       s.setAttribute("aria-labelledby", "lang-screen-h");
-      s.innerHTML = `<div class="ls-box"><h1 id="lang-screen-h" tabindex="-1">Surface Explorer</h1>` +
+      const first = browserLang();
+      s.innerHTML = `<div class="ls-box"><p class="ls-brand">Surface Explorer</p><h1 id="lang-screen-h" tabindex="-1" lang="${first}">${{ en: "Choose your language", tr: "Dilinizi seçin", fr: "Choisissez votre langue", de: "Sprache wählen", es: "Elige tu idioma" }[first]}</h1>` +
         `<ul class="ls-list" role="list">` + LANGS.map((l) => `<li><button type="button" class="ls-btn" lang="${l.code}" data-lang="${l.code}">${l.name}</button></li>`).join("") +
-        `</ul></div>`;
+        `</ul><p class="ls-note" lang="${first}">${NOTE[first]}</p></div>`;
       document.body.appendChild(s);
       document.body.classList.add("lang-open");
+      const shown = () => s.classList.add("in"); // fade in; the timer covers a background tab, where animation frames wait
+      if (!calm()) { requestAnimationFrame(() => requestAnimationFrame(shown)); setTimeout(shown, 120); } else shown();
       s.querySelector("h1").focus({ preventScroll: true });
+      const note = s.querySelector(".ls-note");
+      const showNote = (c) => { if (note.getAttribute("lang") !== c) { note.setAttribute("lang", c); note.textContent = NOTE[c]; } };
+      s.addEventListener("pointerover", (e) => { const b = e.target.closest(".ls-btn"); if (b) showNote(b.dataset.lang); });
+      s.addEventListener("focusin", (e) => { const b = e.target.closest(".ls-btn"); if (b) showNote(b.dataset.lang); });
       let busy = false;
       s.addEventListener("click", async (e) => {
         const b = e.target.closest(".ls-btn");
@@ -149,9 +170,11 @@
         busy = true;
         b.setAttribute("aria-busy", "true");
         await set(b.dataset.lang);
-        s.remove();
-        document.body.classList.remove("lang-open");
-        resolve(lang);
+        const done = () => { s.remove(); document.body.classList.remove("lang-open"); resolve(lang); };
+        if (calm()) return done();
+        s.classList.remove("in");
+        s.classList.add("out");
+        setTimeout(done, 260);
       });
     });
   }
@@ -164,5 +187,5 @@
     readyP = pick ? set(pick, { save: !!q }).then(() => lang) : chooser();
     return readyP;
   }
-  window.I18N = { ready, t, tx, fmt, apply, set, picker, LANGS, onChange: (fn) => listeners.push(fn), get lang() { return lang; }, stored, norm };
+  window.I18N = { ready, t, tx, fmt, apply, set, picker, chooser, LANGS, onChange: (fn) => listeners.push(fn), get lang() { return lang; }, stored, norm };
 })();

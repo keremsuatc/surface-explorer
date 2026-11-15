@@ -7,7 +7,8 @@
    "maturity": "PROVISIONAL",
    "hazard": "flood",
    "priority": 1,
-   "layers": "bgd-flood-2026-07/layers.json"
+   "layers": "bgd-flood-2026-07/layers.json",
+   "scene3d": "spread"
   },
   {
    "id": "moz-flood-2026-01",
@@ -16,17 +17,63 @@
    "maturity": "BETA",
    "hazard": "flood",
    "priority": 2,
-   "layers": "moz-flood-2026-01/layers.json"
+   "layers": "moz-flood-2026-01/layers.json",
+   "scene3d": "spread"
   },
   {
    "id": "npl-flood-2026-08",
-   "title": "Gyirong–Rasuwa seli",
-   "area_name": "Tibet–Nepal sınırı (Betrawati–Gerkhu)",
+   "title": "Tibet–Nepal sınırında buz ve kaya kopması",
+   "area_name": "Gyirong–Rasuwa (Betrawati–Gerkhu)",
    "maturity": null,
    "hazard": "flood",
    "priority": 3,
    "nisar": false,
-   "layers": "npl-flood-2026-08/layers.json"
+   "layers": "npl-flood-2026-08/layers.json",
+   "scene3d": "route"
+  },
+  {
+   "id": "usa-wildfire-2025-01",
+   "title": "Palisades Fire",
+   "area_name": "Pacific Palisades–Malibu, Los Angeles County",
+   "maturity": null,
+   "hazard": "wildfire",
+   "priority": 4,
+   "nisar": false,
+   "layers": "usa-wildfire-2025-01/layers.json",
+   "scene3d": "fire"
+  },
+  {
+   "id": "ven-earthquake-2026-06",
+   "title": "Venezuela depremleri (M7,2 ve M7,5), 24 Haziran 2026",
+   "area_name": "Northern coast between San Felipe and Caracas",
+   "maturity": null,
+   "hazard": "earthquake",
+   "priority": 9,
+   "nisar": true,
+   "layers": "ven-earthquake-2026-06/map_layers.json",
+   "place": "Venezuela",
+   "shocks": [
+    {
+     "mag": 7.2,
+     "time_utc": "2026-06-24T22:04:31.806Z",
+     "lat": 10.3713,
+     "lon": -68.5564,
+     "depth_km": 10,
+     "place": "20 km E of San Felipe",
+     "source": "USGS",
+     "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zc/executive"
+    },
+    {
+     "mag": 7.5,
+     "time_utc": "2026-06-24T22:05:04.053Z",
+     "lat": 10.5955,
+     "lon": -67.2205,
+     "depth_km": 10,
+     "place": "20 km W of Catia La Mar",
+     "source": "USGS",
+     "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp/executive"
+    }
+   ]
   }
  ]
 }

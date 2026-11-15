@@ -1,0 +1,75 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "kind": "wildfire",
+ "finding": "CAL FIRE's incident record gives 23,448 acres (about 94.9 km²) burned. The official perimeter drawn here measures the same, and VIIRS satellites detected heat inside it on 7–12 January 2025.",
+ "background": "usa-wildfire-2025-01/optical_2025-01-12.jpg",
+ "layers": [
+  {
+   "id": "firms",
+   "kind": "points",
+   "file": "usa-wildfire-2025-01/firms_viirs.geojson",
+   "label": "Active fire detections",
+   "color": "#ff5a1f",
+   "legend": "Active fire detections · NASA FIRMS, VIIRS 375 m, 7–12 Jan 2025",
+   "note": "Each dot is a VIIRS pixel where heat was detected during one satellite pass. The dots do not show a fire front."
+  },
+  {
+   "id": "perimeter",
+   "kind": "polygon",
+   "file": "usa-wildfire-2025-01/perimeter.geojson",
+   "label": "Mapped fire perimeter",
+   "color": "#ffd166",
+   "legend": "Mapped fire perimeter · NIFC WFIGS, version of 21 Jan 2025",
+   "note": "Official perimeter 2025-CALFD-000738, mapped from infrared imagery."
+  }
+ ],
+ "measurement": {
+  "total_acres": 23448,
+  "total_km2": 94.9,
+  "total_label": "Total in the CAL FIRE incident record",
+  "perimeter_source": "NIFC WFIGS Interagency Fire Perimeters, 2025-CALFD-000738",
+  "perimeter_version": "2025-01-21",
+  "perimeter_url": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0",
+  "record_url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire",
+  "firms_url": "https://firms.modaps.eosdis.nasa.gov/download/",
+  "perimeter_km2": 94.89,
+  "perimeter_acres": 23449,
+  "perimeter_drawn_km2": 94.89,
+  "perimeter_in_frame_km2": 94.89,
+  "perimeter_gis_acres": 23448,
+  "perimeter_map_method": "IR Image Interpretation",
+  "perimeter_date_current": "2025-01-21T23:43Z",
+  "firms_counts": {
+   "kept": 2121,
+   "before_start": 10,
+   "after_end": 0,
+   "farther": 119
+  },
+  "firms_days": [
+   "2025-01-07",
+   "2025-01-12"
+  ],
+  "firms_by_satellite": {
+   "S-NPP": 1072,
+   "NOAA-20": 1049
+  },
+  "firms_rule": "Kept: VIIRS detections from the fire's start (7 January 2025 18:30 UTC, CAL FIRE) to its containment (31 January), whose pixel centre lies inside the official perimeter or within 375 m of it (one VIIRS pixel). Not kept: detections before the start (ten on 1 January belong to an earlier fire) and those farther from the perimeter (other fires or edge pixels).",
+  "perimeter_islands": 2,
+  "firms_archive": "VIIRS 375 m, collection 2, NASA FIRMS yearly country archive (files of 10 October 2026)"
+ },
+ "sources": [
+  {
+   "publisher": "CAL FIRE incident record",
+   "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+  },
+  {
+   "publisher": "NIFC WFIGS Interagency Fire Perimeters",
+   "url": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0"
+  },
+  {
+   "publisher": "NASA FIRMS (VIIRS S-NPP and NOAA-20)",
+   "url": "https://firms.modaps.eosdis.nasa.gov/download/"
+  }
+ ],
+ "score": null
+}

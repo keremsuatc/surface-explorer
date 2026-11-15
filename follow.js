@@ -577,17 +577,18 @@
   I.onChange(() => { if (!raw) return; localize(); writeTexts(); });
 
   // v67: scenes that follow a route down a valley (follow_water.json "kind": "route") are drawn by follow-route.js, built from the event record
-  function startRoute(d) {
+  function startRoute(d, file = "follow-route.js", name = "FollowRoute") {
     return new Promise((resolve, reject) => {
-      const js = document.createElement("script"); js.src = "follow-route.js?v=68";
-      js.onload = () => (window.FollowRoute ? resolve() : reject(new Error("route player missing")));
-      js.onerror = () => reject(new Error("route player not loaded"));
+      const js = document.createElement("script"); js.src = `${file}?v=71`;
+      js.onload = () => (window[name] ? resolve() : reject(new Error("scene player missing")));
+      js.onerror = () => reject(new Error("scene player not loaded"));
       document.head.appendChild(js);
-    }).then(() => window.FollowRoute({ raw: d, I, $, esc, back, setBack, loadLib, webglOk, EVENT }));
+    }).then(() => window[name]({ raw: d, I, $, esc, back, setBack, loadLib, webglOk, EVENT }));
   }
   const notAvailable = () => fail(tr("There is no Follow the Water scene for “{event}”. The satellite map for this event still works.", { event: EVENT }), tr("Follow the Water is not available for this event"));
   I.ready().then(() => { I.picker($("fw-lang")); setBack(); return getJson(`data/${EVENT}/follow_water.json`); }).then((d) => {
     if (d.event_id === EVENT && d.kind === "route") return startRoute(d); // v67: route scene (Gyirong–Rasuwa), its own player file
+    if (d.event_id === EVENT && d.kind === "fire") return startRoute(d, "follow-fire.js", "FollowFire"); // v70: dated observations of a wildfire (Palisades)
     if (d.event_id !== EVENT || !d.flood || !d.timeline) { notAvailable(); return null; }
     raw = JSON.parse(JSON.stringify(d));
     data = d; TL = d.timeline;

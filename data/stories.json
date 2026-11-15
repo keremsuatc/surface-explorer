@@ -1,0 +1,337 @@
+{
+ "_doc": [
+  "v75: content of 'How do disasters happen?'. One record per story; the app reads only this file.",
+  "status: 'draft' (never opened for visitors: listed as 'In preparation') or 'ready' (opens). A story is shown as ready only with status 'ready' AND six slides that each have an image and an English caption; a missing language falls back to English.",
+  "image: path under web/data/, e.g. 'stories/earthquake/01.jpg' (16:9, about 1600 x 900, JPEG or WebP); null while not ready.",
+  "caption / alt: one short sentence per language (en, tr, fr, de, es). alt describes the picture for screen readers (falls back to the caption).",
+  "event_id: the event the last picture's 'Explore on the map' button opens (an id from web/data/events.json); without a valid id the button returns to the story list.",
+  "hazard: emblem of the story card (earthquake, flood, icerock, wildfire).",
+  "Local test of drafts: add ?stories=preview to the address (drawn placeholder frames, the placeholder captions below)."
+ ],
+ "stories": [
+  {
+   "id": "earthquake",
+   "hazard": "earthquake",
+   "event_id": "ven-earthquake-2026-06",
+   "status": "ready",
+   "title": {
+    "en": "Earthquake",
+    "tr": "Deprem",
+    "fr": "Séisme",
+    "de": "Erdbeben",
+    "es": "Terremoto"
+   },
+   "slides": [
+    {
+     "image": "stories/earthquake/01.webp",
+     "caption": {
+      "en": "Rough rocks on either side of the fault catch against each other and lock in place.",
+      "tr": "Fayın iki yanındaki pürüzlü kayalar birbirine takılır ve kilitlenir.",
+      "fr": "De part et d'autre de la faille, les roches rugueuses s'accrochent les unes aux autres et se bloquent.",
+      "de": "Die rauen Gesteine auf beiden Seiten der Verwerfung verhaken sich und bleiben stecken.",
+      "es": "Las rocas ásperas a ambos lados de la falla se traban entre sí y quedan bloqueadas."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/earthquake/02.webp",
+     "caption": {
+      "en": "As the ground slowly pushes and pulls, the locked rocks bend and store energy.",
+      "tr": "Yer yavaşça itip çektikçe kilitli kayalar bükülür ve enerji biriktirir.",
+      "fr": "Tandis que le sol pousse et tire lentement, les roches bloquées se plient et accumulent de l'énergie.",
+      "de": "Während der Untergrund langsam drückt und zieht, verbiegen sich die verhakten Gesteine und speichern Energie.",
+      "es": "Mientras el terreno empuja y tira lentamente, las rocas bloqueadas se doblan y acumulan energía."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/earthquake/03.webp",
+     "caption": {
+      "en": "The rocks suddenly slip along the fault, leaving the pale rock layer lower on one side than the other.",
+      "tr": "Kayalar fay boyunca aniden kayar; açık renkli kaya katmanı bir yanda diğer yandan daha aşağıda kalır.",
+      "fr": "Les roches glissent soudain le long de la faille : la couche claire se retrouve plus basse d'un côté que de l'autre.",
+      "de": "Plötzlich rutschen die Gesteine entlang der Verwerfung ab: Die helle Schicht liegt nun auf einer Seite tiefer als auf der anderen.",
+      "es": "Las rocas se deslizan de golpe a lo largo de la falla y la capa de roca clara queda más baja en un lado que en el otro."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/earthquake/04.webp",
+     "caption": {
+      "en": "The sudden slip releases energy that ripples through the rock in all directions as seismic waves.",
+      "tr": "Ani kayma, kayanın içinde her yöne sismik dalgalar olarak yayılan enerjiyi açığa çıkarır.",
+      "fr": "Ce glissement brutal libère de l'énergie qui se propage dans la roche dans toutes les directions sous forme d'ondes sismiques.",
+      "de": "Das plötzliche Abrutschen setzt Energie frei, die sich als Erdbebenwellen in alle Richtungen durch das Gestein ausbreitet.",
+      "es": "El deslizamiento repentino libera energía que se propaga por la roca en todas direcciones como ondas sísmicas."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/earthquake/05.webp",
+     "caption": {
+      "en": "When the waves reach the surface, the ground shakes, making trees sway and houses tremble.",
+      "tr": "Dalgalar yüzeye ulaşınca yer sarsılır; ağaçlar sallanır, evler titrer.",
+      "fr": "Quand les ondes atteignent la surface, le sol tremble : les arbres se balancent et les maisons vibrent.",
+      "de": "Erreichen die Wellen die Oberfläche, bebt der Boden: Bäume schwanken und Häuser zittern.",
+      "es": "Cuando las ondas llegan a la superficie, el suelo tiembla: los árboles se balancean y las casas vibran."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/earthquake/06.webp",
+     "caption": {
+      "en": "After the shaking stops, the pale rock layer stays out of line, leaving a lasting trace of the earthquake underground.",
+      "tr": "Sarsıntı durunca açık renkli kaya katmanı hizasız kalır; deprem yer altında kalıcı bir iz bırakır.",
+      "fr": "Une fois la secousse terminée, la couche claire reste décalée : le séisme laisse une trace durable sous terre.",
+      "de": "Nach dem Beben bleibt die helle Gesteinsschicht versetzt – eine bleibende Spur des Erdbebens im Untergrund.",
+      "es": "Cuando termina el temblor, la capa de roca clara sigue desalineada y deja una huella duradera del terremoto bajo tierra."
+     },
+     "alt": {}
+    }
+   ]
+  },
+  {
+   "id": "river-flood",
+   "hazard": "flood",
+   "event_id": "bgd-flood-2026-07",
+   "status": "ready",
+   "title": {
+    "en": "River flood",
+    "tr": "Nehir taşkını",
+    "fr": "Crue de rivière",
+    "de": "Flusshochwasser",
+    "es": "Crecida de río"
+   },
+   "slides": [
+    {
+     "image": "stories/river-flood/01.webp",
+     "caption": {
+      "en": "The river flows within its banks, and the nearby fields, road, and homes stay dry.",
+      "tr": "Nehir kendi yatağında akıyor; yakındaki tarlalar, yol ve evler kuru.",
+      "fr": "La rivière coule dans son lit : les champs, la route et les maisons à côté restent au sec.",
+      "de": "Der Fluss fließt in seinem Bett. Die Felder, die Straße und die Häuser daneben bleiben trocken.",
+      "es": "El río corre por su cauce y los campos, la carretera y las casas de al lado siguen secos."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/river-flood/02.webp",
+     "caption": {
+      "en": "Heavy rain runs down the hillsides into small streams, which carry the extra water into the river.",
+      "tr": "Şiddetli yağmur yamaçlardan küçük derelere akıyor; dereler de bu fazla suyu nehre taşıyor.",
+      "fr": "La forte pluie dévale les collines jusqu'aux petits ruisseaux, qui apportent toute cette eau à la rivière.",
+      "de": "Starker Regen läuft die Hänge hinunter in kleine Bäche, und die bringen das viele Wasser zum Fluss.",
+      "es": "La lluvia fuerte baja por las laderas hasta los arroyos, que llevan toda esa agua al río."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/river-flood/03.webp",
+     "caption": {
+      "en": "As more rainwater pours in, the river covers the gravel bar and rises to the top of its banks.",
+      "tr": "Nehre daha çok yağmur suyu geldikçe çakıllı kıyıyı örtüyor ve su kenarların en üstüne kadar yükseliyor.",
+      "fr": "Avec encore plus de pluie, la rivière recouvre la plage de galets et monte jusqu'en haut de ses berges.",
+      "de": "Kommt noch mehr Regenwasser dazu, bedeckt der Fluss die Kiesbank und steigt bis zum Rand seiner Ufer.",
+      "es": "Con más agua de lluvia, el río cubre la orilla de piedras y sube hasta lo alto de sus bordes."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/river-flood/04.webp",
+     "caption": {
+      "en": "The swollen river spills over the lowest part of its bank, sending muddy water into the first rows of crops.",
+      "tr": "Kabaran nehir kıyısının en alçak yerinden taşıyor ve çamurlu su ekinlerin ilk sıralarına giriyor.",
+      "fr": "La rivière gonflée déborde là où la berge est la plus basse, et l'eau boueuse entre dans les premiers rangs de cultures.",
+      "de": "Der volle Fluss tritt an der niedrigsten Stelle über das Ufer, und schlammiges Wasser fließt in die ersten Pflanzenreihen.",
+      "es": "El río crecido se desborda por la parte más baja de la orilla y el agua con barro entra en las primeras filas de cultivos."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/river-flood/05.webp",
+     "caption": {
+      "en": "Floodwater spreads across the low fields, covers part of the road, and reaches the houses closest to the river.",
+      "tr": "Taşkın suyu alçak tarlalara yayılıyor, yolun bir kısmını kaplıyor ve nehre en yakın evlere ulaşıyor.",
+      "fr": "L'eau de la crue s'étale sur les champs bas, couvre une partie de la route et atteint les maisons les plus proches de la rivière.",
+      "de": "Das Hochwasser breitet sich über die tiefen Felder aus, bedeckt einen Teil der Straße und erreicht die Häuser am Fluss.",
+      "es": "El agua de la inundación se extiende por los campos bajos, cubre parte de la carretera y llega a las casas más cercanas al río."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/river-flood/06.webp",
+     "caption": {
+      "en": "As the river returns to its channel, mud and puddles show where floodwater once covered the fields.",
+      "tr": "Nehir yatağına dönünce çamur ve su birikintileri, suyun tarlaları nerede kapladığını gösteriyor.",
+      "fr": "Quand la rivière retourne dans son lit, la boue et les flaques montrent où l'eau avait recouvert les champs.",
+      "de": "Wenn der Fluss in sein Bett zurückkehrt, zeigen Schlamm und Pfützen, wo das Wasser die Felder bedeckt hat.",
+      "es": "Cuando el río vuelve a su cauce, el barro y los charcos muestran dónde el agua cubrió los campos."
+     },
+     "alt": {}
+    }
+   ]
+  },
+  {
+   "id": "ice-rock-flood",
+   "hazard": "icerock",
+   "event_id": "npl-flood-2026-08",
+   "status": "ready",
+   "title": {
+    "en": "Flood from ice and rock",
+    "tr": "Buz ve kaya kaynaklı taşkın",
+    "fr": "Crue due à la glace et aux roches",
+    "de": "Flut aus Eis und Fels",
+    "es": "Inundación por hielo y roca"
+   },
+   "slides": [
+    {
+     "image": "stories/ice-rock-flood/01.webp",
+     "caption": {
+      "en": "High above the river, a large mass of ice and rock clings to a steep mountainside.",
+      "tr": "Nehrin çok yukarısında, büyük bir buz ve kaya kütlesi dik bir dağ yamacına tutunuyor.",
+      "fr": "Loin au-dessus de la rivière, une grande masse de glace et de roche s'accroche à une pente raide.",
+      "de": "Hoch über dem Fluss hängt eine große Masse aus Eis und Fels an einem steilen Berghang.",
+      "es": "Muy por encima del río, una gran masa de hielo y roca se aferra a una ladera empinada."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/ice-rock-flood/02.webp",
+     "caption": {
+      "en": "The mass breaks free and starts to slide down the slope.",
+      "tr": "Kütle kopuyor ve yamaçtan aşağı kaymaya başlıyor.",
+      "fr": "La masse se détache et commence à glisser le long de la pente.",
+      "de": "Die Masse bricht ab und beginnt, den Hang hinunterzurutschen.",
+      "es": "La masa se desprende y empieza a deslizarse ladera abajo."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/ice-rock-flood/03.webp",
+     "caption": {
+      "en": "Ice and rock tumble into the valley and reach the river.",
+      "tr": "Buz ve kayalar yuvarlanarak vadiye iniyor ve nehre ulaşıyor.",
+      "fr": "La glace et la roche dégringolent dans la vallée et atteignent la rivière.",
+      "de": "Eis und Fels stürzen ins Tal und erreichen den Fluss.",
+      "es": "El hielo y la roca caen rodando al valle y llegan al río."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/ice-rock-flood/04.webp",
+     "caption": {
+      "en": "A muddy surge rushes downstream, carrying chunks of ice and rock.",
+      "tr": "Çamurlu bir su dalgası, buz ve kaya parçaları taşıyarak akıntı yönünde hızla ilerliyor.",
+      "fr": "Une vague boueuse dévale la rivière en emportant des blocs de glace et de roche.",
+      "de": "Eine schlammige Flutwelle rast flussabwärts und reißt Eis- und Felsbrocken mit.",
+      "es": "Una oleada de barro baja con fuerza por el río, arrastrando trozos de hielo y roca."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/ice-rock-flood/05.webp",
+     "caption": {
+      "en": "As the surge travels down the valley, it spills over the riverbanks in places.",
+      "tr": "Dalga vadi boyunca ilerlerken yer yer nehrin kıyılarından taşıyor.",
+      "fr": "En descendant la vallée, la vague déborde par endroits des berges.",
+      "de": "Auf ihrem Weg durch das Tal tritt die Welle an manchen Stellen über die Ufer.",
+      "es": "Mientras baja por el valle, la oleada se desborda en algunos tramos de la orilla."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/ice-rock-flood/06.webp",
+     "caption": {
+      "en": "As the water recedes, mud and rocks left behind can narrow parts of the river channel.",
+      "tr": "Su çekilince geride kalan çamur ve kayalar nehir yatağını yer yer daraltabilir.",
+      "fr": "Quand l'eau se retire, la boue et les roches laissées sur place peuvent rétrécir le lit de la rivière par endroits.",
+      "de": "Wenn das Wasser zurückgeht, können zurückgebliebener Schlamm und Fels das Flussbett stellenweise verengen.",
+      "es": "Cuando el agua baja, el barro y las rocas que quedan pueden estrechar partes del cauce del río."
+     },
+     "alt": {}
+    }
+   ]
+  },
+  {
+   "id": "wildfire",
+   "hazard": "wildfire",
+   "event_id": "usa-wildfire-2025-01",
+   "status": "ready",
+   "title": {
+    "en": "Wildfire",
+    "tr": "Orman yangını",
+    "fr": "Feu de forêt",
+    "de": "Waldbrand",
+    "es": "Incendio forestal"
+   },
+   "slides": [
+    {
+     "image": "stories/wildfire/01.webp",
+     "caption": {
+      "en": "After a long dry spell, the grass and pine needles in the forest can catch fire easily.",
+      "tr": "Uzun süre yağmur yağmayınca ormandaki otlar ve çam iğneleri kolayca alev alabilir.",
+      "fr": "Après une longue période sans pluie, l'herbe et les aiguilles de pin de la forêt peuvent prendre feu facilement.",
+      "de": "Nach langer Trockenheit können Gras und Kiefernnadeln im Wald leicht Feuer fangen.",
+      "es": "Después de mucho tiempo sin lluvia, la hierba y las agujas de pino del bosque pueden prenderse con facilidad."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/wildfire/02.webp",
+     "caption": {
+      "en": "A small flame catches in the dry grass at the edge of the forest.",
+      "tr": "Ormanın kenarındaki kuru otlarda küçük bir alev tutuşuyor.",
+      "fr": "Une petite flamme s'allume dans l'herbe sèche, au bord de la forêt.",
+      "de": "Im trockenen Gras am Waldrand entzündet sich eine kleine Flamme.",
+      "es": "Una pequeña llama prende en la hierba seca, al borde del bosque."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/wildfire/03.webp",
+     "caption": {
+      "en": "The flames spread from the grass to nearby shrubs.",
+      "tr": "Alevler otlardan yakındaki çalılara yayılıyor.",
+      "fr": "Les flammes passent de l'herbe aux buissons voisins.",
+      "de": "Die Flammen breiten sich vom Gras auf die Sträucher daneben aus.",
+      "es": "Las llamas pasan de la hierba a los arbustos cercanos."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/wildfire/04.webp",
+     "caption": {
+      "en": "Wind carries glowing embers ahead of the flames, where they can start new fires.",
+      "tr": "Rüzgâr kızgın kıvılcımları alevlerin önüne taşıyor; kıvılcımlar oralarda yeni yangınlar başlatabilir.",
+      "fr": "Le vent emporte des braises devant les flammes, où elles peuvent allumer de nouveaux feux.",
+      "de": "Der Wind trägt glühende Funken vor die Flammen, wo sie neue Feuer entfachen können.",
+      "es": "El viento lleva brasas encendidas por delante de las llamas, donde pueden empezar nuevos fuegos."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/wildfire/05.webp",
+     "caption": {
+      "en": "The fire spreads through the pines, sending smoke above the forest.",
+      "tr": "Yangın çam ağaçlarının arasında yayılıyor ve ormanın üzerine duman yükseliyor.",
+      "fr": "Le feu se propage parmi les pins et la fumée monte au-dessus de la forêt.",
+      "de": "Das Feuer breitet sich zwischen den Kiefern aus, und Rauch steigt über den Wald.",
+      "es": "El fuego se extiende entre los pinos y el humo sube por encima del bosque."
+     },
+     "alt": {}
+    },
+    {
+     "image": "stories/wildfire/06.webp",
+     "caption": {
+      "en": "After the flames die down, blackened trees stand over ground covered in ash.",
+      "tr": "Alevler sönünce kararmış ağaçlar külle kaplı toprağın üzerinde ayakta kalıyor.",
+      "fr": "Quand les flammes s'éteignent, des arbres noircis restent debout sur un sol couvert de cendres.",
+      "de": "Wenn die Flammen erlöschen, stehen schwarze Bäume auf einem Boden voller Asche.",
+      "es": "Cuando las llamas se apagan, quedan árboles ennegrecidos sobre un suelo cubierto de ceniza."
+     },
+     "alt": {}
+    }
+   ]
+  }
+ ]
+}

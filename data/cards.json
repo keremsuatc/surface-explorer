@@ -1,0 +1,71 @@
+{
+ "generated_from": "catalog/events/<event>.json (web.card) via pipeline/export/build_cards.py",
+ "cards": {
+  "bgd-flood-2026-07": {
+   "title": "Bangladesh: Flash floods",
+   "place": "Habiganj, Sylhet Division",
+   "sentence": "Flash floods and landslides hit the area. Radar shows where there may be water.",
+   "image": {
+    "file": "bgd-flood-2026-07/card.jpg",
+    "width": 960,
+    "height": 640,
+    "alt": "This project's NISAR HH radar preview, 12 July 2026",
+    "caption": "NISAR radar image, 12 Jul 2026 · dark can be water or smooth ground",
+    "credit": "NISAR: NASA/JPL-Caltech, ASF DAAC"
+   }
+  },
+  "moz-flood-2026-01": {
+   "title": "Mozambique: Limpopo River floods",
+   "place": "Chókwè, Limpopo River",
+   "sentence": "The Limpopo River flooded. Radar shows where the ground changed between two passes.",
+   "image": {
+    "file": "moz-flood-2026-01/card.jpg",
+    "width": 960,
+    "height": 640,
+    "alt": "True-colour satellite image of Chókwè and the Limpopo River, 27 January 2026",
+    "caption": "Sentinel-2, 27 Jan 2026",
+    "credit": "Contains modified Copernicus Sentinel data 2026"
+   }
+  },
+  "npl-flood-2026-08": {
+   "title": "Ice and rock collapse on the Tibet–Nepal border",
+   "place": "Gyirong–Rasuwa",
+   "sentence": "Ice and rock broke off the mountain. Water and mud moved down the valley.",
+   "marker": "Tibet–Nepal",
+   "image": {
+    "file": "npl-flood-2026-08/card.jpg",
+    "width": 960,
+    "height": 640,
+    "alt": "Satellite view of the north side of Langtang Lirung: snow and ice, a bare patch where ice and rock broke away, and a grey debris track running down into the forest.",
+    "caption": "Where ice and rock broke away, and the debris track · Sentinel-2, 28 Sep 2026",
+    "credit": "Contains modified Copernicus Sentinel data 2026"
+   }
+  },
+  "usa-wildfire-2025-01": {
+   "title": "Palisades Fire",
+   "place": "Los Angeles, California",
+   "sentence": "A wind-driven fire burned the hills towards Malibu.",
+   "image": {
+    "file": "usa-wildfire-2025-01/card.jpg",
+    "width": 960,
+    "height": 640,
+    "alt": "True-colour satellite image of the burned hills above Pacific Palisades, 12 January 2025",
+    "caption": "Sentinel-2, 12 Jan 2025 · grey-brown: burned slopes",
+    "credit": "Contains modified Copernicus Sentinel data 2025"
+   }
+  },
+  "ven-earthquake-2026-06": {
+   "title": "Venezuela: Two strong earthquakes",
+   "place": "Northern coast between San Felipe and Caracas",
+   "sentence": "Two shocks, about half a minute apart, shook the coast. Radar shows how the ground moved.",
+   "image": {
+    "file": "ven-earthquake-2026-06/card.jpg",
+    "width": 960,
+    "height": 640,
+    "alt": "NISAR radar map of ground motion along the northern coast of Venezuela, 17–29 June 2026",
+    "caption": "NISAR radar: ground motion, 17–29 Jun 2026 · colours are not damage",
+    "credit": "NISAR: NASA/JPL-Caltech, ASF DAAC"
+   }
+  }
+ }
+}

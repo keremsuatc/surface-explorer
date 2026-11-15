@@ -29,7 +29,7 @@
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
         onerror="showLoadError('The Leaflet stylesheet (cdnjs) could not be loaded; check your internet connection.')">
-  <link rel="stylesheet" href="style.css?v=68" onerror="showLoadError('<code>style.css</code> could not be loaded.')">
+  <link rel="stylesheet" href="style.css?v=94" onerror="showLoadError('<code>style.css</code> could not be loaded.')">
 </head>
 <body>
   <a data-i18n class="skip" href="#explore">Skip to the explanation panel</a>
@@ -37,6 +37,7 @@
   <!-- Start screen: globe + list for choosing an event (shown when no event is given in the address) -->
   <section id="intro" class="intro" aria-labelledby="intro-h" hidden>
     <div class="intro-head">
+      <button data-i18n type="button" id="to-home" class="btn btn-small to-home">← Start</button>
       <div class="lang-pick-slot intro-lang"></div>
       <p class="eyebrow">NISAR Flood Explorer</p>
       <h1 data-i18n id="intro-h" tabindex="-1">Explore how Earth changes.</h1>
@@ -56,6 +57,8 @@
       </div>
       <div class="intro-side">
         <h2 data-i18n class="intro-list-h" id="intro-list-h">Events</h2>
+        <!-- v69: event type filter (all / floods / wildfires): updates this list and the globe markers -->
+        <div id="intro-filter" class="intro-filter" role="group" hidden></div>
         <ul id="intro-list" class="intro-list" aria-labelledby="intro-list-h"></ul>
         <p data-i18n class="intro-note">Showing selected case studies, not a complete disaster catalogue.</p>
         <!-- v61: short event preview (place, short date, one sentence, one button); the map opens only from its button -->
@@ -67,6 +70,19 @@
       </div>
     </div>
   </section>
+
+  <!-- v75: start menu (after the language choice): illustrated stories or the interactive map -->
+  <section id="home" class="home space" aria-labelledby="home-h" hidden>
+    <div class="home-top"><p class="home-brand">Surface Explorer</p><div class="lang-pick-slot home-lang"></div></div>
+    <div class="home-body">
+      <h1 data-i18n id="home-h" tabindex="-1">Explore how Earth changes.</h1>
+      <p data-i18n class="home-sub">Choose how you want to start.</p>
+      <div class="home-choices" id="home-choices"></div>
+    </div>
+  </section>
+  <!-- v75: "How do disasters happen?" — the story list, then one story at a time (content: web/data/stories.json) -->
+  <section id="stories" class="stories space" aria-labelledby="stories-h" hidden></section>
+  <section id="story" class="story space" role="dialog" aria-modal="true" aria-labelledby="story-h" hidden></section>
 
   <header class="top">
     <div class="brand">
@@ -116,9 +132,11 @@
         <button data-i18n type="button" data-view="satellite" aria-pressed="true">Satellite</button>
         <button data-i18n type="button" data-view="analysis" aria-pressed="false">Street map</button>
       </div>
+      <!-- v75: flood map area: everything the data cover / the settlement close-up (filled from app.js; hidden elsewhere) -->
+      <div id="area-switch" class="view-switch area-switch" role="group" hidden></div>
       <div class="map-tools">
         <button data-i18n type="button" id="return-aoi" class="btn btn-small map-btn">Return to study area</button>
-        <button data-i18n type="button" id="to-text" class="btn btn-small map-btn mobile-only">Read more ↓</button>
+        <button data-i18n type="button" id="to-text" class="btn btn-small map-btn mobile-only">Data and sources ↓</button>
       </div>
       <div id="sat-error" class="sat-error" role="alert" hidden>
         <span data-i18n>Satellite imagery could not be loaded.</span>
@@ -128,6 +146,8 @@
       <!-- Always-visible small legend: active layer, its dates and the study-area note -->
       <div id="map-legend" class="map-legend" aria-live="polite"></div>
     </section>
+    <!-- v76: the dates and data limits of the view, right under the image (the sentence and the action are above it) -->
+    <div id="view-notes" class="view-notes" hidden></div>
     <!-- v68: Timeline controls right under the image (previous, play/pause, next, slider; the four stops). Built once per view, so they never move -->
     <div id="stage-ctrl" class="stage-ctrl" hidden></div>
     <!-- v68: Timeline source and capture details, folded (the date, title, place and sentence are above the image) -->
@@ -256,10 +276,10 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
           onerror="showLoadError('The Leaflet library (cdnjs) could not be loaded; check your internet connection.')"></script>
-  <script src="i18n.js?v=68"></script>
-  <script src="intro.js?v=68"></script>
+  <script src="i18n.js?v=94"></script>
+  <script src="intro.js?v=94"></script>
   <!-- Public settings (optional ArcGIS API key restricted to this site) -->
   <script src="config.js"></script>
-  <script src="app.js?v=68" onerror="showLoadError('<code>app.js</code> could not be loaded.')"></script>
+  <script src="app.js?v=94" onerror="showLoadError('<code>app.js</code> could not be loaded.')"></script>
 </body>
 </html>

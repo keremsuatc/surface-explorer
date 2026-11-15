@@ -1,8 +1,9 @@
 {
  "event_id": "npl-flood-2026-08",
- "finding": "UNOSAT data of 2 September 2026: about 65 km² of the roughly 1,246 km² it examined appears to be affected by the flood.",
+ "finding": "UNOSAT data of 2 September 2026: in its whole analysis area of about 1,246 km² (Rasuwa and Nuwakot districts), about 65 km² appears to be affected by the flood; about 2.3 km² of that lies in this image.",
  "layer": {
-  "file": "npl-flood-2026-08/unosat_extent.geojson"
+  "file": "npl-flood-2026-08/unosat_extent.geojson",
+  "what": "area UNOSAT mapped as affected (mud and rock flow)"
  },
  "background": "npl-flood-2026-08/optical_2026-08-27.jpg",
  "measurement": {
@@ -21,7 +22,10 @@
   "scope": "UNOSAT's whole analysis area (Rasuwa and Nuwakot districts). The app draws the full layer, simplified by about 5 m (not clipped); the image frame shows only a small part of it (about 2.3 km² of the affected area).",
   "imagery": "Sentinel-2 (27 August 2026) and PlanetScope (26 August 2026)",
   "status": "Preliminary assessment: UNOSAT says it has not been validated in the field.",
-  "licence": "CC BY-SA"
+  "licence": "CC BY-SA",
+  "frame_km2": 18.0,
+  "in_frame_km2": 2.3,
+  "frame_in_analysed_km2": 15.9
  },
  "official_map": {
   "id": 4259,

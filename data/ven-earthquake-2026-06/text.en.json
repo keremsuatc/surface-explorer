@@ -1,0 +1,9 @@
+{
+ "event_id": "ven-earthquake-2026-06",
+ "lang": "en",
+ "generated_from": "catalog/events/ven-earthquake-2026-06.json via pipeline/export/build_event_web.py",
+ "event": {
+  "place": "Venezuela",
+  "area_name": "Northern coast between San Felipe and Caracas"
+ }
+}

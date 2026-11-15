@@ -1,0 +1,41 @@
+{
+ "event_id": "npl-flood-2026-08",
+ "generated_from": "catalog/events/npl-flood-2026-08.json (web.views) via build_event_web.py views",
+ "applies_to": "unosat",
+ "overview": {
+  "label": "Affected areas",
+  "bounds": [
+   [
+    27.65307,
+    84.32504
+   ],
+   [
+    28.35967,
+    85.5585
+   ]
+  ],
+  "coverage": {
+   "file": "unosat_analysis.geojson",
+   "label": "Area UNOSAT analysed",
+   "label_at": [
+    28.34608,
+    85.41271
+   ]
+  }
+ },
+ "closeup": {
+  "label": "Close look",
+  "place": "Betrawati–Gerkhu",
+  "bounds": [
+   [
+    27.9469,
+    85.1614
+   ],
+   [
+    27.9919,
+    85.1981
+   ]
+  ]
+ },
+ "legend": "Mapped flood, mud and rock impact"
+}

@@ -1,0 +1,36 @@
+{
+ "event_id": "bgd-flood-2026-07",
+ "generated_from": "catalog/events/bgd-flood-2026-07.json (web.views) via build_event_web.py views",
+ "applies_to": "evidence",
+ "overview": {
+  "label": "Affected areas",
+  "bounds": [
+   [
+    24.32484,
+    91.36011
+   ],
+   [
+    24.42528,
+    91.46979
+   ]
+  ],
+  "coverage": {
+   "outline": "existing",
+   "label": "Satellite data cover this area"
+  }
+ },
+ "closeup": {
+  "label": "Close look",
+  "place": "North-east change area",
+  "bounds": [
+   [
+    24.37552,
+    91.4256
+   ],
+   [
+    24.39016,
+    91.44156
+   ]
+  ]
+ }
+}

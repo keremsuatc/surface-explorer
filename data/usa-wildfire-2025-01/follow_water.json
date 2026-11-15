@@ -1,0 +1,377 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "kind": "fire",
+ "generated_from": "catalog/events/usa-wildfire-2025-01.json (web.follow) via pipeline/export/build_event_web.py follow",
+ "label": "Illustrative 3D view of dated observations",
+ "exaggeration": 1.5,
+ "elevation": {
+  "source": "Terrain Tiles (Mapzen/Tilezen terrarium PNG, AWS Open Data registry 'terrain-tiles')",
+  "tile_url": "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
+  "maxzoom": 13,
+  "terms": "https://github.com/tilezen/joerd/blob/master/docs/attribution.md",
+  "underlying": "USGS 3DEP (NED) in the United States"
+ },
+ "background": {
+  "url": "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}",
+  "maxzoom": 16,
+  "credit": "USDA, USGS The National Map: Orthoimagery (data refreshed June 2024)",
+  "note": "Background outside the dated images: USGS orthoimagery from before the fire."
+ },
+ "frame": [
+  [
+   34.015,
+   -118.7
+  ],
+  [
+   34.14,
+   -118.49
+  ]
+ ],
+ "images": [
+  {
+   "time": "2025-01-02T18:45:02Z",
+   "label": "2025-01-02",
+   "file": "usa-wildfire-2025-01/optical_2025-01-02.jpg",
+   "scene": "S2A_11SLT_20250102_0_L2A",
+   "source": "Sentinel-2",
+   "gsd_m": 10.0
+  },
+  {
+   "time": "2025-01-07T18:45:03Z",
+   "label": "2025-01-07",
+   "file": "usa-wildfire-2025-01/optical_2025-01-07.jpg",
+   "scene": "S2B_11SLT_20250107_0_L2A",
+   "source": "Sentinel-2",
+   "gsd_m": 10.0
+  },
+  {
+   "time": "2025-01-12T18:45:00Z",
+   "label": "2025-01-12",
+   "file": "usa-wildfire-2025-01/optical_2025-01-12.jpg",
+   "scene": "S2A_11SLT_20250112_0_L2A",
+   "source": "Sentinel-2",
+   "gsd_m": 10.0
+  },
+  {
+   "time": "2025-01-14T18:28:31Z",
+   "label": "2025-01-14",
+   "file": "usa-wildfire-2025-01/landsat_2025-01-14.jpg",
+   "scene": "LC09_L2SP_041036_20250114_02_T1",
+   "source": "Landsat-9",
+   "gsd_m": 30.02
+  }
+ ],
+ "stops": [
+  {
+   "id": "before",
+   "chip": "Before",
+   "place": "Pacific Palisades–Malibu",
+   "time": "2025-01-02T18:45:02Z",
+   "kind": "image",
+   "sentence": "Five days before the fire: green and dark slopes rise from the coast between Pacific Palisades and Malibu.",
+   "bearing": 15,
+   "pitch": 58,
+   "sources": [
+    {
+     "label": "Copernicus Sentinel-2 L2A, S2A_11SLT_20250102_0_L2A",
+     "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250102_0_L2A"
+    }
+   ],
+   "fit_bounds": [
+    [
+     -118.7,
+     34.015
+    ],
+    [
+     -118.49,
+     34.14
+    ]
+   ],
+   "t": [
+    0.0,
+    0.08
+   ],
+   "detections_so_far": 0,
+   "image": "2025-01-02"
+  },
+  {
+   "id": "start",
+   "chip": "First day",
+   "place": "Above Pacific Palisades",
+   "time": "2025-01-07T18:45:03Z",
+   "kind": "image",
+   "sentence": "10:45 a.m. local time, about 15 minutes after the start: smoke rises above Pacific Palisades and drifts out to sea.",
+   "bearing": 0,
+   "pitch": 55,
+   "sources": [
+    {
+     "label": "CAL FIRE incident record (start 10:30 a.m., location)",
+     "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+    },
+    {
+     "label": "NASA Earth Observatory, 9 January 2025",
+     "url": "https://science.nasa.gov/earth/earth-observatory/fires-tear-through-los-angeles-153793/"
+    }
+   ],
+   "fit_bounds": [
+    [
+     -118.57923,
+     34.04128
+    ],
+    [
+     -118.50983,
+     34.09916
+    ]
+   ],
+   "t": [
+    0.23,
+    0.31
+   ],
+   "detections_so_far": 0,
+   "image": "2025-01-07"
+  },
+  {
+   "id": "heat",
+   "chip": "8 Jan",
+   "place": "Pacific Palisades towards Malibu",
+   "time": "2025-01-08T21:08:00Z",
+   "kind": "detections",
+   "sentence": "By the satellite passes of 8 January, heat was detected from Pacific Palisades westwards towards Malibu.",
+   "bearing": 20,
+   "pitch": 55,
+   "sources": [
+    {
+     "label": "NASA FIRMS, VIIRS 375 m (S-NPP, NOAA-20)",
+     "url": "https://firms.modaps.eosdis.nasa.gov/download/"
+    }
+   ],
+   "fit_bounds": [
+    [
+     -118.67368,
+     34.0284
+    ],
+    [
+     -118.49955,
+     34.0958
+    ]
+   ],
+   "t": [
+    0.46,
+    0.54
+   ],
+   "detections_so_far": 1105,
+   "image": "2025-01-07"
+  },
+  {
+   "id": "scar",
+   "chip": "12 Jan",
+   "place": "Pacific Palisades–Malibu",
+   "time": "2025-01-12T18:45:00Z",
+   "kind": "image",
+   "sentence": "Five days after the start: grey-brown burned slopes; the heat detections of the past days lie on them.",
+   "bearing": 345,
+   "pitch": 52,
+   "sources": [
+    {
+     "label": "Copernicus Sentinel-2 L2A, S2A_11SLT_20250112_0_L2A",
+     "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250112_0_L2A"
+    }
+   ],
+   "fit_bounds": [
+    [
+     -118.68587,
+     34.02985
+    ],
+    [
+     -118.50057,
+     34.12936
+    ]
+   ],
+   "t": [
+    0.69,
+    0.77
+   ],
+   "detections_so_far": 2120,
+   "image": "2025-01-12"
+  },
+  {
+   "id": "final",
+   "chip": "31 Jan",
+   "place": "Pacific Palisades–Malibu",
+   "time": "2025-01-31T18:48:00Z",
+   "kind": "record",
+   "sentence": "31 January: CAL FIRE's record gives the fire as fully contained. The yellow line is the mapped fire perimeter.",
+   "bearing": 0,
+   "pitch": 45,
+   "perimeter": true,
+   "sources": [
+    {
+     "label": "CAL FIRE incident record",
+     "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+    },
+    {
+     "label": "NIFC WFIGS perimeter 2025-CALFD-000738",
+     "url": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0"
+    }
+   ],
+   "fit_bounds": [
+    [
+     -118.68587,
+     34.02985
+    ],
+    [
+     -118.50057,
+     34.12936
+    ]
+   ],
+   "t": [
+    0.92,
+    1.0
+   ],
+   "detections_so_far": 2121,
+   "image": "2025-01-14"
+  }
+ ],
+ "places": [
+  {
+   "place": "palisades",
+   "kind": "place",
+   "stops": [
+    "before",
+    "start",
+    "scar",
+    "final"
+   ],
+   "anchor": "right",
+   "id": "palisades",
+   "name": "Pacific Palisades",
+   "lonlat": [
+    -118.52647,
+    34.04806
+   ],
+   "osm": "node/150943581",
+   "ground_m": 100
+  },
+  {
+   "place": "malibu",
+   "kind": "place",
+   "stops": [
+    "before",
+    "heat"
+   ],
+   "anchor": "left",
+   "id": "malibu",
+   "name": "Malibu",
+   "lonlat": [
+    -118.68942,
+    34.03559
+   ],
+   "osm": "node/2517373897",
+   "ground_m": 6
+  },
+  {
+   "place": "topanga",
+   "kind": "place",
+   "stops": [
+    "before",
+    "scar",
+    "final"
+   ],
+   "anchor": "bottom",
+   "id": "topanga",
+   "name": "Topanga",
+   "lonlat": [
+    -118.60296,
+    34.0897
+   ],
+   "osm": "node/7399702863",
+   "ground_m": 244
+  },
+  {
+   "id": "origin",
+   "lonlat": [
+    -118.54453,
+    34.07022
+   ],
+   "name": "Start location (CAL FIRE)",
+   "kind": "obs",
+   "stops": [
+    "start"
+   ],
+   "anchor": "bottom",
+   "ground_m": 404
+  }
+ ],
+ "layers": {
+  "firms": "firms_viirs.geojson",
+  "perimeter": "perimeter.geojson"
+ },
+ "progression": {
+  "found": false,
+  "checked": "2026-11-13: NIFC WFIGS Interagency Fire Perimeters (current, one perimeter per incident), CAL FIRE FRAP historical perimeters (one final perimeter per fire: PALISADES 2025, 23,448.9 GIS acres, same IRWIN ID) and an ArcGIS Online search: no dated official progression perimeters. Only the final perimeter is shown, at the last stop.",
+  "frap": "https://services2.arcgis.com/iq8zYa0SRsvIFFKz/arcgis/rest/services/PalisadesFirePerimeter_COMPRESS/FeatureServer"
+ },
+ "texts": {
+  "sub": "Palisades Fire · 2–31 January 2025",
+  "place_title": "Palisades Fire",
+  "travel": "The camera moves between dated observations; the slider is not a clock.",
+  "perimeter_label": "Mapped fire perimeter",
+  "perimeter_note": "NIFC WFIGS 2025-CALFD-000738, version of 21 January 2025",
+  "detections_label": "Active fire detections",
+  "detections_note": "NASA FIRMS, VIIRS 375 m: one dot per pixel and satellite pass, not a fire front"
+ },
+ "method": [
+  [
+   "What this scene shows",
+   "Each stop shows only what was observed by its date: the latest dated satellite image of the area draped on the terrain (Sentinel-2 or Landsat-9), and the VIIRS heat detections up to that moment, added pass by pass. Between stops the camera moves; the data change only at their own observation times."
+  ],
+  [
+   "What it does not show",
+   "No fire front, no spread speed and no flame height: the dots are not joined. No dated official progression perimeters were found, so the final perimeter appears only at the last stop."
+  ],
+  [
+   "The perimeter",
+   "The same official perimeter as on the evidence map (NIFC WFIGS 2025-CALFD-000738, version of 21 January 2025, 94.89 km² measured here), draped on the terrain. CAL FIRE's historical perimeter dataset (FRAP) gives the same fire the same final size (23,448.9 GIS acres)."
+  ],
+  [
+   "Terrain",
+   "Heights are stretched ×{x} so the slopes can be read; the images and lines lie on the terrain."
+  ]
+ ],
+ "method_values": {
+  "x": 1.5
+ },
+ "sources": [
+  {
+   "publisher": "Copernicus Sentinel-2 (ESA)",
+   "what": "Images of 2, 7 and 12 January 2025, made here (10 m)",
+   "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a"
+  },
+  {
+   "publisher": "Landsat-9 (USGS)",
+   "what": "Image of 14 January 2025, made here (30 m)",
+   "url": "https://planetarycomputer.microsoft.com/dataset/landsat-c2-l2"
+  },
+  {
+   "publisher": "NASA FIRMS",
+   "what": "VIIRS active fire detections, 7–12 January 2025",
+   "url": "https://firms.modaps.eosdis.nasa.gov/download/"
+  },
+  {
+   "publisher": "NIFC WFIGS",
+   "what": "Official perimeter 2025-CALFD-000738 (version of 21 January 2025)",
+   "url": "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0"
+  },
+  {
+   "publisher": "CAL FIRE",
+   "what": "Incident record: start, containment, size",
+   "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+  },
+  {
+   "publisher": "USGS The National Map",
+   "what": "Background orthoimagery (data refreshed June 2024)",
+   "url": "https://www.usgs.gov/programs/national-geospatial-program/national-map"
+  }
+ ],
+ "media": null
+}

@@ -1,0 +1,252 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "bounds_latlon": [
+  [
+   34.015,
+   -118.7
+  ],
+  [
+   34.14,
+   -118.49
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "period": {
+  "start": "2025-01-07",
+  "end": "2025-01-31",
+  "summary": "The fire began at about 10:30 a.m. local time on 7 January 2025 and was 100 % contained at 10:48 a.m. on 31 January (CAL FIRE incident record).",
+  "sources": [
+   {
+    "date": "2025-01-31",
+    "says": "Started 7 January 2025 10:30 AM; contained 31 January 2025 10:48 AM; 23,448 acres.",
+    "publisher": "CAL FIRE incident record",
+    "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+   }
+  ]
+ },
+ "searched": "Sentinel-2 L2A scenes 28 December 2024 – 17 January 2025 and Landsat 8/9 Collection 2 Level-2 scenes 5–16 January 2025 over the frame; the CAL FIRE incident record",
+ "rule": "Each stop shows only material from its own date. Satellite captures and the incident record are labelled differently; nothing is drawn between them.",
+ "stages": [
+  {
+   "id": "before",
+   "title": "Before the fire",
+   "chip": "Before",
+   "frame": {
+    "side": "before",
+    "label": "2025-01-02",
+    "datetime_utc": "2025-01-02T18:45:02.738000Z",
+    "scene": "S2A_11SLT_20250102_0_L2A",
+    "tile": "MGRS-11SLT",
+    "platform": "sentinel-2a",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 3.015763,
+    "inside_study_area": {
+     "clear_share": 1.0,
+     "cloud_share": 0.0,
+     "water_share_scl": 0.1534,
+     "pixels": 671681
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32611",
+    "source_window_px": [
+     1959,
+     1416
+    ],
+    "file": "usa-wildfire-2025-01/optical_2025-01-02.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250102_0_L2A",
+    "kind": "image",
+    "location": "Pacific Palisades–Malibu",
+    "heading": "Before the fire",
+    "sentence": "The hills between Pacific Palisades and Malibu are dark with vegetation.",
+    "why": "Clear Sentinel-2 image five days before the fire; same frame and colours as the 12 January image.",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a",
+    "source_short": "Sentinel-2"
+   }
+  },
+  {
+   "id": "start",
+   "title": "The fire begins",
+   "chip": "Fire begins",
+   "frame": {
+    "label": "2025-01-07",
+    "datetime_utc": "2025-01-07T18:45:03.298000Z",
+    "scene": "S2B_11SLT_20250107_0_L2A",
+    "tile": "MGRS-11SLT",
+    "platform": "sentinel-2b",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 39.062339,
+    "inside_study_area": {
+     "clear_share": 0.4693,
+     "cloud_share": 0.5307,
+     "water_share_scl": 0.1495,
+     "pixels": 671681
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32611",
+    "source_window_px": [
+     1959,
+     1416
+    ],
+    "file": "usa-wildfire-2025-01/optical_2025-01-07.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_11SLT_20250107_0_L2A",
+    "export": {
+     "source_gsd_m": 10.0,
+     "width": 1936,
+     "height": 1391,
+     "ground_m_per_px": [
+      10.0,
+      10.0
+     ],
+     "crs": "EPSG:3857",
+     "resampling": "lanczos",
+     "format": "JPEG quality 90, 4:4:4",
+     "sharpening": "none"
+    },
+    "kind": "image",
+    "location": "Pacific Palisades–Malibu",
+    "heading": "10:45 a.m., about 15 minutes after the start",
+    "sentence": "Smoke streams from the hills above Pacific Palisades towards the ocean.",
+    "why": "Sentinel-2 passed at 18:45 UTC (10:45 a.m. local time); CAL FIRE gives 10:30 a.m. as the start. About half of the frame is cloud or smoke in the scene classification. NASA Earth Observatory showed the same capture.",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a",
+    "source_short": "Sentinel-2",
+    "sources": [
+     {
+      "publisher": "NASA Earth Observatory, 9 January 2025",
+      "short": "NASA",
+      "url": "https://science.nasa.gov/earth/earth-observatory/fires-tear-through-los-angeles-153793/"
+     }
+    ]
+   }
+  },
+  {
+   "id": "after",
+   "title": "Burn scar",
+   "chip": "12 Jan",
+   "frame": {
+    "side": "after",
+    "label": "2025-01-12",
+    "datetime_utc": "2025-01-12T18:45:00.334000Z",
+    "scene": "S2A_11SLT_20250112_0_L2A",
+    "tile": "MGRS-11SLT",
+    "platform": "sentinel-2a",
+    "sensor": "Sentinel-2 MSI (true colour)",
+    "scene_cloud_cover": 0.023079,
+    "inside_study_area": {
+     "clear_share": 0.9997,
+     "cloud_share": 0.0003,
+     "water_share_scl": 0.1528,
+     "pixels": 671681
+    },
+    "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32611",
+    "source_window_px": [
+     1959,
+     1416
+    ],
+    "file": "usa-wildfire-2025-01/optical_2025-01-12.jpg",
+    "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250112_0_L2A",
+    "kind": "image",
+    "location": "Pacific Palisades–Malibu",
+    "heading": "Five days later",
+    "sentence": "Grey-brown burned slopes stretch from Pacific Palisades towards Malibu.",
+    "why": "First clear Sentinel-2 image after the main spread (99.97 % clear inside the frame); the same date ESA used.",
+    "catalog": "Earth Search STAC (AWS Open Data), collection sentinel-2-l2a",
+    "source_short": "Sentinel-2",
+    "sources": [
+     {
+      "publisher": "ESA, 14 January 2025",
+      "short": "ESA",
+      "url": "https://www.esa.int/media/land-burned-by-palisades-wildfire"
+     }
+    ]
+   }
+  },
+  {
+   "id": "landsat",
+   "title": "One week after the start",
+   "chip": "14 Jan",
+   "frame": {
+    "label": "2025-01-14",
+    "datetime_utc": "2025-01-14T18:28:31.082685Z",
+    "scene": "LC09_L2SP_041036_20250114_02_T1",
+    "platform": "landsat-9",
+    "sensor": "Landsat OLI (true colour)",
+    "scene_cloud_cover": 0.21,
+    "stretch": "surface reflectance 0.0–0.25, linear",
+    "empty_pixels": 1,
+    "file": "usa-wildfire-2025-01/landsat_2025-01-14.jpg",
+    "stac": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/landsat-c2-l2/items/LC09_L2SP_041036_20250114_02_T1",
+    "export": {
+     "source_gsd_m": 30.0,
+     "width": 645,
+     "height": 464,
+     "ground_m_per_px": [
+      30.02,
+      29.99
+     ],
+     "crs": "EPSG:3857",
+     "resampling": "lanczos",
+     "format": "JPEG quality 90, 4:4:4",
+     "sharpening": "none"
+    },
+    "kind": "image",
+    "location": "Pacific Palisades–Malibu",
+    "heading": "One week after the start",
+    "sentence": "Landsat-9 shows the same burned area at 30 m.",
+    "why": "Landsat-9 OLI-2, 14 January 2025 18:28 UTC, 0.2 % cloud in the scene; 30 m pixels shown as they are. NASA Earth Observatory used this capture.",
+    "catalog": "Microsoft Planetary Computer, collection landsat-c2-l2",
+    "source_short": "Landsat-9",
+    "sources": [
+     {
+      "publisher": "NASA Earth Observatory, 17 January 2025",
+      "short": "NASA",
+      "url": "https://science.nasa.gov/earth/earth-observatory/the-palisades-fires-footprint-153831/"
+     }
+    ]
+   }
+  },
+  {
+   "id": "contained",
+   "title": "Fully contained",
+   "chip": "31 Jan",
+   "frame": {
+    "kind": "map",
+    "record": true,
+    "label": "2025-01-31",
+    "location": "Pacific Palisades–Malibu",
+    "bounds": [
+     [
+      34.015,
+      -118.7
+     ],
+     [
+      34.14,
+      -118.49
+     ]
+    ],
+    "layers": [
+     {
+      "file": "usa-wildfire-2025-01/perimeter.geojson",
+      "style": "perimeter"
+     }
+    ],
+    "heading": "Fully contained (incident record)",
+    "sentence": "CAL FIRE's incident record: 100 % contained on 31 January. This is a record, not a satellite image.",
+    "note": "Outline: the official perimeter (NIFC WFIGS 2025-CALFD-000738, version of 21 January 2025, mapped from infrared imagery). Background map: not from 31 January.",
+    "credit": "CAL FIRE incident record; perimeter NIFC WFIGS",
+    "why": "Containment time 31 January 2025 10:48 a.m.; 23,448 acres.",
+    "catalog": "CAL FIRE incidents",
+    "product_id": "Palisades Fire · 2025-CALFD-000738",
+    "link": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire",
+    "source_short": "CAL FIRE",
+    "sources": [
+     {
+      "publisher": "CAL FIRE incident record",
+      "short": "CAL FIRE",
+      "url": "https://www.fire.ca.gov/incidents/2025/1/7/palisades-fire"
+     }
+    ]
+   }
+  }
+ ],
+ "extra": [],
+ "extra_note": null
+}

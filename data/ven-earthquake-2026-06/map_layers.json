@@ -1,0 +1,513 @@
+{
+ "event_id": "ven-earthquake-2026-06",
+ "generated_from": "catalog/events/ven-earthquake-2026-06.json via pipeline/export/build_event_web.py layers",
+ "event_date": "2026-06-24",
+ "bounds_latlon": [
+  [
+   9.75,
+   -69.2
+  ],
+  [
+   10.9,
+   -66.15
+  ]
+ ],
+ "layers": [
+  {
+   "id": "nisar-los-a162",
+   "group": "nisar-los",
+   "kind": "raster",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/nisar_los_a162_20260613_20260625.png",
+   "crs": "EPSG:3857",
+   "bounds_latlon": [
+    [
+     9.749864,
+     -69.2
+    ],
+    [
+     10.900135,
+     -66.873049
+    ]
+   ],
+   "width": 3238,
+   "height": 1627,
+   "stats": {
+    "valid_share": 0.7343,
+    "min": -47.56,
+    "max": 55.45,
+    "p01": -16.55,
+    "p99": 36.85,
+    "beyond_scale_share": 0.0059
+   },
+   "observed": [
+    "2026-06-13",
+    "2026-06-25"
+   ],
+   "version": "2026-09-05",
+   "unit": "cm",
+   "quantity": "line-of-sight displacement",
+   "nodata": "transparent",
+   "nodata_definition": "Pixels without a value in NASA's raster (outside the swath, water mask, decorrelation) come back from the ImageServer as the requested no-data -9999 (NaN and the service fill |v| > 1e30 are treated the same); they are drawn fully transparent (alpha 0). No gap is filled with 0; the built rasters contain no pixel with the exact value 0 (audit 2026-11-14).",
+   "scale": {
+    "min": -40,
+    "max": 40,
+    "clipped": true,
+    "colors": [
+     "#4575b5",
+     "#ffffbf",
+     "#d62f27"
+    ],
+    "_doc": "Same range as NASA's web map stretch (-40 to 40 cm); low values blue, high values red; values beyond the range are drawn at the end colour."
+   },
+   "value_range": {
+    "min": -47.56,
+    "max": 55.45,
+    "p01": -16.55,
+    "p99": 36.85,
+    "beyond_scale_share": 0.0059,
+    "note": "Values in the file run from -47.56 to 55.45 cm (1st-99th percentile -16.55 to 36.85 cm); 0.59 % of the valid pixels lie outside the colour scale's -40 to +40 cm and are drawn in the end colour, so the colours do not show their full size. The scale is NASA's web-map stretch, not the data range."
+   },
+   "geometry": {
+    "orbit": "ascending",
+    "track": 162,
+    "frames": [
+     "006",
+     "007"
+    ],
+    "look_side": "left",
+    "incidence_deg_approx": 40,
+    "los_look_direction": "about 40 degrees off vertical, slightly south of due west",
+    "sign_published": "positive = towards the satellite",
+    "sign_confirmed": false,
+    "sign_note": "NASA's item says positive is towards the satellite (east and up on ascending tracks, west and up on the descending track). Project check on 2026-11-13 (point values across the coast at 67.0-68.0 W): ascending values rise to about +45 cm just south of the fault and the descending track is negative there, while NASA's Earth Observatory article reports westward motion south of the fault. For a left-looking ascending pass, westward motion is away from the satellite, so the published sign description and the values disagree; the sign is not confirmed. Show values by number, not by direction words, until NASA JPL confirms.",
+    "look_side_basis": "NISAR L-SAR looks left; consistent with NASA's stated look directions for these tracks",
+    "sign_missing": "Not established from product documentation (read 2026-11-14): (1) the formula and sign NASA JPL used to turn the Urgent Response GUNW unwrapped phase into these '_cm' layers (not published with the item or the ImageServer); (2) the GUNW interferogram phase convention (reference x conj(secondary) or the reverse): the NISAR user guide (nisar-docs.asf.alaska.edu, GUNW and phase pages) does not state it, and the product specification JPL D-102272 Rev E could be downloaded but its text could not be extracted in this environment; (3) the line-of-sight unit vectors and platform heading of these Urgent Response granules (not listed in CMR; the provisional GUNW files need an Earthdata login). Documented: NISAR is left-looking (nisar-docs.asf.alaska.edu/nisar-intro); NASA's item gives the look directions and 'positive = towards the satellite'."
+   },
+   "covers_both_shocks": true,
+   "covers_note": "The pair spans 2026-06-24 22:04:31.806Z (M7.2) and 22:05:04.053Z (M7.5): the map is the sum of both shocks and of any aftershock and post-seismic motion until 2026-06-25; it cannot separate them.",
+   "label": "Ground motion, ascending track 162",
+   "legend": "Line-of-sight displacement, cm (−40 to +40) · NASA JPL NISAR, 13–25 Jun 2026",
+   "note": "Covers both shocks of 24 June. Preliminary (predicted orbits), not calibrated to the ground. Sign not confirmed; colours stop at ±40 cm, some values are larger. Transparent = no data, not zero motion.",
+   "source": {
+    "product": "nasa-nisar-ur-los-venezuela",
+    "publisher": "NASA JPL / NISAR Operations Science Team (NASA Disasters Program)",
+    "product_id": "DISASTERS_202606_EARTHQUAKE_VENEZUELA/202611_nisar_LOSDisplacement (ImageServer item 1d972eab2bbd4098af71c0c61db083fc; web map 9244f7b07fa64d45ae7cb66c34d1696a)",
+    "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=9244f7b07fa64d45ae7cb66c34d1696a",
+    "licence": "NASA data and products are freely available to federal, state, public, non-profit and commercial users (item licenseInfo, read 2026-11-13).",
+    "credit": "NASA-JPL/Caltech Team, NISAR Operations Science Team"
+   }
+  },
+  {
+   "id": "nisar-los-d054",
+   "group": "nisar-los",
+   "kind": "raster",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/nisar_los_d054_20260617_20260629.png",
+   "crs": "EPSG:3857",
+   "bounds_latlon": [
+    [
+     9.749842,
+     -69.2
+    ],
+    [
+     10.900158,
+     -67.498915
+    ]
+   ],
+   "width": 2367,
+   "height": 1627,
+   "stats": {
+    "valid_share": 0.7839,
+    "min": -58.01,
+    "max": 45.99,
+    "p01": -29.92,
+    "p99": 27.87,
+    "beyond_scale_share": 0.0025
+   },
+   "observed": [
+    "2026-06-17",
+    "2026-06-29"
+   ],
+   "version": "2026-09-05",
+   "unit": "cm",
+   "quantity": "line-of-sight displacement",
+   "nodata": "transparent",
+   "nodata_definition": "Pixels without a value in NASA's raster (outside the swath, water mask, decorrelation) come back from the ImageServer as the requested no-data -9999 (NaN and the service fill |v| > 1e30 are treated the same); they are drawn fully transparent (alpha 0). No gap is filled with 0; the built rasters contain no pixel with the exact value 0 (audit 2026-11-14).",
+   "scale": {
+    "min": -40,
+    "max": 40,
+    "clipped": true,
+    "colors": [
+     "#4575b5",
+     "#ffffbf",
+     "#d62f27"
+    ],
+    "_doc": "Same range as NASA's web map stretch (-40 to 40 cm); low values blue, high values red; values beyond the range are drawn at the end colour."
+   },
+   "value_range": {
+    "min": -58.01,
+    "max": 45.99,
+    "p01": -29.92,
+    "p99": 27.87,
+    "beyond_scale_share": 0.0025,
+    "note": "Values in the file run from -58.01 to 45.99 cm (1st-99th percentile -29.92 to 27.87 cm); 0.25 % of the valid pixels lie outside the colour scale's -40 to +40 cm and are drawn in the end colour, so the colours do not show their full size. The scale is NASA's web-map stretch, not the data range."
+   },
+   "geometry": {
+    "orbit": "descending",
+    "track": 54,
+    "frames": [
+     "083",
+     "084"
+    ],
+    "look_side": "left",
+    "incidence_deg_approx": 40,
+    "los_look_direction": "about 40 degrees off vertical, slightly south of due east",
+    "sign_published": "positive = towards the satellite",
+    "sign_confirmed": false,
+    "sign_note": "NASA's item says positive is towards the satellite (east and up on ascending tracks, west and up on the descending track). Project check on 2026-11-13 (point values across the coast at 67.0-68.0 W): ascending values rise to about +45 cm just south of the fault and the descending track is negative there, while NASA's Earth Observatory article reports westward motion south of the fault. For a left-looking ascending pass, westward motion is away from the satellite, so the published sign description and the values disagree; the sign is not confirmed. Show values by number, not by direction words, until NASA JPL confirms.",
+    "look_side_basis": "NISAR L-SAR looks left; consistent with NASA's stated look directions for these tracks",
+    "sign_missing": "Not established from product documentation (read 2026-11-14): (1) the formula and sign NASA JPL used to turn the Urgent Response GUNW unwrapped phase into these '_cm' layers (not published with the item or the ImageServer); (2) the GUNW interferogram phase convention (reference x conj(secondary) or the reverse): the NISAR user guide (nisar-docs.asf.alaska.edu, GUNW and phase pages) does not state it, and the product specification JPL D-102272 Rev E could be downloaded but its text could not be extracted in this environment; (3) the line-of-sight unit vectors and platform heading of these Urgent Response granules (not listed in CMR; the provisional GUNW files need an Earthdata login). Documented: NISAR is left-looking (nisar-docs.asf.alaska.edu/nisar-intro); NASA's item gives the look directions and 'positive = towards the satellite'."
+   },
+   "covers_both_shocks": true,
+   "covers_note": "The pair spans 2026-06-24 22:04:31.806Z (M7.2) and 22:05:04.053Z (M7.5): the map is the sum of both shocks and of any aftershock and post-seismic motion until 2026-06-29; it cannot separate them.",
+   "label": "Ground motion, descending track 54",
+   "legend": "Line-of-sight displacement, cm (−40 to +40) · NASA JPL NISAR, 17–29 Jun 2026",
+   "note": "Covers both shocks of 24 June. Preliminary (predicted orbits), not calibrated to the ground. Sign not confirmed; colours stop at ±40 cm, some values are larger. Transparent = no data, not zero motion.",
+   "source": {
+    "product": "nasa-nisar-ur-los-venezuela",
+    "publisher": "NASA JPL / NISAR Operations Science Team (NASA Disasters Program)",
+    "product_id": "DISASTERS_202606_EARTHQUAKE_VENEZUELA/202611_nisar_LOSDisplacement (ImageServer item 1d972eab2bbd4098af71c0c61db083fc; web map 9244f7b07fa64d45ae7cb66c34d1696a)",
+    "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=9244f7b07fa64d45ae7cb66c34d1696a",
+    "licence": "NASA data and products are freely available to federal, state, public, non-profit and commercial users (item licenseInfo, read 2026-11-13).",
+    "credit": "NASA-JPL/Caltech Team, NISAR Operations Science Team"
+   }
+  },
+  {
+   "id": "nisar-los-a061",
+   "group": "nisar-los",
+   "kind": "raster",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/nisar_los_a061_20260618_20260630.png",
+   "crs": "EPSG:3857",
+   "bounds_latlon": [
+    [
+     9.75,
+     -67.149317
+    ],
+    [
+     10.65008,
+     -66.15
+    ]
+   ],
+   "width": 1391,
+   "height": 1273,
+   "stats": {
+    "valid_share": 0.8769,
+    "min": -25.16,
+    "max": 96.0,
+    "p01": -10.28,
+    "p99": 46.52,
+    "beyond_scale_share": 0.0185
+   },
+   "observed": [
+    "2026-06-18",
+    "2026-06-30"
+   ],
+   "version": "2026-09-05",
+   "unit": "cm",
+   "quantity": "line-of-sight displacement",
+   "nodata": "transparent",
+   "nodata_definition": "Pixels without a value in NASA's raster (outside the swath, water mask, decorrelation) come back from the ImageServer as the requested no-data -9999 (NaN and the service fill |v| > 1e30 are treated the same); they are drawn fully transparent (alpha 0). No gap is filled with 0; the built rasters contain no pixel with the exact value 0 (audit 2026-11-14).",
+   "scale": {
+    "min": -40,
+    "max": 40,
+    "clipped": true,
+    "colors": [
+     "#4575b5",
+     "#ffffbf",
+     "#d62f27"
+    ],
+    "_doc": "Same range as NASA's web map stretch (-40 to 40 cm); low values blue, high values red; values beyond the range are drawn at the end colour."
+   },
+   "value_range": {
+    "min": -25.16,
+    "max": 96.0,
+    "p01": -10.28,
+    "p99": 46.52,
+    "beyond_scale_share": 0.0185,
+    "note": "Values in the file run from -25.16 to 96.0 cm (1st-99th percentile -10.28 to 46.52 cm); 1.85 % of the valid pixels lie outside the colour scale's -40 to +40 cm and are drawn in the end colour, so the colours do not show their full size. The scale is NASA's web-map stretch, not the data range."
+   },
+   "geometry": {
+    "orbit": "ascending",
+    "track": 61,
+    "frames": [
+     "006",
+     "007"
+    ],
+    "look_side": "left",
+    "incidence_deg_approx": 40,
+    "los_look_direction": "about 40 degrees off vertical, slightly south of due west",
+    "sign_published": "positive = towards the satellite",
+    "sign_confirmed": false,
+    "sign_note": "NASA's item says positive is towards the satellite (east and up on ascending tracks, west and up on the descending track). Project check on 2026-11-13 (point values across the coast at 67.0-68.0 W): ascending values rise to about +45 cm just south of the fault and the descending track is negative there, while NASA's Earth Observatory article reports westward motion south of the fault. For a left-looking ascending pass, westward motion is away from the satellite, so the published sign description and the values disagree; the sign is not confirmed. Show values by number, not by direction words, until NASA JPL confirms.",
+    "look_side_basis": "NISAR L-SAR looks left; consistent with NASA's stated look directions for these tracks",
+    "sign_missing": "Not established from product documentation (read 2026-11-14): (1) the formula and sign NASA JPL used to turn the Urgent Response GUNW unwrapped phase into these '_cm' layers (not published with the item or the ImageServer); (2) the GUNW interferogram phase convention (reference x conj(secondary) or the reverse): the NISAR user guide (nisar-docs.asf.alaska.edu, GUNW and phase pages) does not state it, and the product specification JPL D-102272 Rev E could be downloaded but its text could not be extracted in this environment; (3) the line-of-sight unit vectors and platform heading of these Urgent Response granules (not listed in CMR; the provisional GUNW files need an Earthdata login). Documented: NISAR is left-looking (nisar-docs.asf.alaska.edu/nisar-intro); NASA's item gives the look directions and 'positive = towards the satellite'."
+   },
+   "covers_both_shocks": true,
+   "covers_note": "The pair spans 2026-06-24 22:04:31.806Z (M7.2) and 22:05:04.053Z (M7.5): the map is the sum of both shocks and of any aftershock and post-seismic motion until 2026-06-30; it cannot separate them.",
+   "label": "Ground motion, ascending track 61",
+   "legend": "Line-of-sight displacement, cm (−40 to +40) · NASA JPL NISAR, 18–30 Jun 2026",
+   "note": "Covers both shocks of 24 June. Preliminary (predicted orbits), not calibrated to the ground. Sign not confirmed; colours stop at ±40 cm, some values are larger. Transparent = no data, not zero motion.",
+   "source": {
+    "product": "nasa-nisar-ur-los-venezuela",
+    "publisher": "NASA JPL / NISAR Operations Science Team (NASA Disasters Program)",
+    "product_id": "DISASTERS_202606_EARTHQUAKE_VENEZUELA/202611_nisar_LOSDisplacement (ImageServer item 1d972eab2bbd4098af71c0c61db083fc; web map 9244f7b07fa64d45ae7cb66c34d1696a)",
+    "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=9244f7b07fa64d45ae7cb66c34d1696a",
+    "licence": "NASA data and products are freely available to federal, state, public, non-profit and commercial users (item licenseInfo, read 2026-11-13).",
+    "credit": "NASA-JPL/Caltech Team, NISAR Operations Science Team"
+   }
+  },
+  {
+   "id": "cems-damage",
+   "group": "damage",
+   "kind": "points",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/cems_damage_points.geojson",
+   "count": {
+    "Possibly damaged": 1583,
+    "Destroyed": 698,
+    "Damaged": 838
+   },
+   "observed": [
+    "2026-06-26",
+    "2026-07-05"
+   ],
+   "version": "2026-07-06",
+   "preliminary": true,
+   "assessed": "2026-07-06",
+   "classes": {
+    "Destroyed": "#b2182b",
+    "Damaged": "#f46d43",
+    "Possibly damaged": "#fee08b"
+   },
+   "count_meaning": "3,119 = buildings that Copernicus EMS graded as Destroyed, Damaged or Possibly damaged from very-high-resolution images inside its five graded areas of interest (the activation statistic 'Identified buildings'). It is not the number of damaged buildings in Venezuela: buildings outside these areas, and parts not analysed, were not graded.",
+   "by_aoi": {
+    "AOI02 Caracas": {
+     "total": 20,
+     "Destroyed": 3,
+     "Possibly damaged": 17
+    },
+    "AOI05 Santa Cruz": {
+     "total": 3,
+     "Destroyed": 3
+    },
+    "AOI06 Moron": {
+     "total": 96,
+     "Destroyed": 8,
+     "Damaged": 39,
+     "Possibly damaged": 49
+    },
+    "AOI08 San Felipe": {
+     "total": 183,
+     "Damaged": 14,
+     "Possibly damaged": 169
+    },
+    "AOI12 Caraballeda": {
+     "total": 2817,
+     "Destroyed": 684,
+     "Damaged": 785,
+     "Possibly damaged": 1348
+    }
+   },
+   "label": "Building damage (preliminary)",
+   "color": "#f46d43",
+   "legend": "Graded buildings · Copernicus EMS EMSR884, images 26 Jun–5 Jul 2026, assessment of 6 Jul 2026",
+   "note": "Preliminary grading from satellite images, not field-checked. Only five areas were graded.",
+   "source": {
+    "product": "cems-emsr884-grading",
+    "publisher": "Copernicus Emergency Management Service (Rapid Mapping)",
+    "product_id": "EMSR884 grading (GRA) products: EMSR884_AOI02_GRA_MONIT01_v2, EMSR884_AOI05_GRA_PRODUCT_v1, EMSR884_AOI06_GRA_MONIT01_v2, EMSR884_AOI08_GRA_MONIT01_v2, EMSR884_AOI12_GRA_MONIT02_v1",
+    "url": "https://mapping.emergency.copernicus.eu/activations/EMSR884",
+    "licence": "Copernicus EMS terms and conditions: free reuse with attribution (https://mapping.emergency.copernicus.eu/terms-and-conditions/)",
+    "credit": "© European Union, Copernicus Emergency Management Service, EMSR884"
+   }
+  },
+  {
+   "id": "cems-areas",
+   "group": "damage",
+   "kind": "polygon",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/cems_assessed_areas.geojson",
+   "count": {
+    "assessed_area": 5,
+    "not_analysed": 51
+   },
+   "observed": [
+    "2026-06-26",
+    "2026-07-05"
+   ],
+   "version": "2026-07-06",
+   "label": "Graded areas",
+   "color": "#ffffff",
+   "legend": "Areas graded by Copernicus EMS EMSR884 (and parts not analysed)",
+   "note": "Outside these outlines no grading was made.",
+   "source": {
+    "product": "cems-emsr884-grading",
+    "publisher": "Copernicus Emergency Management Service (Rapid Mapping)",
+    "product_id": "EMSR884 grading (GRA) products: EMSR884_AOI02_GRA_MONIT01_v2, EMSR884_AOI05_GRA_PRODUCT_v1, EMSR884_AOI06_GRA_MONIT01_v2, EMSR884_AOI08_GRA_MONIT01_v2, EMSR884_AOI12_GRA_MONIT02_v1",
+    "url": "https://mapping.emergency.copernicus.eu/activations/EMSR884",
+    "licence": "Copernicus EMS terms and conditions: free reuse with attribution (https://mapping.emergency.copernicus.eu/terms-and-conditions/)",
+    "credit": "© European Union, Copernicus Emergency Management Service, EMSR884"
+   }
+  },
+  {
+   "id": "osu-damage-likelihood",
+   "group": "damage",
+   "kind": "polygon",
+   "status": "not_redistributed",
+   "file": null,
+   "observed": [
+    "2026-06-24",
+    "2026-06-25"
+   ],
+   "version": "2026-09-16",
+   "preliminary": true,
+   "status_note": "Not copied: the NASA item states no licence (credit and contact only), the FeatureServer advertises anonymous edit and delete (contents can change without a version), and the item gives two assessment dates (25 June and 1 July 2026) and two totals (58,870 in press, 69,431 in the item). Link to the official map instead.",
+   "official_url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=0c3d77dd5aae46e4829d9a282477615c",
+   "label": "Damage likelihood (experimental, link only)",
+   "legend": "Sentinel-1 damage likelihood · Oregon State University, via NASA",
+   "note": "Not shown on this map: licence not stated. Open the official map.",
+   "source": {
+    "product": "osu-s1-damage-likelihood",
+    "publisher": "Oregon State University and CUNY (published by NASA Disasters Program)",
+    "product_id": "202610_s1_likelydmgareas, layer 0 'Structures' (main.Venezuela_damage_20260625_v0)",
+    "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=0c3d77dd5aae46e4829d9a282477615c",
+    "licence": null,
+    "credit": "Damage analysis of Copernicus Sentinel-1 data by Corey Scher and Jamon Van Den Hoek, Oregon State University"
+   }
+  },
+  {
+   "id": "s2-laguaira-before",
+   "group": "optical-laguaira",
+   "kind": "image",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/optical_laguaira_20260602.jpg",
+   "crs": "EPSG:3857",
+   "bounds_latlon": [
+    [
+     10.56,
+     -67.06
+    ],
+    [
+     10.63,
+     -66.8
+    ]
+   ],
+   "width": 2845,
+   "height": 779,
+   "scene": "S2B_19PGM_20260602_0_L2A",
+   "datetime_utc": "2026-06-02T15:00:00.370000Z",
+   "platform": "sentinel-2b",
+   "scene_cloud_cover": 46.92274,
+   "inside_frame": {
+    "clear_share": 0.992,
+    "cloud_share": 0.008,
+    "water_share_scl": 0.3015,
+    "pixels": 551015
+   },
+   "export": {
+    "source": "TCI (visual) COG, 10 m, uint8, EPSG:32619",
+    "ground_m_per_px": [
+     10.0,
+     10.0
+    ],
+    "resampling": "lanczos",
+    "colour": "TCI as delivered (fixed L2A scaling, no stretch)",
+    "format": "JPEG quality 90, 4:4:4",
+    "sharpening": "none"
+   },
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_19PGM_20260602_0_L2A",
+   "observed": [
+    "2026-06-02",
+    "2026-06-02"
+   ],
+   "version": null,
+   "pair": "laguaira",
+   "side": "before",
+   "visible": "10 m true colour: shows the coast, the airport, streets, open ground and fresh bare slopes, but not single damaged buildings. Building damage in Caraballeda and Catia La Mar graded by Copernicus EMS from sub-metre images cannot be seen at this resolution; a difference between the two dates is not by itself evidence of damage (light, haze, season, construction, cleanup).",
+   "label": "La Guaira coast, before",
+   "legend": "Sentinel-2 true colour, 10 m · 2026-06-02 · Contains modified Copernicus Sentinel data 2026",
+   "note": "Shows the landscape, not building damage: single buildings are smaller than a few pixels.",
+   "source": {
+    "product": "copernicus-sentinel-2-l2a",
+    "publisher": "European Union / ESA, Copernicus Sentinel-2 (Earth Search STAC, AWS Open Data)",
+    "product_id": "sentinel-2-l2a (TCI, 10 m)",
+    "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+    "licence": "Copernicus Sentinel data: free, full and open access (Copernicus data policy, Regulation (EU) 1159/2013); attribution 'Contains modified Copernicus Sentinel data 2026'",
+    "credit": "Contains modified Copernicus Sentinel data 2026"
+   }
+  },
+  {
+   "id": "s2-laguaira-after",
+   "group": "optical-laguaira",
+   "kind": "image",
+   "status": "available",
+   "file": "ven-earthquake-2026-06/optical_laguaira_20260722.jpg",
+   "crs": "EPSG:3857",
+   "bounds_latlon": [
+    [
+     10.56,
+     -67.06
+    ],
+    [
+     10.63,
+     -66.8
+    ]
+   ],
+   "width": 2845,
+   "height": 779,
+   "scene": "S2B_19PGM_20260722_0_L2A",
+   "datetime_utc": "2026-07-22T15:00:04.822000Z",
+   "platform": "sentinel-2b",
+   "scene_cloud_cover": 25.134614,
+   "inside_frame": {
+    "clear_share": 0.9721,
+    "cloud_share": 0.0279,
+    "water_share_scl": 0.3034,
+    "pixels": 551015
+   },
+   "export": {
+    "source": "TCI (visual) COG, 10 m, uint8, EPSG:32619",
+    "ground_m_per_px": [
+     10.0,
+     10.0
+    ],
+    "resampling": "lanczos",
+    "colour": "TCI as delivered (fixed L2A scaling, no stretch)",
+    "format": "JPEG quality 90, 4:4:4",
+    "sharpening": "none"
+   },
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_19PGM_20260722_0_L2A",
+   "observed": [
+    "2026-07-22",
+    "2026-07-22"
+   ],
+   "version": null,
+   "pair": "laguaira",
+   "side": "after",
+   "visible": "10 m true colour: shows the coast, the airport, streets, open ground and fresh bare slopes, but not single damaged buildings. Building damage in Caraballeda and Catia La Mar graded by Copernicus EMS from sub-metre images cannot be seen at this resolution; a difference between the two dates is not by itself evidence of damage (light, haze, season, construction, cleanup).",
+   "label": "La Guaira coast, after",
+   "legend": "Sentinel-2 true colour, 10 m · 2026-07-22 · Contains modified Copernicus Sentinel data 2026",
+   "note": "Shows the landscape, not building damage: single buildings are smaller than a few pixels.",
+   "source": {
+    "product": "copernicus-sentinel-2-l2a",
+    "publisher": "European Union / ESA, Copernicus Sentinel-2 (Earth Search STAC, AWS Open Data)",
+    "product_id": "sentinel-2-l2a (TCI, 10 m)",
+    "url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+    "licence": "Copernicus Sentinel data: free, full and open access (Copernicus data policy, Regulation (EU) 1159/2013); attribution 'Contains modified Copernicus Sentinel data 2026'",
+    "credit": "Contains modified Copernicus Sentinel data 2026"
+   }
+  }
+ ]
+}

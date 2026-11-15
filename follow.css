@@ -224,3 +224,9 @@ body.fr-route .fw-mode { display: none; }
 .fr-loading { position: absolute; right: 10px; top: 10px; z-index: 3; margin: 0; padding: 4px 9px; border-radius: 999px; background: rgba(14, 24, 32, .86); color: #e6e9ef;
   font-size: 12px; pointer-events: none; }
 .fr-loading[hidden] { display: none; }
+/* v70: Follow the Fire keys */
+.fw-key .ff-k-img { width: 16px; height: 12px; border-radius: 2px; background: linear-gradient(135deg, #6b5a3a 0 45%, #8f8f7a 45% 100%); border: 1px solid rgba(255,255,255,.6); }
+.fw-key .ff-k-dots { width: 14px; height: 12px; background: radial-gradient(circle at 30% 60%, #ff5a1f 0 2.4px, transparent 2.8px), radial-gradient(circle at 70% 35%, #ff5a1f 0 2.4px, transparent 2.8px), radial-gradient(circle at 75% 80%, #ff5a1f 0 2px, transparent 2.4px); }
+.fw-key .ff-k-perim { width: 18px; height: 11px; border: 2.5px solid #ffd166; background: rgba(255, 209, 102, .14); border-radius: 2px; }
+/* v70: the perimeter switch keeps its place while hidden (only the last stop shows it), so nothing moves when it appears */
+#ff-perim-btn[hidden] { display: inline-flex; visibility: hidden; }

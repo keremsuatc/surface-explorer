@@ -1,0 +1,56 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "lang": "en",
+ "generated_from": "catalog/events/usa-wildfire-2025-01.json via pipeline/export/build_event_web.py",
+ "event": {
+  "title": "Palisades Fire",
+  "place": "Palisades Fire · Los Angeles, California",
+  "area_name": "Pacific Palisades–Malibu, Santa Monica Mountains",
+  "dates": "From 7 Jan 2025",
+  "lede": "On 7 January 2025 a wildfire began in the hills above Pacific Palisades and, driven by strong winds, burned towards Malibu.",
+  "facts": [
+   "Began at about 10:30 a.m. local time on 7 January 2025 (CAL FIRE).",
+   "100 % contained on 31 January 2025; 23,448 acres (CAL FIRE)."
+  ]
+ },
+ "maturity": {
+  "text": "No NISAR analysis for this event. The images are Copernicus Sentinel-2 and Landsat-9 made here; the perimeter is NIFC's and the heat detections are NASA FIRMS'."
+ },
+ "steps": [],
+ "not_this": [],
+ "layers": {},
+ "regions": [],
+ "sources": [],
+ "uncertainty": [],
+ "simple": {
+  "title": "Palisades Fire",
+  "lines": [],
+  "small": "",
+  "layers": [],
+  "evidence": [],
+  "shows": {
+   "off": "True-colour satellite images."
+  },
+  "finding": {
+   "text": "CAL FIRE's incident record gives 23,448 acres (about 94.9 km²) burned. The official perimeter drawn here measures the same, and VIIRS satellites detected heat inside it on 7–12 January 2025.",
+   "step": null
+  },
+  "place_labels": [
+   {
+    "lat": 34.04806,
+    "lon": -118.52647,
+    "text": "Pacific Palisades"
+   },
+   {
+    "lat": 34.03559,
+    "lon": -118.68942,
+    "text": "Malibu"
+   },
+   {
+    "lat": 34.0897,
+    "lon": -118.60296,
+    "text": "Topanga"
+   }
+  ]
+ }
+}

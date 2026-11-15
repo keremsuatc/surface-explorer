@@ -1,0 +1,246 @@
+{
+ "event_id": "ven-earthquake-2026-06",
+ "generated_from": "catalog/events/ven-earthquake-2026-06.json (data.shaking) via pipeline/export/build_shaking.py",
+ "shock": {
+  "usgs_id": "us6000t7zp",
+  "mag": 7.5,
+  "mag_type": "Mww",
+  "time_utc": "2026-06-24T22:05:04.053Z",
+  "lat": 10.5955,
+  "lon": -67.2205,
+  "depth_km": 10,
+  "place": "20 km W of Catia La Mar",
+  "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp/executive"
+ },
+ "product": {
+  "publisher": "USGS",
+  "type": "shakemap",
+  "version": 16,
+  "process_timestamp": "2026-09-07T23:36:54Z",
+  "map_status": "automatic",
+  "page": "https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp/shakemap/intensity",
+  "grid": "https://earthquake.usgs.gov/product/shakemap/us6000t7zp/us/1788824357255/download/grid.xml",
+  "legend": "https://earthquake.usgs.gov/product/shakemap/us6000t7zp/us/1788824357255/download/mmi_legend.png",
+  "licence": "public domain (USGS)",
+  "intensity_observations": 455,
+  "seismic_stations": 0,
+  "gmice": "WGRW12",
+  "grid_spacing_deg": [
+   0.0129,
+   0.0127
+  ]
+ },
+ "map": {
+  "bounds_latlon": [
+   [
+    9.75,
+    -69.2
+   ],
+   [
+    10.9,
+    -66.15
+   ]
+  ],
+  "epicentre": [
+   10.5955,
+   -67.2205
+  ],
+  "separate_layers": [
+   "nisar-los-a162",
+   "nisar-los-d054",
+   "nisar-los-a061"
+  ]
+ },
+ "scale": {
+  "rule": "class = MMI rounded to the nearest whole number; the legend's DAMAGE row is not used",
+  "source": "https://earthquake.usgs.gov/product/shakemap/us6000t7zp/us/1788824357255/download/mmi_legend.png",
+  "classes": [
+   {
+    "class": "I",
+    "from": null,
+    "to": 1.5,
+    "shaking": "Not felt",
+    "pga_pct_g": "<0.0464",
+    "pgv_cm_s": "<0.0215",
+    "level": 1
+   },
+   {
+    "class": "II-III",
+    "from": 1.5,
+    "to": 3.5,
+    "shaking": "Weak",
+    "pga_pct_g": "0.297",
+    "pgv_cm_s": "0.135",
+    "level": 2
+   },
+   {
+    "class": "IV",
+    "from": 3.5,
+    "to": 4.5,
+    "shaking": "Light",
+    "pga_pct_g": "2.76",
+    "pgv_cm_s": "1.41",
+    "level": 3
+   },
+   {
+    "class": "V",
+    "from": 4.5,
+    "to": 5.5,
+    "shaking": "Moderate",
+    "pga_pct_g": "6.2",
+    "pgv_cm_s": "4.65",
+    "level": 4
+   },
+   {
+    "class": "VI",
+    "from": 5.5,
+    "to": 6.5,
+    "shaking": "Strong",
+    "pga_pct_g": "11.5",
+    "pgv_cm_s": "9.64",
+    "level": 5
+   },
+   {
+    "class": "VII",
+    "from": 6.5,
+    "to": 7.5,
+    "shaking": "Very strong",
+    "pga_pct_g": "21.5",
+    "pgv_cm_s": "20",
+    "level": 6
+   },
+   {
+    "class": "VIII",
+    "from": 7.5,
+    "to": 8.5,
+    "shaking": "Severe",
+    "pga_pct_g": "40.1",
+    "pgv_cm_s": "41.4",
+    "level": 7
+   },
+   {
+    "class": "IX",
+    "from": 8.5,
+    "to": 9.5,
+    "shaking": "Violent",
+    "pga_pct_g": "74.7",
+    "pgv_cm_s": "85.8",
+    "level": 8
+   },
+   {
+    "class": "X+",
+    "from": 9.5,
+    "to": null,
+    "shaking": "Extreme",
+    "pga_pct_g": ">139",
+    "pgv_cm_s": ">178",
+    "level": 9
+   }
+  ]
+ },
+ "animation": {
+  "level_from": "mmi_class (scale.classes[].level)",
+  "soil_factor": null,
+  "soil_note": "ShakeMap values already include the local site (Vs30) amplification: do not apply a second soil factor.",
+  "buildings": "Low-rise / high-rise and more flexible / stiffer models are illustrative only: no safe/unsafe verdict and no damage share."
+ },
+ "regions": [
+  {
+   "id": "catia-la-mar",
+   "name": "Catia La Mar",
+   "lat": 10.5993,
+   "lon": -67.0145,
+   "osm": "node/922793109",
+   "distance_km": 22.5,
+   "grid_node": {
+    "lat": 10.6029,
+    "lon": -67.0136,
+    "offset_km": 0.41
+   },
+   "mmi": 9.0,
+   "mmi_class": "IX",
+   "shaking": "Violent",
+   "pga_pct_g": 104.4,
+   "pgv_cm_s": 91.13,
+   "psa_pct_g": {
+    "0.3s": 160.2,
+    "1.0s": 112.6,
+    "3.0s": 19.58
+   },
+   "soil": {
+    "vs30_m_s": 459.5,
+    "status": "estimated",
+    "site_class": "C",
+    "site_class_text": "Very dense soil and soft rock"
+   },
+   "animation_level": 8
+  },
+  {
+   "id": "caracas",
+   "name": "Caracas",
+   "lat": 10.5061,
+   "lon": -66.9146,
+   "osm": "node/914310439",
+   "distance_km": 34.9,
+   "grid_node": {
+    "lat": 10.5015,
+    "lon": -66.9105,
+    "offset_km": 0.68
+   },
+   "mmi": 7.7,
+   "mmi_class": "VIII",
+   "shaking": "Severe",
+   "pga_pct_g": 48.83,
+   "pgv_cm_s": 40.38,
+   "psa_pct_g": {
+    "0.3s": 84.15,
+    "1.0s": 51.93,
+    "3.0s": 10.28
+   },
+   "soil": {
+    "vs30_m_s": 366.0,
+    "status": "estimated",
+    "site_class": "C",
+    "site_class_text": "Very dense soil and soft rock"
+   },
+   "animation_level": 7
+  },
+  {
+   "id": "valencia",
+   "name": "Valencia",
+   "lat": 10.17,
+   "lon": -68.0004,
+   "osm": "node/7179881094",
+   "distance_km": 97.5,
+   "grid_node": {
+    "lat": 10.1719,
+    "lon": -68.0064,
+    "offset_km": 0.69
+   },
+   "mmi": 6.2,
+   "mmi_class": "VI",
+   "shaking": "Strong",
+   "pga_pct_g": 17.46,
+   "pgv_cm_s": 14.55,
+   "psa_pct_g": {
+    "0.3s": 32.1,
+    "1.0s": 18.61,
+    "3.0s": 3.72
+   },
+   "soil": {
+    "vs30_m_s": 360.7,
+    "status": "estimated",
+    "site_class": "C",
+    "site_class_text": "Very dense soil and soft rock"
+   },
+   "animation_level": 5
+  }
+ ],
+ "limits": [
+  "ShakeMap estimates, not recordings: the product uses 455 'Did You Feel It?' intensity reports and 0 seismic stations, with ground-motion models and the NEIC finite fault (version 3).",
+  "The M7.2 shock near San Felipe came 32.2 s before the M7.5; felt reports cannot separate the two, so the M7.5 map may include shaking from both.",
+  "Vs30 (SVEL) is ShakeMap's estimate of the top 30 m of ground (from a topographic-slope proxy), not a site measurement.",
+  "The map status is 'automatic' (version 16): USGS may still revise it."
+ ],
+ "places_source": "OpenStreetMap place=city nodes (read 2026-11-14 via Overpass API); ODbL"
+}

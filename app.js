@@ -11,7 +11,7 @@
   const I = window.I18N;
   const t = (k, v) => I.t(k, v);
   const txCache = {};
-  const txt = (id) => { const k = `${I.lang}|${id}`; if (!(k in txCache)) txCache[k] = texts[id] ? I.tx(texts[id]) : null; return txCache[k]; };
+  const txt = (id) => { const k = `${I.lang}|${id}`; if (!(k in txCache)) txCache[k] = texts[id] ? (texts[id]._quake ? quakeText(id) : I.tx(texts[id])) : null; return txCache[k]; };
   const getJson = async (path) => {
     const r = await fetch(path, { cache: "no-store" });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -26,7 +26,18 @@
   }
   // English text for every event (small files; needed for the event cards)
   const texts = {};
+  // v73: an earthquake event (events.json "hazard": "earthquake") is drawn from its map_layers.json (built from the catalog record);
+  // its short texts are written here from that file and the events.json entry, in the chosen language (see quakeText)
+  const quakeLayers = {};
   await Promise.all(index.events.map(async (e) => {
+    if (e.hazard === "earthquake") {
+      try { quakeLayers[e.id] = await getJson(`data/${e.layers}`); } catch (err) {
+        fail(t("Event layers ({file}) could not be read: {error}.", { file: `<code>data/${e.layers}</code>`, error: err.message }));
+        texts[e.id] = null; return;
+      }
+      try { texts[e.id] = { ...(await getJson(`data/${e.id}/text.en.json`)), _quake: true }; } catch (err) { texts[e.id] = { _quake: true }; } // optional
+      return;
+    }
     try { texts[e.id] = await getJson(`data/${e.id}/text.en.json`); } catch (err) {
       texts[e.id] = null;
       fail(t("The event text ({file}) could not be read; run {command}.", { file: `<code>data/${e.id}/text.en.json</code>`, command: "<code>python3 pipeline/export/build_text_en.py</code>" }));
@@ -76,8 +87,9 @@
     map.flyToBounds(b, { ...opts, ...m });
     // Check the real result instead of relying on events (other moves, e.g. invalidateSize, also fire "moveend")
     moveTimer = setTimeout(() => {
-      const pad = opts.padding ? L.point(opts.padding) : L.point(0, 0);
-      const want = Math.min(map.getBoundsZoom(b, false, pad.multiplyBy(2)), opts.maxZoom ?? Infinity);
+      const pad = opts.padding ? L.point(opts.padding).multiplyBy(2)   // v75: also uneven padding (top / bottom kept clear of the map controls)
+        : L.point(opts.paddingTopLeft || [0, 0]).add(L.point(opts.paddingBottomRight || [0, 0]));
+      const want = Math.min(map.getBoundsZoom(b, false, pad), opts.maxZoom ?? Infinity);
       const off = Math.abs(map.getZoom() - want) > 0.6 || !map.getBounds().contains(b.getCenter());
       if (off) { map.stop(); map.fitBounds(b, { ...opts, animate: false }); }
     }, m.duration * 1000 + 500);
@@ -91,6 +103,20 @@
   // Leaflet zoom 7 and the study area at 12–14, so those tiles were dropped and the map showed grey until the new ones arrived.
   // Keep them up to 8 levels up (only the outer call sets the limit; Leaflet's own recursion keeps it).
   const KeepCoarse = L.TileLayer.extend({
+    // v74: at fractional zoom (zoomSnap 0.25) and on retina screens (128 px tiles) Leaflet scales the tile grid, and the tiles' edges land
+    // between screen pixels: hairline gaps open between neighbouring tiles and the map's light grey ground shows through as thin white
+    // lines (measured: a grid every 90.5 px at zoom 13.5, 107.5 px at 13.75 and 14.75, outside the satellite images only). Each tile is
+    // drawn 1 px larger than its grid cell, so neighbours overlap by one pixel and no gap can open. The image overlays are not tiles.
+    _initTile(tile) {
+      L.TileLayer.prototype._initTile.call(this, tile);
+      const sz = this.getTileSize();
+      tile.style.width = `${sz.x + 1}px`;
+      tile.style.height = `${sz.y + 1}px`;
+      // Leaflet 1.9 draws tiles with mix-blend-mode: plus-lighter (it adds the half-covered edge pixels of neighbours); with the 1 px
+      // overlap that addition doubled the overlapping row and column, and bright lines appeared (USGS basemap, Palisades: +80 grey levels).
+      // The overlap already closes the gap, so the tiles are drawn normally.
+      tile.style.mixBlendMode = "normal";
+    },
     _retainParent(x, y, z, minZoom) {
       if (this._inRetain) return L.TileLayer.prototype._retainParent.call(this, x, y, z, minZoom);
       this._inRetain = true;
@@ -166,7 +192,25 @@
       maxNativeZoom: RETINA ? ESRI_URL_MAX - 1 : 18,
       attribution: `Powered by <a href="https://www.esri.com">Esri</a> | ${ESRI_SOURCE}`,
     }) : null;
-  const activeSat = () => (state.satSource === "esri" && esriBase ? esriBase : satBase);
+  // v69: USGS The National Map orthoimagery (public domain, no key; cached to level 16) for events whose layers.json asks for it ("basemap": "usgs")
+  const USGS_SOURCE = "USDA, USGS The National Map: Orthoimagery (data refreshed June 2024)";
+  const usgsBase = new KeepCoarse("https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
+    detectRetina: true, maxZoom: RETINA ? 19 : 18, maxNativeZoom: RETINA ? 15 : 16,
+    attribution: `<a href="https://www.usgs.gov/programs/national-geospatial-program/national-map">${USGS_SOURCE}</a>` });
+  const activeSat = () => (meta && meta.basemap === "usgs" ? usgsBase : state.satSource === "esri" && esriBase ? esriBase : satBase);
+  // v69: the attribution line names what each credit is for: the background map apart from the dated images and the data layers
+  for (const l of [streetBase, satBase, esriBase, usgsBase].filter(Boolean)) {
+    const orig = l.options.attribution;
+    l._attrOrig = orig;
+    l.getAttribution = function () { if (!this._attrText) this._attrText = `${t("Basemap")}: ${orig}`; return this._attrText; };
+  }
+  const relabelBase = () => { // after a language change: replace the label of the background credit in place
+    for (const l of [streetBase, satBase, esriBase, usgsBase].filter(Boolean)) {
+      const now = `${t("Basemap")}: ${l._attrOrig}`;
+      if (l._attrText && l._attrText !== now && map.hasLayer(l)) { map.attributionControl.removeAttribution(l._attrText); l._attrText = now; map.attributionControl.addAttribution(now); }
+      else l._attrText = now;
+    }
+  };
   // Credits shown only while their data is on the map. Leaflet counts every addAttribution call, so each credit is
   // added once and removed once (v65 fix: repeated adds on every render kept a credit after its layer was gone)
   const credits = new Set();
@@ -176,7 +220,7 @@
   };
   // Satellite tiles that fail to load: after a few failures with none loaded, Esri falls back to EOxCloudless;
   // EOxCloudless shows an error and offers the street map
-  for (const layer of [satBase, esriBase].filter(Boolean)) {
+  for (const layer of [satBase, esriBase, usgsBase].filter(Boolean)) {
     let loaded = 0, errors = 0;
     layer.on("loading", () => { loaded = 0; errors = 0; }); // counted per loading round (pan/zoom/view change)
     layer.on("tileload", () => { loaded++; $("sat-error").hidden = true; });
@@ -184,13 +228,13 @@
       errors++;
       if (state.view !== "satellite" || state.satFallback || errors < 3 || loaded) return;
       if (layer === esriBase && state.satSource === "esri") { state.satSource = "eox"; state.esriFailed = true; render(); }
-      else if (layer === satBase) $("sat-error").hidden = false;
+      else if (layer === satBase || layer === usgsBase) $("sat-error").hidden = false;
     });
   }
   function syncBase() {
     const useSat = state.view === "satellite" && !state.satFallback;
     const want = useSat ? activeSat() : streetBase;
-    for (const l of [streetBase, satBase, esriBase]) if (l && l !== want && map.hasLayer(l)) map.removeLayer(l);
+    for (const l of [streetBase, satBase, esriBase, usgsBase]) if (l && l !== want && map.hasLayer(l)) map.removeLayer(l);
     if (!map.hasLayer(want)) want.addTo(map);
     if (!useSat) $("sat-error").hidden = true;
   }
@@ -257,16 +301,35 @@
   // The divider exists only for a real before–after comparison (grey radar of both dates). Then the pair-derived candidate stays on the
   // "after" side. Without the grey comparison the candidate is shown on one map, labelled as derived from the change between the two dates.
   // highest zoom for the true-colour images: one image pixel ≈ 2 CSS pixels (EPSG:3857 metres per CSS pixel = 156543.03 / 2^z)
-  function opticalMaxZoom() {
-    const ex = optical && optical.export;
-    if (!ex || !bounds) return undefined;
-    const w = L.CRS.EPSG3857.project(bounds.getNorthEast()).x - L.CRS.EPSG3857.project(bounds.getSouthWest()).x;
+  const swirOn = () => !!(state.burnView && optical && optical.variants && optical.variants.swir);
+  const opticalPair = () => (swirOn() ? optical.variants.swir.pair : optical.pair);
+  // v74: an image pair with its own extent (earthquake: La Guaira) is drawn, split and capped on that extent, not the event frame
+  const pairBounds = () => (optical && optical.bounds_latlon ? L.latLngBounds(optical.bounds_latlon) : bounds);
+  function opticalMaxZoom(exOver) {
+    const ex = exOver || (swirOn() ? optical.variants.swir.export : optical && optical.export);
+    const bb = exOver ? bounds : pairBounds();
+    if (!ex || !bb) return undefined;
+    const w = L.CRS.EPSG3857.project(bb.getNorthEast()).x - L.CRS.EPSG3857.project(bb.getSouthWest()).x;
     return Math.floor(Math.log2(156543.03 * 2 / (w / ex.width)) * 4) / 4;
   }
   // v65: an event without NISAR analysis (layers.json "nisar": false): Before / After, Timeline and the UNOSAT evidence only
   const lite = () => !!(meta && meta.nisar === false);
+  const hazardNow = () => ((meta && index && index.events.find((e) => e.id === meta.event_id)) || {}).hazard || "flood"; // v69: event type from events.json
   let evidence = null;      // data/<event>/evidence.json (v65, events without NISAR analysis)
   const vecCache = {};      // GeoJSON layers by file
+  // v69: point layers (VIIRS detections): small circles, drawn on canvas so two thousand of them stay light on a phone
+  const ptRenderer = L.canvas({ padding: 0.2, pane: "regions" });
+  // dot size grows with the zoom but stays well under the 375 m VIIRS pixel, so the dots read as separate detections
+  const ptRadius = () => Math.max(1.2, Math.min(3.2, 1.2 + (map.getZoom() - 11) * 0.7));
+  function points(file, color) {
+    const lay = L.geoJSON(null, { pane: "regions", interactive: false,
+      pointToLayer: (f, ll) => L.circleMarker(ll, { renderer: ptRenderer, radius: ptRadius(), weight: 0.6, color: "#2b0a00", fillColor: color, fillOpacity: 0.85, opacity: 0.6 }) });
+    lay.on("add", () => { const z = () => lay.eachLayer((m) => m.setRadius(ptRadius())); map.on("zoomend", z); lay.once("remove", () => map.off("zoomend", z)); });
+    const fill = (gj) => { lay.clearLayers(); lay.addData(gj); };
+    if (vecCache[file]) fill(vecCache[file]);
+    else getJson(`data/${file}`).then((gj) => { vecCache[file] = gj; fill(gj); }).catch(() => fail(t("A layer image could not be loaded: {file}", { file: `<code>data/${file}</code>` })));
+    return lay;
+  }
   function vector(file, style) {
     const lay = L.geoJSON(null, { pane: "regions", interactive: false, style: () => style });
     const fill = (gj) => { lay.clearLayers(); lay.addData(gj); };
@@ -275,6 +338,43 @@
     return lay;
   }
   const UNOSAT_EXTENT = { color: "#ff8c1a", weight: 2, opacity: 1, fillColor: "#ff8c1a", fillOpacity: 0.18 };
+  // v75: data coverage outline (where the product looked); never a flood edge
+  const COVERAGE_LINE = { color: "#ffffff", weight: 1.5, opacity: 0.9, dashArray: "5 5", fill: false };
+  // v75: the flood map's two views, from data/<event>/views.json (record web.views): "Affected areas" = everything the data cover,
+  // "Close look" = the settlement. Shown only where the flood layer is on screen (Nepal: UNOSAT evidence; NISAR events: Explore evidence).
+  let views = null;
+  const floodView = () => !!(views && meta && (views.applies_to === "unosat" ? state.ui === "simple" && state.mapMode === "unosat" : state.ui === "evidence"));
+  function renderAreaSwitch() {
+    const box = $("area-switch"), on = floodView();
+    box.hidden = !on;
+    document.body.classList.toggle("area-switch-on", on);
+    document.body.classList.toggle("area-overview", on && state.areaView === "overview");
+    if (!on) { box.innerHTML = ""; return; }
+    box.setAttribute("aria-label", t("Map area"));
+    box.innerHTML = ["overview", "closeup"].map((k) => `<button type="button" data-area="${k}" aria-pressed="${state.areaView === k}">${esc(t(views[k].label))}</button>`).join("");
+    box.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => setAreaView(b.dataset.area, true)));
+  }
+  // the whole area stays clear of the area switch (top) and of the legend (bottom); the close look keeps the usual small margin
+  function areaGo() {
+    const b = L.latLngBounds(views[state.areaView].bounds);
+    if (state.areaView !== "overview") { goTo(b, { padding: [12, 12] }); return; }
+    const mr = map.getContainer().getBoundingClientRect(), sw = $("area-switch").getBoundingClientRect(), lg = $("map-legend").getBoundingClientRect();
+    const top = sw.height ? Math.max(12, sw.bottom - mr.top + 8) : 12, bottom = lg.height ? Math.max(12, mr.bottom - lg.top + 8) : 12;
+    // phones: the key sits under the map (f-below), so only the switch needs room; a key still on the map keeps its own room
+    const onMap = $("map-legend").parentElement === map.getContainer().parentElement;
+    goTo(b, { paddingTopLeft: [12, top], paddingBottomRight: [12, onMap && top + bottom < mr.height * 0.6 ? bottom : 12] });
+  }
+  function setAreaView(k, focus) {
+    if (!views) return;
+    state.areaView = k;
+    renderAreaSwitch();
+    render();
+    areaGo();
+    if (focus) { const b = $("area-switch").querySelector(`[data-area="${k}"]`); if (b) b.focus(); }
+  }
+  // v69: wildfire layers. Perimeter: the official outline (a line with a light fill); detections: small dots, one per VIIRS pixel and pass
+  const FIRE_PERIMETER = { color: "#ffd166", weight: 2.5, opacity: 1, fillColor: "#ffd166", fillOpacity: 0.12 };
+  const MAP_STYLES = { perimeter: FIRE_PERIMETER };
   const UNOSAT_LAKE = { color: "#1e90ff", weight: 3, opacity: 1, fillColor: "#1e90ff", fillOpacity: 0.45 };
   const UNOSAT_SOURCE = { color: "#ff3b30", weight: 2, opacity: 1, dashArray: "5 4", fillColor: "#ff3b30", fillOpacity: 0.12 };
   let stageFramed = null;   // id of the Timeline stop the map was last framed for
@@ -312,7 +412,7 @@
   // "radar" (the NISAR radar pair with the divider) and "radartl" (NISAR radar images one at a time).
   state.mapMode = "optical";
   let optical = null;    // data/<event>/optical.json of the open event (null: no suitable pair)
-  const COPERNICUS_NOTE = "Contains modified Copernicus Sentinel data 2026";
+  // (v69: the Copernicus credit carries the year of the images on the map; see render())
   state.tl = 0;          // index of the radar frame shown ("radartl": NISAR radar images one at a time, from Data and science)
   // v63: "timeline" = four stages (before / flood begins / towards the end / after) from data/<event>/stages.json
   state.stage = 0;
@@ -339,10 +439,10 @@
     $("map-status").textContent = msg;
     statusTimer = setTimeout(() => { $("map-status").hidden = false; }, 120); // avoid flicker for cached images
   }
-  const DATA_V = "40"; // bump when layer PNGs are regenerated (avoids stale cached colours)
+  const DATA_V = "42"; // bump when layer PNGs are regenerated (avoids stale cached colours)
   // cls: "pixelated" for radar and analysis rasters (each pixel stays a visible square); "photo" for the true-colour images
   // (smooth, like a photograph; see opticalMaxZoom for how far they can be enlarged)
-  function img(file, pane, cls = "pixelated") {
+  function img(file, pane, cls = "pixelated", b = bounds) { // b: v73 a layer with its own extent (earthquake rasters)
     const seq = loadSeq;
     pending++;
     setStatus(t("Loading map layers…"));
@@ -351,7 +451,7 @@
       pending = Math.max(0, pending - 1);
       if (!pending) setStatus("");
     };
-    return L.imageOverlay(`data/${file}?v=${DATA_V}`, bounds, { pane, opacity: 1, interactive: false, className: cls })
+    return L.imageOverlay(`data/${file}?v=${DATA_V}`, b, { pane, opacity: 1, interactive: false, className: cls })
       .on("load", done)
       .on("error", () => { done(); if (seq === loadSeq) fail(t("A layer image could not be loaded: {file}", { file: `<code>data/${file}</code>` })); });
   }
@@ -384,6 +484,9 @@
     outline.clearLayers();
     focusGroup.clearLayers();
     map.attributionControl.removeAttribution(GFM_NOTE);
+    for (const c of QCREDIT) setCredit(c, false); // v73: earthquake layer credits
+    $("map-legend").classList.remove("q-legend");
+    qPlaceLegend(true);
     $("change-label").hidden = true;
     $("map-legend").innerHTML = "";
     pending = 0;
@@ -402,6 +505,7 @@
       b.setAttribute("aria-pressed", String(e.id === activeId));
       b.setAttribute("aria-label", `${ev.place}, ${ev.dates}`);
       b.innerHTML = (ev.thumb ? `<img src="data/${esc(ev.thumb)}" alt="${esc(ev.thumb_alt || "")}" loading="lazy">` : "") +
+        (window.NFEHazard ? window.NFEHazard.emblem(e.hazard, "c-emblem") : "") + // v69: same type emblem as on the globe
         `<span class="c-text"><span class="c-place">${esc(ev.place)}</span><span class="c-dates">${esc(ev.dates)}</span></span>`; // v64: no BETA / PROVISIONAL label here (data status: Sources and method)
       b.addEventListener("click", () => {
         setCardsOpen(false);
@@ -450,11 +554,21 @@
     }
     if (seq !== loadSeq) return; // a newer event was requested meanwhile
     if (!tt) { setStatus(""); return; }
+    const quake = entry.hazard === "earthquake";
+    if (quake) m = quakeMeta(entry, m); // v73: map_layers.json → the image-only ("lite") path with its own layers and timeline
     let tlj = null, opj = null, stj = null, evj = null;
+    if (quake) { // only a verified pair adds the comparison: optical.json, or (v74) a before/after image pair listed in map_layers.json
+      try { opj = await getJson(`data/${entry.id}/optical.json`); } catch (e) { opj = qOpticalPair(entry.id, m.qlayers); }
+      try { m.shaking = await getJson(`data/${entry.id}/shaking.json`); } catch (e) { m.shaking = null; } // v80: USGS ShakeMap of the story's animation
+    }
+    else {
     if (m.nisar !== false) { try { tlj = await getJson(`data/${entry.id}/timeline.json`); } catch (e) { tlj = null; } } // optional: without it the timeline uses layers.json dates
     try { opj = await getJson(`data/${entry.id}/optical.json`); } catch (e) { opj = null; } // optional: without it Before / After explains why
     try { stj = await getJson(`data/${entry.id}/stages.json`); } catch (e) { stj = null; }   // optional: without it the Timeline explains why
     if (m.nisar === false) { try { evj = await getJson(`data/${entry.id}/evidence.json`); } catch (e) { evj = null; } }
+    }
+    let vwj = null;
+    if (entry.hazard === "flood") { try { vwj = await getJson(`data/${entry.id}/views.json`); } catch (e) { vwj = null; } } // v75: optional overview / close-up (flood events only; v78: no 404 for the others)
     if (seq !== loadSeq) return;
     meta = m;
     T = tt;
@@ -469,9 +583,15 @@
     state.stage = stages ? Math.max(0, stages.stages.findIndex((x) => x.frame)) : 0;
     state.tpos = 0;
     state.stageMissing = null;
-    state.mapMode = optical ? "optical" : "analysis";
+    state.mapMode = quake ? (qDamage().length ? "damage" : qRasters().length ? "motion" : "qtimeline") : optical ? "optical" : "analysis"; // v74: earthquake: buildings first
+    state.qTrack = quake ? (qRasters()[0] || {}).id || null : null; // v73: earthquake: the radar track shown, the timeline stop
+    state.qStop = 0;
+    state.qPrevView = null;
     state.tl = T.steps.length ? Math.max(0, timeline.frames.findIndex((f) => f.label === T.steps[0].view.pair[1])) : 0;
     evidence = evj && evj.event_id === entry.id ? evj : null;
+    views = vwj && vwj.event_id === entry.id ? vwj : null;
+    state.areaView = "overview";
+    renderAreaSwitch();
     stageFramed = null;
     state.helperQ = null;
     bounds = L.latLngBounds(meta.bounds_latlon); // image overlay extent
@@ -515,10 +635,41 @@
   }
 
   // Header: title, area, product status and the single warning badge (also rewritten when the language changes)
+  // v76: first sentence of a text and the rest ("94.9 km²" and "10 m" are not sentence ends)
+  function firstSentence(x) {
+    const m = String(x || "").trim().match(/^(.+?[.!?])\s+(\S[\s\S]*)$/);
+    return m ? [m[1], m[2]] : [String(x || "").trim(), ""];
+  }
+  // v76: open "Data and sources" and go to it (optionally to one of its entries)
+  function openData(id) {
+    $("science").open = true;
+    renderScience();
+    (($(id) && id) ? $(id) : $("science")).scrollIntoView({ block: "start", behavior: reducedMotion.matches ? "auto" : "smooth" });
+  }
+  // v76: the event's summary (text.en.json event.lede) is "what happened; the area we looked at": the first part is the one
+  // sentence under the place name, the rest (a data limit) goes to the small line with the dates
+  function splitLede(s0) {
+    const s1 = String(s0 || "").trim(), i = s1.indexOf(";");
+    const src = ((texts[meta && meta.event_id] || {}).event || {}).lede || ""; // split only where the English source has the two parts
+    if (i < 0 || src.indexOf(";") < 0) return [s1, ""];
+    const rest = s1.slice(i + 1).trim();
+    return [s1.slice(0, i).trim().replace(/\s+$/, "") + ".", rest ? rest.charAt(0).toLocaleUpperCase(I.lang) + rest.slice(1) : ""];
+  }
   function renderHeader() {
-    // v64: the short form (place) replaces the full title on small phones in the Timeline, so the image and its sentence fit
-    $("title").innerHTML = `<span class="t-full">${esc(T.event.title)}</span><span class="t-short" aria-hidden="true">${esc(lite() ? T.event.title : T.event.place)}</span>`;
-    $("subtitle").textContent = lite() ? T.event.area_name : t("{area} · {size} study area", { area: T.event.area_name, size: areaText() });
+    // v76: place name, one short sentence about what happened there, then the area / data limit and the dates (small)
+    const ev = T.event, quake = isQuake();
+    const h1 = quake ? ev.title : ev.place || ev.title;
+    const [lede, limit] = quake ? [ev.lede, ""] : splitLede(ev.lede || ev.area_name);
+    // v78: the place after the last " · " is never broken (e.g. "Gyirong–Rasuwa" at its dash)
+    const k = h1.lastIndexOf(" · "), h1h = k > 0 ? `${esc(h1.slice(0, k))} · <span class="nowrap">${esc(h1.slice(k + 3))}</span>` : esc(h1);
+    $("title").innerHTML = `<span class="t-full">${h1h}</span><span class="t-short" aria-hidden="true">${h1h}</span>`;
+    const small = quake ? [ev.area_name, ev.dates] : [ev.dates]; // the area clause of the summary is the first line of "Data and sources"
+    void limit;
+    $("subtitle").innerHTML = (lede ? `<span class="ev-lede">${esc(lede)}</span>` : "") +
+      `<span class="ev-limit">${small.filter(Boolean).map((x, k) => (k === small.filter(Boolean).length - 1 ? `<span class="nowrap">${esc(x)}</span>` : esc(x))).join(" · ")}</span>`;
+    renderHeaderRest();
+  }
+  function renderHeaderRest() { // badges, product status, event facts and the page title
     const mb = $("maturity-badge");
     mb.textContent = t("{maturity} product", { maturity: meta.maturity });
     mb.classList.toggle("beta", meta.maturity === "BETA");
@@ -526,7 +677,7 @@
     $("maturity-info").textContent = T.maturity.text;
     $("product-status").textContent = T.maturity.text; // v64: the data status lives here (no badge by the event name); the text starts with the label
     // Same meaning as before (experimental candidate, no validated flood boundary / no flood area), in plain words
-    $("warning-badge").textContent = meta.support.length
+    $("warning-badge").textContent = isQuake() ? t("Preliminary products — not checked on the ground") : meta.support.length
       ? t("Possible water — flooding not confirmed")
       : t("Radar change only — we did not map the flooded area");
     $("event-info").innerHTML = `<p>${esc(T.event.lede)}</p><ul>${T.event.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>` +
@@ -557,18 +708,22 @@
   // Language changed: the same event, map position, zoom, layers and step stay; only the words are written again
   I.onChange(() => {
     localizeStatic();
+    relabelBase();
+    for (const c of [...credits]) setCredit(c, false); // credits are written again (with their translated group names) by render()
     setCardsOpen(!$("event-cards").hidden);
     if (!meta) return;
     T = txt(meta.event_id);
     buildCards(meta.event_id);
     $("current-event").textContent = T.event.place;
     renderHeader();
-    renderPairText();
-    buildLayerList();
-    map.removeLayer(regionGroup); map.removeLayer(controlGroup);
-    regionGroup = L.layerGroup(); controlGroup = L.layerGroup();
-    buildRegions();
-    buildInfo();
+    if (!isQuake()) { // v73: the NISAR flood panels (layer list, inspection areas, sources) are not built for an earthquake
+      renderPairText();
+      buildLayerList();
+      map.removeLayer(regionGroup); map.removeLayer(controlGroup);
+      regionGroup = L.layerGroup(); controlGroup = L.layerGroup();
+      buildRegions();
+      buildInfo();
+    }
     if (!lite()) {
       renderStepText(state.step);
       renderShowMe(T.steps[state.step]);
@@ -688,7 +843,8 @@
   }
   $("step-prev").addEventListener("click", () => T && goStep(Math.max(0, state.step - 1)));
   $("to-map").addEventListener("click", () => document.querySelector(".map-col").scrollIntoView({ block: "start" }));
-  $("to-text").addEventListener("click", () => (state.ui === "simple" ? $("simple-card") : $("explore")).scrollIntoView({ block: "start" }));
+  // v76: phones — the map tool goes to "Data and sources" (opened) in the simple view, to the step text in the evidence view
+  $("to-text").addEventListener("click", () => (state.ui === "simple" ? openData() : $("explore").scrollIntoView({ block: "start" })));
   $("step-next").addEventListener("click", () => T && goStep(Math.min(T.steps.length - 1, state.step + 1)));
   $("reset-view").addEventListener("click", () => goStep(state.step, false));
 
@@ -921,10 +1077,10 @@
         `<img src="data/${esc(fx.file)}?v=${DATA_V}" width="${fx.width}" height="${fx.height}" alt="${esc(fx.sentence)}">` +
         `<p class="sf-credit">${esc(fx.credit)} · ${esc(fx.licence)} · <a href="${esc(fx.url)}" target="_blank" rel="noopener">${esc(fx.publisher)} ↗</a></p>`;
     }
-    if (kind === "map") { // UNOSAT outlines on the background map, framed on the place of this stop
+    if (kind === "map" && typeof stf.frame.layers[0] === "string") { // UNOSAT outlines on the background map, framed on the place of this stop
       overlays.stLakes = vector(stf.frame.layers[0], UNOSAT_LAKE).addTo(map);
       overlays.stSource = vector(stf.frame.layers[1], UNOSAT_SOURCE).addTo(map);
-    }
+    } else if (kind === "map") stf.frame.layers.forEach((L_, i) => { overlays["stMap" + i] = vector(L_.file, MAP_STYLES[L_.style] || UNOSAT_EXTENT).addTo(map); });
     if (stf && stageFramed !== stf.id) {
       if (kind === "map") goTo(L.latLngBounds(stf.frame.bounds), { padding: [16, 16] });
       else if (kind === "image" && stageFramed && stageFramed !== "image") goTo(viewBounds, { padding: [12, 12] });
@@ -933,7 +1089,27 @@
     if (!stf && stageFramed && stageFramed !== "image") { goTo(viewBounds, { padding: [12, 12] }); stageFramed = null; }
     if (state.ui === "simple" && state.mapMode === "unosat" && evidence) { // evidence: UNOSAT outline over the image of the day after
       overlays.evImage = img(evidence.background, "before", "photo").addTo(map);
-      overlays.evExtent = vector(evidence.layer.file, UNOSAT_EXTENT).addTo(map);
+      if (evidence.layers) { // v69: listed layers, each can be switched off (wildfire: heat detections and the official perimeter)
+        for (const L_ of evidence.layers) {
+          if (state.evOff && state.evOff[L_.id]) continue;
+          if (L_.kind === "points") overlays.evFirms = points(L_.file, L_.color).addTo(map);
+          else overlays.evPerim = vector(L_.file, FIRE_PERIMETER).addTo(map);
+        }
+      } else overlays.evExtent = vector(evidence.layer.file, UNOSAT_EXTENT).addTo(map);
+      if (views && views.overview.coverage && views.overview.coverage.file) overlays.evCover = vector(`${meta.event_id}/${views.overview.coverage.file}`, COVERAGE_LINE).addTo(map);
+    }
+    if (isQuake()) quakeDraw(); // v73: earthquake layers (radar track or damage) and the epicentres
+    if (floodView() && views.overview.coverage && views.overview.coverage.outline === "existing") { // v75: the study outline drawn as the coverage line (legend swatch)
+      const st = { ...COVERAGE_LINE, pane: "regions", interactive: false };
+      overlays.evCover = (meta.study_area ? L.geoJSON(meta.study_area.outline, { style: () => st, interactive: false, pane: "regions" }) : L.rectangle(bounds, st)).addTo(map);
+    }
+    if (floodView() && state.areaView === "overview" && views.overview.coverage) { // v75: what the data cover, named on its outline
+      const cb = L.latLngBounds(views.overview.bounds);
+      if (views.overview.coverage.file) overlays.covLabel = L.marker(views.overview.coverage.label_at || cb.getNorthWest(), { pane: "regions", keyboard: false, interactive: false,
+        icon: L.divIcon({ className: "place-label cov-label", html: `<span>${esc(t(views.overview.coverage.label))}</span>`, iconSize: [0, 0] }) }).addTo(map);
+      // where "Close look" goes: one named dot (the settlement labels would pile up at this scale and are hidden by CSS)
+      if (views.closeup.place) overlays.closeLabel = L.marker(L.latLngBounds(views.closeup.bounds).getCenter(), { pane: "regions", keyboard: false, interactive: false,
+        icon: L.divIcon({ className: "place-label close-label", html: `<i></i><span>${esc(t(views.closeup.place))}</span>`, iconSize: [0, 0] }) }).addTo(map);
     }
     if (kind === "image") { // Timeline stage: one dated true-colour image; the previous one stays until the new one has loaded, then a short fade
       const old = keepStage ? keepStage : null, url = `data/${stf.frame.file}?v=${DATA_V}`;
@@ -953,18 +1129,26 @@
     document.body.classList.toggle("stage-mode", !!(state.ui === "simple" && state.mapMode === "timeline"));
     renderStageCaption(stf);
     if (opticalShown()) { // Before / After: the two dated true-colour images on the two sides of the divider, same grid and extent
-      overlays.optBefore = img(optical.pair[0].file, "before", "photo").addTo(map);
-      overlays.optAfter = img(optical.pair[1].file, "after", "photo").addTo(map);
+      const pr = opticalPair(); // v69: or the short-wave infrared pair of the same scenes ("Highlight the burn scar")
+      overlays.optBefore = img(pr[0].file, "before", "photo", pairBounds()).addTo(map);
+      overlays.optAfter = img(pr[1].file, "after", "photo", pairBounds()).addTo(map);
     }
     // 10 m true-colour pixels: the map stops zooming where one image pixel covers about two screen points (no deeper zoom into blur)
-    const capZ = (opticalShown() || kind === "image" || overlays.evImage) ? opticalMaxZoom() : undefined;
+    const capZ = (opticalShown() || kind === "image" || overlays.evImage) ? opticalMaxZoom(kind === "image" && stf.frame.export ? stf.frame.export : undefined) : undefined; // v69: each image's own pixel
     if (map.options.maxZoom !== capZ) map.setMaxZoom(capZ);
-    const NISAR_NOTE = "NISAR: NASA/JPL-Caltech, ASF DAAC"; // only for events with NISAR images
+    // v69: credits in groups — dated images (with the year of the images on the map) and data layers — apart from the background map
+    const IMG = t("Dated images"), LAY = t("Layers");
+    const NISAR_NOTE = `${IMG}: NISAR: NASA/JPL-Caltech, ASF DAAC`; // only for events with NISAR images
     setCredit(NISAR_NOTE, !lite());
-    const copernicus = !!(overlays.optBefore || kind === "image" || overlays.evImage);
-    const unosat = !!(kind === "map" || overlays.evExtent), UNOSAT_NOTE = "UNOSAT (CC BY-SA)";
+    const landsat = kind === "image" && /^L[CO]0\d/.test(stf.frame.scene || "");
+    const copernicus = !!(overlays.optBefore || (kind === "image" && !landsat) || overlays.evImage);
+    const yearOn = (overlays.optBefore ? optical.pair[1].label : kind === "image" ? stf.frame.label : overlays.evImage ? evidence.background.match(/\d{4}/)[0] : "2026").slice(0, 4);
+    const unosat = !!((kind === "map" && !stf.frame.record) || overlays.evExtent), UNOSAT_NOTE = `${LAY}: UNOSAT (CC BY-SA)`;
     setCredit(UNOSAT_NOTE, unosat);
-    setCredit(COPERNICUS_NOTE, copernicus);
+    for (const y of ["2025", "2026"]) setCredit(`${IMG}: Contains modified Copernicus Sentinel data ${y}`, copernicus && yearOn === y);
+    setCredit(`${IMG}: Landsat-9, U.S. Geological Survey`, landsat);
+    const fireLayers = !!(overlays.evFirms || overlays.evPerim || (kind === "map" && stf.frame.record));
+    setCredit(`${LAY}: NASA FIRMS (VIIRS) · NIFC WFIGS · CAL FIRE`, fireLayers);
     $("change-label").hidden = !overlays.change;
     if (!lite()) $("change-label").textContent = t("Radar change · {dates}", { dates: narrow.matches ? fmtShort(state.before) + " → " + fmtShort(state.after, true) : fmtPair(state.before, state.after) }) + (state.pol === "HH" ? "" : " · " + state.pol);
     // Draw order: support layers below, candidate and intersection on top
@@ -1022,8 +1206,9 @@
       if (stf.frame && kind !== "figure") {
         // v66: place on every frame; v68: with the part of the valley where there is room (on phones it is in the block above the image)
         const loc = stf.frame.location ? `${narrow.matches ? I.tx(stf.frame.location) : stagePlace(I.tx(stf.frame))} · ` : "";
-        $("label-before").textContent = loc + (kind === "map" ? t("Observed {date} · {source}", { date: d(stf.frame.label), source: stf.frame.sensor ? `UNOSAT · ${stf.frame.sensor}` : "UNOSAT" })
-          : t("Captured {date} · {source}", { date: d(stf.frame.label), source: "Sentinel-2" })); // v68: capture date for a photo, observation date for an analysis map
+        $("label-before").textContent = loc + (kind === "map" && stf.frame.record ? t("Incident record {date} · {source}", { date: d(stf.frame.label), source: stf.frame.source_short })
+          : kind === "map" ? t("Observed {date} · {source}", { date: d(stf.frame.label), source: stf.frame.sensor ? `UNOSAT · ${stf.frame.sensor}` : "UNOSAT" })
+          : t("Captured {date} · {source}", { date: d(stf.frame.label), source: stf.frame.source_short || "Sentinel-2" })); // v68: capture / observation date; v69: incident record, sensor of the frame
         $("label-before").title = stf.frame.datetime_utc ? `${fmtUtc(stf.frame.datetime_utc)} · ${stf.frame.scene}` : "";
       }
     } else if (overlays.evImage) { // evidence (image-only event): what the picture under the outline is
@@ -1031,9 +1216,14 @@
       $("label-after").hidden = true;
       $("label-before").textContent = t("{date} · Sentinel-2 · true colour", { date: d(evidence.background.match(/\d{4}-\d{2}-\d{2}/)[0]) });
     } else if (opticalShown() && split) { // capture date and source on both sides of the divider
-      const [ob, oa] = optical.pair;
-      $("label-before").textContent = t("Before · {date} · Sentinel-2", { date: d(ob.label) });
-      $("label-after").textContent = t("After · {date} · Sentinel-2", { date: d(oa.label) });
+      const [ob, oa] = opticalPair();
+      if (optical.quake) { // v74: full capture dates; on phones the date alone, so both tags fit side by side
+        $("label-before").textContent = narrow.matches ? fmtDay(ob.label) : t("Before · {date} · Sentinel-2", { date: fmtDay(ob.label) });
+        $("label-after").textContent = narrow.matches ? fmtDay(oa.label) : t("After · {date} · Sentinel-2", { date: fmtDay(oa.label) });
+      } else {
+      $("label-before").textContent = swirOn() ? t("Before · {date} · Sentinel-2 infrared", { date: d(ob.label) }) : t("Before · {date} · Sentinel-2", { date: d(ob.label) });
+      $("label-after").textContent = swirOn() ? t("After · {date} · Sentinel-2 infrared", { date: d(oa.label) }) : t("After · {date} · Sentinel-2", { date: d(oa.label) });
+      }
       $("label-before").title = `${fmtUtc(ob.datetime_utc)} · ${ob.scene}`;
       $("label-after").title = `${fmtUtc(oa.datetime_utc)} · ${oa.scene}`;
     } else if (state.ui === "simple" && split) {
@@ -1175,6 +1365,7 @@
     if (!meta || !T || !T.simple) return;
     stopPlay();
     state.ui = "simple";
+    renderAreaSwitch();
     document.body.classList.add("ui-simple");
     state.step = 0;
     focusGroup.clearLayers();
@@ -1196,7 +1387,7 @@
   const finding = () => (T && T.simple && T.simple.finding) || null;
   function renderFinding() {
     const box = $("ev-finding"), f = finding();
-    box.hidden = !(meta && f && (state.ui === "evidence" || (lite() && state.ui === "simple" && state.mapMode === "unosat")));
+    box.hidden = !(meta && f && state.ui === "evidence"); // v76: in the simple view the finding is the sentence above the map
     if (box.hidden) { box.innerHTML = ""; return; }
     box.innerHTML = `<p class="evf-k">${esc(t("Finding"))}</p><p class="evf-t">${esc(f.text)}</p>`;
   }
@@ -1211,6 +1402,8 @@
     renderSimpleBar();
     goStep(step || 0, false);
     renderFinding();
+    renderAreaSwitch();
+    if (floodView()) areaGo(); // v75: the area view, after the step's own framing
     $("to-simple").focus({ preventScroll: true });
     if (narrow.matches && finding()) $("ev-finding").scrollIntoView({ block: "start" }); // phones: finding first, the map right under it
   }
@@ -1237,6 +1430,7 @@
   function renderSimpleBar() {
     renderFinding();
     const bar = $("simple-bar"), sv = T && T.simple;
+    $("view-notes").hidden = true; $("view-notes").innerHTML = ""; // v76: filled again by the view that has dates and limits
     const show = state.ui === "simple" && sv && sv.shows;
     bar.hidden = !show;
     if (!show) { bar.innerHTML = ""; $("stage-ctrl").hidden = true; $("stage-ctrl").innerHTML = ""; renderModeBar(); return; }
@@ -1250,26 +1444,57 @@
     // are in the map key only, so nothing is said twice
     void pa; void pb;
     renderModeBar();
+    if (isQuake()) { renderQuakeBar(bar); return; } // v73; v74: also the satellite image comparison
     if (state.mapMode !== "timeline") { $("stage-ctrl").hidden = true; $("stage-ctrl").innerHTML = ""; }
     if (state.mapMode === "radartl") { renderTimelineBar(bar); return; }
     if (state.mapMode === "timeline") { renderStageBar(bar); return; }
+    // v76: above the map, one sentence that says what the view shows, the action the reader can take, then the dates and the
+    // limits in small type; the longer numbers and methods are under "Data and sources"
+    const notes = $("view-notes");
+    // phones: the first screen is the place, its one sentence, the action and the picture; the view's own sentence goes under the picture
+    let lead = "";
+    const say = (txt) => { if (!txt) return ""; if (narrow.matches) { lead = `<p class="sb-text">${esc(txt)}</p>`; return ""; } return `<p class="sb-text" aria-live="polite">${esc(txt)}</p>`; };
+    const setNotes = (html) => { notes.innerHTML = lead + (html ? `<p class="sb-limits">${html}</p>` : ""); notes.hidden = !(html || lead); };
+    const more = (id) => { const a = notes.querySelector(".sb-more"); if (a) a.addEventListener("click", (e) => { e.preventDefault(); openData(id); }); };
+    setNotes("");
+    if (state.mapMode === "unosat" && evidence && evidence.layers) { // v69: wildfire evidence — two layers, each with what it is
+      const ev = I.tx(evidence), ms = ev.measurement, off = state.evOff || {}, [f1, f2] = firstSentence((finding() || {}).text || "");
+      bar.innerHTML = say(f1) +
+        `<div class="sb-classes ev-layers" role="group" aria-label="${esc(t("Layers on the map"))}">` + ev.layers.map((L_) =>
+          `<button type="button" class="btn sc-evl" data-id="${esc(L_.id)}" aria-pressed="${!off[L_.id]}"><i class="evk evk-${esc(L_.kind)}" style="--c:${esc(L_.color)}"></i>${esc(L_.label)}</button>`).join("") + `</div>` +
+        "";
+      setNotes(`${f2 ? `${esc(f2)} ` : ""}${esc(t("Each dot is a heat detection at one satellite pass, not a fire front."))} ` +
+        `<a href="${esc(ms.record_url)}" target="_blank" rel="noopener">CAL FIRE ↗</a> · <a href="#science" class="sb-more">${esc(t("Data and sources"))} ↓</a>`);
+      bar.querySelectorAll(".sc-evl").forEach((b) => b.addEventListener("click", () => {
+        state.evOff = { ...(state.evOff || {}), [b.dataset.id]: !(state.evOff || {})[b.dataset.id] };
+        renderSimpleBar(); render(); bar.querySelector(`.sc-evl[data-id="${b.dataset.id}"]`).focus();
+      }));
+      more("sci-fire");
+      return;
+    }
     if (state.mapMode === "unosat") {
       const ms = evidence && evidence.measurement;
-      bar.innerHTML = ms ? `<p class="sb-pair">${esc(t("Orange: area UNOSAT mapped as affected (mud and rock flow), drawn over the Sentinel-2 image of 27 August. A preliminary assessment, not checked on the ground."))}</p>` +
-        `<p class="sb-pair">${esc(t("The numbers are for UNOSAT's whole analysis area; this image shows only a small part of it."))} ` +
-        `<a href="${esc(ms.data_url)}" target="_blank" rel="noopener">${esc(t("UNOSAT data, {date}", { date: fmtDay(ms.version) }))} ↗</a></p>` +
-        `<p class="sb-pair sb-score">${esc(scoreLine(evidence.score))} <a href="#science" class="sb-more">${esc(t("Details"))} ↓</a></p>` : "";
-      const more = bar.querySelector(".sb-more");
-      if (more) more.addEventListener("click", (e) => { e.preventDefault(); $("science").open = true; renderScience(); ($("sci-score") || $("science")).scrollIntoView({ block: "start" }); });
+      // v72: the layer, its background image date and what this image frame contains come from the event's files (no event text in the code)
+      const evt = I.tx(evidence), bg = optical && optical.pair.find((o) => o.file === evidence.background), f = finding();
+      bar.innerHTML = ms && f ? say(f.text) : "";
+      if (ms) setNotes(`${esc(t("Orange: {what}, drawn over the Sentinel-2 image of {date}.", { what: (evt.layer && evt.layer.what) || t("area UNOSAT mapped as affected"), date: bg ? fmtDay(bg.label) : "" }))} ${esc(evt.measurement.status || "")} ` +
+        `<a href="${esc(ms.data_url)}" target="_blank" rel="noopener">${esc(t("UNOSAT data, {date}", { date: fmtDay(ms.version) }))} ↗</a> · <a href="#science" class="sb-more">${esc(t("Data and sources"))} ↓</a>`);
+      more("sci-unosat");
       return;
     }
     if (state.mapMode === "optical") {
-      const op = optical ? I.tx(optical) : null;
+      const op = optical ? I.tx(optical) : null, sw = op && op.variants && op.variants.swir, [c1, c2] = firstSentence(op ? op.change : "");
       bar.innerHTML = op
-        ? `<p class="sb-text" aria-live="polite">${esc(op.change)}</p>` +
-          (op.hint ? `<p class="sb-hint-line">${esc(op.hint)}</p>` : "") +
-          `<p class="sb-pair">${esc(t("Right image: {timing}.", { timing: op.after_timing }))}</p>`
+        ? say(c1) +
+          `<p class="sb-action"><span aria-hidden="true">↔</span> ${esc(op.hint || t("Drag the line to compare before and after."))}</p>` +
+          // v69: the same two scenes in short-wave infrared, switched on by the reader; the data type is said while it is on
+          (sw ? `<div class="sb-classes"><button type="button" class="btn sc-burn" aria-pressed="${swirOn()}">${esc(sw.label)}</button></div>` +
+            (swirOn() ? `<p class="sb-limits sb-swir"><b>${esc(sw.data_type)}</b> ${esc(sw.note)}</p>` : "") : "")
         : `<p class="sb-text" aria-live="polite">${esc(t("No pair of dated, cloud-free satellite images of this area was found for the flood. The radar and analysis layers are under Data and science."))}</p>`;
+      if (op) setNotes(`${c2 ? `${esc(c2)} ` : ""}${esc(t("Right image: {timing}.", { timing: op.after_timing }))} <a href="#science" class="sb-more">${esc(t("Data and sources"))} ↓</a>`);
+      more();
+      const bb = bar.querySelector(".sc-burn");
+      if (bb) bb.addEventListener("click", () => { state.burnView = !state.burnView; renderSimpleBar(); render(); bar.querySelector(".sc-burn").focus(); }); // same view: the map is not moved
       return;
     }
     bar.innerHTML = `<p class="sb-text" aria-live="polite">${esc(a.text)}</p>` +
@@ -1297,24 +1522,60 @@
     const show = !!(meta && state.ui === "simple");
     row.hidden = !show;
     if (!show) { row.innerHTML = ""; return; }
-    const href = FOLLOW_WATER[meta.event_id];
+    row.classList.toggle("mb-quake", isQuake()); // v73: earthquake labels break only at their own break points
+    row.classList.add("mb-q"); // v76: every view is named by what it lets you learn
+    row.classList.remove("mb-n4");
+    const href = followHref(meta.event_id);
     const b = (mode, label) => `<button type="button" class="mb-btn" data-mode="${mode}" aria-pressed="${state.mapMode === mode}">${esc(label)}</button>`;
-    row.innerHTML = b("optical", t("Before / After")) + b("timeline", t("Timeline")) +
-      `<button type="button" class="mb-btn mb-evidence"${lite() ? ` data-ev="unosat" aria-pressed="${state.mapMode === "unosat"}"` : ""}><span>${esc(t("Explore evidence"))}</span><small>${esc(t("data and sources"))}</small></button>` +
-      (href ? `<a class="mb-btn mb-follow sc-follow" href="${href}" title="${esc(t("A 3D sketch of how water moves over this land. Illustration, not observed water."))}">` +
-        `<span>${esc(t("Follow the Water"))}</span><small>${esc(t("illustration"))}</small></a>` : "");
+    if (isQuake()) { // v73: Before / After only with a verified pair; the earthquake layers and the timeline always
+      row.innerHTML = (qDamage().length ? b("damage", t("What was seen in buildings?")) : "") + (qRasters().length ? b("motion", t("How far did the ground move?")) : "") +
+        b("qtimeline", t("What happened when?")) + (optical ? b("optical", t("Compare satellite images")) : ""); // v74: only with a verified image pair
+      row.classList.toggle("mb-n4", row.children.length === 4); // v74: four choices → 2 × 2 on small phones
+      row.querySelectorAll("button.mb-btn[data-mode]").forEach((x) => x.addEventListener("click", () => setMapMode(x.dataset.mode, true)));
+      return;
+    }
+    // v76: the question each view answers, by what it really shows (true-colour pair, dated stages, mapped layers, radar analysis)
+    const fire = hazardNow() === "wildfire";
+    const evLabel = !lite() ? t("Where did the radar see a change?") : fire ? t("Where did the fire spread?") : t("Which areas did the flood affect?");
+    row.innerHTML = b("optical", fire ? t("Where did the fire leave a mark?") : t("What changed in the satellite image?")) +
+      b("timeline", fire ? t("How did the fire unfold?") : t("How did the flood unfold?")) +
+      (lite() && !evidence ? "" : // v71: an event whose record has no evidence section (evidence.json absent) has no evidence button
+      `<button type="button" class="mb-btn mb-evidence"${lite() ? ` data-ev="unosat" aria-pressed="${state.mapMode === "unosat"}"` : ""}><span>${esc(evLabel)}</span>` +
+        (lite() ? "" : `<small>${esc(t("step by step"))}</small>`) + `</button>`) +
+      (href ? (hazardNow() === "wildfire" // v70: the wildfire scene shows dated observations in 3D (no illustration of the fire itself)
+        ? `<a class="mb-btn mb-follow sc-follow" href="${href}" title="${esc(t("Dated satellite images and heat detections of this fire on the 3D terrain."))}"><span>${esc(t("Follow the Fire"))}</span><small>${esc(t("3D observations"))}</small></a>`
+        : `<a class="mb-btn mb-follow sc-follow" href="${href}" title="${esc(t("A 3D sketch of how water moves over this land. Illustration, not observed water."))}">` +
+        `<span>${esc(t("Follow the Water"))}</span><small>${esc(t("illustration"))}</small></a>`) : "");
+    row.classList.toggle("mb-n4", row.children.length === 4); // v76: four choices → 2 × 2 on small phones
     row.querySelectorAll("button.mb-btn[data-mode]").forEach((x) => x.addEventListener("click", () => setMapMode(x.dataset.mode, true)));
-    row.querySelector(".mb-evidence").addEventListener("click", () => (lite() ? setMapMode("unosat", true) : enterEvidence()));
+    const evb = row.querySelector(".mb-evidence");
+    if (evb) evb.addEventListener("click", () => (lite() ? setMapMode("unosat", true) : enterEvidence()));
   }
   function setMapMode(mode, focus) {
     if (!meta || state.mapMode === mode) return;
     stopPlay();
-    state.mapMode = mode;
-    applySimpleLayers();
-    renderSimpleBar();
-    render();
-    renderModeBar();
-    renderScience();
+    const from = state.mapMode;
+    const go = () => {
+      state.mapMode = mode;
+      applySimpleLayers();
+      renderSimpleBar();
+      render();
+      renderModeBar();
+      renderScience();
+    };
+    if (isQuake() && mode === "optical") { // v74: the pair covers a small strip of coast: frame it, remember where the reader was
+      state.qPrevView = { c: map.getCenter(), z: map.getZoom() };
+      go();
+      clearTimeout(moveTimer); map.stop(); // no flight in progress may finish (or be corrected) after this jump
+      map.fitBounds(pairBounds(), { padding: [16, 16], animate: false });
+    } else if (isQuake() && state.qPrevView && from === "optical") {
+      const v = state.qPrevView; state.qPrevView = null;
+      go();
+      clearTimeout(moveTimer); map.stop();
+      map.setView(v.c, v.z, { animate: false });
+    } else if (isQuake()) qKeepView(go); else go(); // v73: an earthquake layer change keeps the map's centre and zoom
+    renderAreaSwitch();
+    if (floodView()) areaGo(); // v75
     if (focus) { const x = $("mode-bar").querySelector(`[data-mode="${mode}"]`) || $("mode-bar").querySelector(`[data-ev="${mode}"]`); if (x) x.focus(); }
   }
   // Timeline: the real observations of the event, one at a time; Play steps through them once and stops at the last date
@@ -1360,7 +1621,7 @@
       `<button type="button" class="btn st-play" aria-pressed="${!!playTimer}">${esc(playTimer ? t("Pause") : t("Play"))}</button>` +
       `<button type="button" class="btn st-step st-next" aria-label="${esc(t("Next image"))}" title="${esc(t("Next image"))}"><span aria-hidden="true">▶</span></button>` +
       `<input type="range" class="st-range" min="0" max="${Math.max(0, tr.length - 1)}" step="1" value="${state.tpos}" aria-label="${esc(t("Timeline: move between the images"))}"${tr.length < 2 ? " disabled" : ""}></div>` +
-      `<div class="st-chips" role="group" aria-label="${esc(t("Flood stages"))}">` +
+      `<div class="st-chips st-n${st.length}" role="group" aria-label="${esc(hazardNow() === "wildfire" ? t("Fire stages") : t("Flood stages"))}" style="grid-template-columns:repeat(${st.length},minmax(0,1fr))">` +
       st.map((x, i) => `<button type="button" class="st-chip${x.frame ? "" : " st-none"}" data-i="${i}" aria-pressed="false">` +
         `<span class="st-n">${i + 1}</span><b>${esc(stageChip(x))}</b><small>${esc(stageSmall(x))}</small></button>`).join("") + `</div>`;
     ctrl.querySelector(".st-play").addEventListener("click", () => { playTimer ? stopPlay() : startStagePlay(); syncStageBar(); ctrl.querySelector(".st-play").focus(); });
@@ -1421,7 +1682,8 @@
   function frameSource(f) {
     const kind = f.kind || "image";
     if (kind === "figure") return t("Landsat-9 · ESA");
-    if (kind === "map") return "UNOSAT";
+    if (kind === "map") return f.record ? f.source_short : "UNOSAT";
+    if (f.source_short && f.source_short !== "Sentinel-2") return t("{source} · true colour", { source: f.source_short }); // v69: Landsat-9
     return t("Sentinel-2 · true colour");
   }
   // v68: which part of the valley and which place a stop looks at ("Lower valley · Betrawati–Gerkhu"); updated with every stop
@@ -1432,7 +1694,8 @@
       `<p class="sth-loc"><span class="sth-pin" aria-hidden="true"></span>${esc(stagePlace(I.tx((stages.stages.find((s0) => s0.frame) || { frame: {} }).frame)))}</p>` +
       `<p class="sth-s">${esc(t("No clear satellite image was found for this stage."))}</p>`;
     const title = f.heading === null ? t("Image of {date}", { date: fmtShort(f.label, true) }) + ` <small>(${esc(t("end not confirmed"))})</small>` : esc(f.heading);
-    return `<p class="sth-date"><time datetime="${esc(f.datetime_utc || f.label)}"${f.datetime_utc ? ` title="${esc(fmtUtc(f.datetime_utc))}"` : ""}>${esc(fmtDay(f.label))}</time></p>` +
+    return `<p class="sth-date"><time datetime="${esc(f.datetime_utc || f.label)}"${f.datetime_utc ? ` title="${esc(fmtUtc(f.datetime_utc))}"` : ""}>${esc(fmtDay(f.label))}</time>` +
+      (f.record ? ` · <span class="sth-kind">${esc(t("Incident record, not a satellite image"))}</span>` : "") + `</p>` +
       `<h3 class="sth-title">${title}</h3>` +
       `<p class="sth-loc"><span class="sth-pin" aria-hidden="true"></span>${esc(stagePlace(f))}</p>` +
       `<p class="sth-s">${esc(f.sentence)}</p>`;
@@ -1511,6 +1774,355 @@
   }
   function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = 0; } }
   // ---------------------------------------------------------------------------------------------------------------
+  // v73: earthquake events. Everything is read from <event>/map_layers.json (built from the catalog record by
+  // build_event_web.py layers): NISAR line-of-sight displacement rasters (cm, transparent = no data), Copernicus EMS building
+  // grading points and graded / not-analysed areas, and layers that are only linked (file null → official_url only).
+  // Optional: "shocks" (map_layers.json or the events.json entry), text.en.json, optical.json (a verified Before / After pair).
+  // Map modes: "motion" (one radar track at a time), "damage", "qtimeline" (the shocks and the observation windows) and,
+  // only with a verified pair, "optical". Changing the mode never moves the map.
+  const isQuake = () => !!(meta && meta.quake);
+  const qEntry = (id) => (index.events.find((e) => e.id === id) || {});
+  function qShocks(id) {
+    const ml = quakeLayers[id] || {}, e = qEntry(id);
+    return (ml.shocks || e.shocks || []).filter((s) => s && s.time_utc && s.mag != null).slice().sort((a, b) => (a.time_utc < b.time_utc ? -1 : 1));
+  }
+  const qMag = (s) => `M${Number(s.mag).toLocaleString(I.lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+  const qClock = (iso) => `${iso.slice(11, 19)} UTC`;
+  const qGap = (sh) => (sh.length > 1 ? Math.round((Date.parse(sh[1].time_utc) - Date.parse(sh[0].time_utc)) / 1000) : null);
+  // the event's short texts (cards, header, start screen) in the chosen language; text.en.json wins where it has a value
+  function quakeText(id) {
+    const e = qEntry(id), ml = quakeLayers[id] || {}, base = I.tx(texts[id] || {}), bev = base.event || {}, sh = qShocks(id);
+    const day = ml.event_date || (sh[0] && sh[0].time_utc.slice(0, 10)) || "";
+    const place = bev.place || I.tx(e.place || e.area_name || e.id);
+    return {
+      ...base, _quake: true,
+      event: { ...bev, place, dates: bev.dates || (day ? fmtDay(day) : ""),
+        title: bev.title || (sh.length > 1 ? t("Earthquakes in {place}", { place }) : t("Earthquake in {place}", { place })),
+        area_name: bev.area_name || I.tx(e.area_name || ""), lede: bev.lede || qLead(sh), facts: bev.facts || [] },
+      maturity: base.maturity || { text: t("Published products of other organisations, shown without new analysis by this project. They are preliminary.") },
+      steps: [], layers: {}, regions: {}, sources: base.sources || [], reference_maps: base.reference_maps || [], uncertainty: base.uncertainty || [],
+      simple: { ...(base.simple || {}), shows: {} },
+    };
+  }
+  // v74: the one sentence a first-time reader starts with (the number of shocks comes from the event's own list)
+  const qLead = (sh) => (sh.length === 2 ? t("Two strong earthquakes struck the same area a short time apart.")
+    : sh.length > 2 ? t("{n} strong earthquakes struck the same area a short time apart.", { n: sh.length })
+    : t("A strong earthquake struck this area."));
+  // v74: two "image" layers of map_layers.json with the same "pair" and sides before / after → the existing Before / After slider.
+  // Each side keeps its own capture date (observed), scene and STAC link; the pair keeps its own extent (bounds_latlon).
+  function qOpticalPair(id, layers) {
+    const imgs = (layers || []).filter((L_) => L_.kind === "image" && L_.status === "available" && L_.file && L_.pair && L_.observed);
+    for (const b of imgs.filter((L_) => L_.side === "before")) {
+      const a = imgs.find((L_) => L_.side === "after" && L_.pair === b.pair);
+      if (!a) continue;
+      const side = (L_) => ({ side: L_.side, file: L_.file, label: L_.observed[0], datetime_utc: L_.datetime_utc, scene: L_.scene, platform: L_.platform, stac: L_.stac });
+      return { event_id: id, quake: true, pair: [side(b), side(a)], bounds_latlon: b.bounds_latlon, export: { width: b.width }, source: b.source };
+    }
+    return null;
+  }
+  function quakeMeta(entry, ml) {
+    return { event_id: entry.id, quake: true, nisar: false, bounds_latlon: ml.bounds_latlon, event_date: ml.event_date, maturity: null,
+      dates: [], radar: {}, change: {}, support: [], regions: [], sources: [], reference_maps: [], qlayers: ml.layers || [], shocks: qShocks(entry.id) };
+  }
+  const qOn = (L_) => L_.status === "available" && !!L_.file;
+  const qRasters = () => (isQuake() ? meta.qlayers.filter((L_) => L_.kind === "raster" && qOn(L_)) : []);
+  const qDamage = () => (isQuake() ? meta.qlayers.filter((L_) => L_.group === "damage" && qOn(L_)) : []);
+  const qLinked = (grp) => (isQuake() ? meta.qlayers.filter((L_) => !qOn(L_) && L_.official_url && (!grp || L_.group === grp)) : []); // file null: only its official link
+  const qById = (id) => meta.qlayers.find((L_) => L_.id === id);
+  const qTrackName = (L_) => {
+    const g = L_.geometry || {};
+    return g.orbit === "ascending" ? t("Ascending track {n}", { n: g.track }) : g.orbit === "descending" ? t("Descending track {n}", { n: g.track }) : L_.id;
+  };
+  const qShort = (pub) => String(pub || "").split(/ \/ | \(|, /)[0];
+  const qSrc = (L_) => (L_.source && L_.source.url ? `<a href="${esc(L_.source.url)}" target="_blank" rel="noopener" title="${esc(L_.source.publisher || "")}">${esc(t("Source: {name}", { name: qShort(L_.source.publisher) }))} ↗</a>` : "");
+  const qObs = (L_) => (L_.observed && L_.observed.length === 2 ? fmtPair(L_.observed[0], L_.observed[1]) : L_.observed ? fmtDay(L_.observed[0]) : "");
+  const qCls = () => ({ Destroyed: t("Destroyed"), Damaged: t("Damaged"), "Possibly damaged": t("Possibly damaged") });
+  const qClsName = (k) => qCls()[k] || k;
+  const qNumNeg = (v) => `${v < 0 ? "−" : v > 0 ? "+" : ""}${I.fmt.num(Math.abs(v), 0)}`;
+  // the stops of the earthquake timeline: each shock, each radar pair, then the damage grading (images → assessment)
+  function qStops() {
+    if (!isQuake()) return [];
+    const st = meta.shocks.map((s, i) => ({ kind: "shock", i, s, from: s.time_utc.slice(0, 10), to: s.time_utc.slice(0, 10) }));
+    const R = qRasters().filter((L_) => L_.observed);
+    if (R.length) st.push({ kind: "radar", R, from: R.reduce((m, L_) => (L_.observed[0] < m ? L_.observed[0] : m), R[0].observed[0]),
+      to: R.reduce((m, L_) => (L_.observed[1] > m ? L_.observed[1] : m), R[0].observed[1]), both: R.every((L_) => L_.covers_both_shocks) });
+    const pts = qDamage().find((L_) => L_.kind === "points");
+    if (pts && pts.observed) st.push({ kind: "damage", L: pts, from: pts.observed[0], to: pts.assessed || pts.observed[1] });
+    return st;
+  }
+  // which layer the map shows in each mode (the timeline shows the layer of its stop; a shock keeps the last radar track)
+  function qShown() {
+    if (!isQuake() || state.ui !== "simple") return { raster: null, damage: false };
+    if (state.mapMode === "motion") return { raster: qById(state.qTrack) || qRasters()[0] || null, damage: false };
+    if (state.mapMode === "damage") return { raster: null, damage: true };
+    if (state.mapMode === "qtimeline") {
+      const s = qStops()[state.qStop];
+      if (s && s.kind === "damage") return { raster: null, damage: true };
+      if (s && s.kind === "radar") return { raster: qById(state.qTrack) || s.R[0], damage: false };
+      return { raster: qById(state.qTrack) || qRasters()[0] || null, damage: false };
+    }
+    return { raster: null, damage: false };
+  }
+  const QCREDIT = new Set();
+  function quakeDraw() {
+    const sh = qShown(), LAY = t("Layers"), on = new Set();
+    if (sh.raster) {
+      overlays.qRaster = img(sh.raster.file, "change", "pixelated", L.latLngBounds(sh.raster.bounds_latlon)).setOpacity(0.85).addTo(map);
+      if (sh.raster.source && sh.raster.source.credit) on.add(`${LAY}: ${sh.raster.source.credit}`);
+    }
+    if (sh.damage) {
+      for (const L_ of qDamage()) {
+        if (L_.kind === "polygon") overlays.qAreas = qAreasLayer(L_.file).addTo(map);
+        else if (L_.kind === "points") overlays.qPoints = qPointsLayer(L_.file, L_.classes || {}).addTo(map);
+        if (L_.source && L_.source.credit) on.add(`${LAY}: ${L_.source.credit}`);
+      }
+    }
+    // epicentres: always shown, labelled with the magnitude (the shock chosen in the timeline is highlighted)
+    const pick = state.mapMode === "qtimeline" ? qStops()[state.qStop] : null;
+    const eg = L.layerGroup();
+    meta.shocks.forEach((s, i) => {
+      if (s.lat == null || s.lon == null) return;
+      const hot = pick && pick.kind === "shock" && pick.i === i;
+      eg.addLayer(L.marker([s.lat, s.lon], { pane: "regions", keyboard: false, interactive: false, zIndexOffset: hot ? 1000 : 0,
+        icon: L.divIcon({ className: `q-epi${hot ? " on" : ""}${i % 2 ? " q-epi-r" : ""}`, html: `<i></i><span>${esc(qMag(s))}</span>`, iconSize: [0, 0] }) }));
+    });
+    overlays.qEpi = eg.addTo(map);
+    for (const c of on) QCREDIT.add(c);
+    for (const c of QCREDIT) setCredit(c, on.has(c));
+  }
+  function qAreasLayer(file) {
+    const style = (f) => (f.properties.status === "not_analysed"
+      ? { color: "#3b3f46", weight: 1, opacity: 0.9, dashArray: "2 3", fillColor: "#8a9099", fillOpacity: 0.55 }
+      : { color: "#ffffff", weight: 2, opacity: 0.95, dashArray: "6 4", fill: false });
+    const lay = L.geoJSON(null, { pane: "regions", interactive: false, style });
+    const fill = (gj) => {
+      lay.clearLayers();
+      // graded outlines first, the parts that could not be analysed on top of them
+      lay.addData({ type: "FeatureCollection", features: gj.features.slice().sort((a, b) => (a.properties.status === "not_analysed") - (b.properties.status === "not_analysed")) });
+    };
+    if (vecCache[file]) fill(vecCache[file]);
+    else getJson(`data/${file}`).then((gj) => { vecCache[file] = gj; fill(gj); }).catch(() => fail(t("A layer image could not be loaded: {file}", { file: `<code>data/${file}</code>` })));
+    return lay;
+  }
+  // v74: building marks stay visible at the opening (regional) zoom: at least 2.5 px, up to 4.5 px close in
+  const qPtRadius = () => Math.max(2.5, Math.min(4.5, 2.5 + (map.getZoom() - 9) * 0.5));
+  function qPointsLayer(file, classes) {
+    const lay = L.geoJSON(null, { pane: "regions", interactive: false,
+      pointToLayer: (f, ll) => L.circleMarker(ll, { renderer: ptRenderer, radius: qPtRadius(), weight: 0.6, color: "#1b1b1b",
+        fillColor: classes[f.properties.damage] || "#cccccc", fillOpacity: 0.95, opacity: 0.7 }) });
+    lay.on("add", () => { const z = () => lay.eachLayer((m) => m.setRadius(qPtRadius())); map.on("zoomend", z); lay.once("remove", () => map.off("zoomend", z)); });
+    // the most severe class is drawn last (on top)
+    const rank = { Destroyed: 2, Damaged: 1 };
+    const fill = (gj) => { lay.clearLayers(); lay.addData({ type: "FeatureCollection", features: gj.features.slice().sort((a, b) => (rank[a.properties.damage] || 0) - (rank[b.properties.damage] || 0)) }); };
+    if (vecCache[file]) fill(vecCache[file]);
+    else getJson(`data/${file}`).then((gj) => { vecCache[file] = gj; fill(gj); }).catch(() => fail(t("A layer image could not be loaded: {file}", { file: `<code>data/${file}</code>` })));
+    return lay;
+  }
+  // v73b: on phones the earthquake key sits right under the map instead of over it, so nothing it says covers the epicentres
+  // (M7.2 and M7.5) or the layer; the map keeps its whole area and its usual framing. Wider screens: over the map as before.
+  function qPlaceLegend(reset) {
+    const lg = $("map-legend"), wrap = document.querySelector(".map-col > .map-wrap");
+    const below = !reset && isQuake() && narrow.matches && state.ui === "simple" && state.mapMode !== "optical";
+    // v76: the flood map views on phones too — the whole covered area stays visible (at 320 px the key covered the southern valley)
+    const fBelow = !reset && !below && narrow.matches && floodView();
+    if ((below || fBelow) && lg.parentElement !== wrap.parentElement) wrap.after(lg);
+    if (!below && !fBelow && lg.parentElement !== wrap) wrap.appendChild(lg);
+    lg.classList.toggle("q-below", below);
+    lg.classList.toggle("f-below", fBelow);
+  }
+  // a layer change keeps the map exactly where it is (centre and zoom), even when the bars above the map change height
+  function qKeepView(fn) {
+    const c = map.getCenter(), z = map.getZoom();
+    fn();
+    requestAnimationFrame(() => {
+      map.invalidateSize({ pan: false });
+      if (!map.getCenter().equals(c, 1e-9) || map.getZoom() !== z) map.setView(c, z, { animate: false });
+    });
+  }
+  // the ±scale bar of a raster: colours from the record, end triangles when the scale is clipped
+  function qRamp(L_) {
+    const sc = L_.scale || {}, cols = (sc.colors || []).join(", ");
+    return `<div class="q-ramp${sc.clipped ? " q-clip" : ""}" style="--lo:${esc((sc.colors || [])[0] || "#000")};--hi:${esc((sc.colors || []).slice(-1)[0] || "#fff")}">` +
+      `<span class="q-ramp-bar" style="background:linear-gradient(90deg, ${esc(cols)})"></span></div>` +
+      `<div class="q-ticks"><span>${sc.clipped ? "≤ " : ""}${qNumNeg(sc.min)}</span><span>0</span><span>${sc.clipped ? "≥ " : ""}${qNumNeg(sc.max)} ${esc(L_.unit || "")}</span></div>`;
+  }
+  function qSignLine(L_, short) {
+    const g = L_.geometry || {};
+    return g.sign_confirmed === true
+      ? `<div class="q-sign ok">${esc(t("Positive values: {sign}.", { sign: I.tx(g.sign_published || "") }))}</div>`
+      : `<div class="q-sign">${esc(short ? t("Sign direction not confirmed") : t("Sign direction not confirmed: values are shown in cm only, not as a direction of motion."))}</div>`;
+  }
+  // v74: the key says only what a first-time reader needs to read the colours; everything technical is under "Data and sources"
+  function renderQuakeLegend() {
+    const box = $("map-legend"), sh = qShown();
+    box.classList.add("simple", "q-legend");
+    box.classList.remove("collapsed", "ml-hidden");
+    let html = "";
+    if (sh.raster) {
+      const L_ = sh.raster, sc = L_.scale || {}, g = L_.geometry || {};
+      html = `<div class="ml-simple q-title">${esc(t("Ground movement ({unit})", { unit: L_.unit || "cm" }))}</div>` + qRamp(L_) +
+        `<div class="q-row"><i class="q-nodata"></i><span>${esc(t("No data (transparent)"))}</span></div>` +
+        (sc.clipped ? `<div class="q-note">${esc(t("Colours stop at ±{v} {unit}; larger movements get the end colour.", { v: I.fmt.num(sc.max, 0), unit: L_.unit || "cm" }))}</div>` : "") +
+        (g.sign_confirmed === true ? `<div class="q-note">${esc(t("Positive values: {sign}.", { sign: I.tx(g.sign_published || "") }))}</div>`
+          : `<div class="q-sign">${esc(t("It is not yet confirmed which direction plus and minus values show."))}</div>`) +
+        `<div class="q-date">${esc(t("Observed {dates}", { dates: qObs(L_) }))} · ${qSrc(L_)}</div>`;
+    } else if (sh.damage) {
+      const pts = qDamage().find((L_) => L_.kind === "points"), ar = qDamage().find((L_) => L_.kind === "polygon");
+      const cnt = (pts && pts.count) || {}, total = Object.values(cnt).reduce((a, b) => a + b, 0);
+      html = `<div class="ml-simple q-title">${esc(t("{n} graded buildings", { n: I.fmt.num(total, 0) }))}</div>` +
+        `<div class="q-classes">` + Object.keys((pts && pts.classes) || {}).map((k) =>
+          `<div class="q-row"><i class="q-dot" style="background:${esc(pts.classes[k])}"></i><span>${esc(qClsName(k))} · ${esc(I.fmt.num(cnt[k] || 0, 0))}</span></div>`).join("") + `</div>` +
+        (ar ? `<div class="q-row"><i class="q-area"></i><span>${esc(t("Dashed line: area examined"))}</span></div>` +
+          ((ar.count || {}).not_analysed ? `<div class="q-row"><i class="q-na"></i><span>${esc(t("Grey: could not be examined"))}</span></div>` : "") +
+          `<div class="q-note">${esc(t("Outside the lines: not examined. No mark does not mean undamaged."))}</div>` : "") +
+        (pts ? `<div class="q-date">${esc(t("Images {dates} · assessed {date}", { dates: qObs(pts), date: fmtShort(pts.assessed || pts.version, true) }))} · ${qSrc(pts)}</div>` : "") +
+        qLinked("damage").map((L_) => `<div class="q-date">${esc(t("Another damage estimate, not shown here:"))} <a href="${esc(L_.official_url)}" target="_blank" rel="noopener">${esc(t("Official map"))} ↗</a></div>`).join("");
+    } else {
+      html = `<div class="ml-simple ml-off">${esc(t("No layer shown"))}</div>`;
+    }
+    box.innerHTML = html + `<a href="#science" class="q-more">${esc(t("Data and sources"))} ↓</a>`;
+    box.querySelector(".q-more").addEventListener("click", (ev) => { ev.preventDefault(); $("science").open = true; renderScience(); $("science").scrollIntoView({ block: "start", behavior: reducedMotion.matches ? "auto" : "smooth" }); });
+  }
+  const qLinkReason = (L_) => (L_.status === "not_redistributed"
+    ? t("{name}: not copied to this map (no reuse licence stated).", { name: qShort((L_.source || {}).publisher) || L_.id })
+    : t("{name}: not available on this map.", { name: qShort((L_.source || {}).publisher) || L_.id }));
+  // the block above the map: the one lead sentence, then one sentence about the view (and, for ground movement, the radar pair)
+  function renderQuakeBar(bar) {
+    const ctrl = $("stage-ctrl");
+    if (state.mapMode !== "qtimeline") { ctrl.hidden = true; ctrl.innerHTML = ""; }
+    const lead = ""; // v76: the lead sentence is in the header, under the event name
+    if (state.mapMode === "damage") {
+      bar.innerHTML = lead + `<p class="sb-text">${esc(qDamage().length ? t("Coloured marks show buildings examined from satellite images.") : t("No building damage layer is available for this event."))}</p>` +
+        (qDamage().length ? `<p class="sb-action"><span aria-hidden="true">＋</span> ${esc(t("Zoom in on the coloured marks to see single buildings."))}</p>` : "");
+      return;
+    }
+    if (state.mapMode === "motion") {
+      const R = qRasters(), cur = qShown().raster;
+      bar.innerHTML = lead + `<p class="sb-text">${esc(meta.shocks.length > 1 ? t("This map compares radar measurements taken before and after the two earthquakes.")
+          : t("This map compares radar measurements taken before and after the earthquake."))}</p>` +
+        (R.length > 1 ? `<div class="q-pairs" role="group" aria-label="${esc(t("Radar measurement pair shown on the map"))}"><span class="q-pairs-k">${esc(t("Radar pair"))}</span>` + R.map((L_) =>
+          `<button type="button" class="btn q-track" data-id="${esc(L_.id)}" aria-pressed="${cur && cur.id === L_.id}">${esc(L_.observed ? `${fmtShort(L_.observed[0])} → ${fmtShort(L_.observed[1])}` : L_.id)}</button>`).join("") + `</div>` : "");
+      bar.querySelectorAll(".q-track").forEach((b) => b.addEventListener("click", () => {
+        qKeepView(() => { state.qTrack = b.dataset.id; renderSimpleBar(); render(); });
+        const nb = $("simple-bar").querySelector(`.q-track[data-id="${b.dataset.id}"]`); if (nb) nb.focus();
+      }));
+      return;
+    }
+    if (state.mapMode === "qtimeline") { renderQuakeTimeline(bar); return; }
+    if (state.mapMode === "optical" && optical) { // v74: the image pair, its two capture dates and what it can and cannot show
+      const [ob, oa] = optical.pair;
+      bar.innerHTML = `<p class="sb-text">${esc(t("The difference in the colour of the slopes is largely seasonal. Damage to single buildings cannot be seen in these images."))}</p>` +
+        `<p class="sb-pair">${esc(t("Left: {before} · Right: {after} · Sentinel-2, 10 m", { before: fmtDay(ob.label), after: fmtDay(oa.label) }))}</p>`;
+      return;
+    }
+    bar.innerHTML = "";
+  }
+  // Timeline: each shock is its own stop (its map mark is highlighted), the radar measurements one dated stop, the building assessment one
+  function qStopHead(s) {
+    const sh = meta.shocks;
+    if (!s) return "";
+    if (s.kind === "shock") {
+      const gap = s.i > 0 ? Math.round((Date.parse(s.s.time_utc) - Date.parse(sh[0].time_utc)) / 1000) : null;
+      return `<p class="sth-date"><time datetime="${esc(s.s.time_utc)}">${esc(fmtDay(s.from))} · ${esc(qClock(s.s.time_utc))}</time></p>` +
+        `<h3 class="sth-title">${esc(t("{mag} earthquake", { mag: qMag(s.s) }))}</h3>` +
+        (s.s.place ? `<p class="sth-loc"><span class="sth-pin" aria-hidden="true"></span>${esc(I.tx(s.s.place))}</p>` : "") +
+        `<p class="sth-s">${esc(gap != null ? t("{s} seconds after the first shock.", { s: gap }) : sh.length > 1 ? t("The first of {n} shocks.", { n: sh.length }) : "")}` +
+        `${s.s.url ? ` <a href="${esc(s.s.url)}" target="_blank" rel="noopener">${esc(s.s.source || t("Source"))} ↗</a>` : ""}</p>`;
+    }
+    if (s.kind === "radar") {
+      return `<p class="sth-date">${esc(t("Radar measurements · {dates}", { dates: fmtPair(s.from, s.to) }))}</p>` +
+        `<h3 class="sth-title">${esc(t("Satellite radar"))}</h3>` +
+        `<p class="sth-s">${esc(s.both && sh.length > 1 ? t("{n} measurement pairs, each taken before and after the earthquakes: every pair covers both earthquakes together and cannot separate them.", { n: s.R.length })
+          : t("{n} measurement pairs, each taken before and after the earthquake.", { n: s.R.length }))}</p>`;
+    }
+    return `<p class="sth-date">${esc(t("Images {dates} · assessed {date}", { dates: qObs(s.L), date: fmtShort(s.L.assessed || s.L.version, true) }))}</p>` +
+      `<h3 class="sth-title">${esc(t("Building damage grading"))}</h3>` +
+      `<p class="sth-s">${esc(t("Preliminary assessment based on satellite images"))}. ${qSrc(s.L)}</p>`;
+  }
+  function renderQuakeTimeline(bar) {
+    const ctrl = $("stage-ctrl"), stops = qStops();
+    if (!stops.length) { bar.innerHTML = `<p class="sb-text">${esc(t("No dated observations of this event are available."))}</p>`; ctrl.hidden = true; ctrl.innerHTML = ""; return; }
+    state.qStop = Math.max(0, Math.min(stops.length - 1, state.qStop || 0));
+    const day = (iso) => Date.parse(`${iso.slice(0, 10)}T00:00:00Z`) / 864e5;
+    const d0 = Math.min(...stops.map((s) => day(s.from))) - 0.5, d1 = Math.max(...stops.map((s) => day(s.to))) + 1.5;
+    const x = (v) => ((v - d0) / (d1 - d0) * 100).toFixed(2);
+    const shockX = meta.shocks.length ? x(Date.parse(meta.shocks[0].time_utc) / 864e5) : null;
+    const lab = (s) => s.kind === "shock" ? `<b>${esc(qMag(s.s))}</b><small>${esc(qClock(s.s.time_utc))}</small>`
+      : s.kind === "radar" ? `<b>${esc(t("Satellite radar"))}</b><small>${esc(t("{n} measurement pairs", { n: s.R.length }))}</small>`
+      : `<b>${esc(t("Buildings"))}</b><small>${esc(t("satellite images"))}</small>`;
+    const shockMark = shockX != null ? `<i class="qt-shock" style="left:${shockX}%"></i>` : "";
+    const bar1 = (from, to, cls, k, n) => `<i class="qt-bar ${cls}" style="left:${x(day(from) + 0.5)}%;width:${Math.max(0, x(day(to) + 0.5) - x(day(from) + 0.5)).toFixed(2)}%;` +
+      `${n > 1 ? `top:${((k + 0.5) / n * 100).toFixed(1)}%;height:${Math.max(3, Math.floor(18 / n))}px` : ""}"></i>`;
+    const mark = (s) => s.kind === "shock"
+      ? `<i class="qt-pin" style="left:${x(Date.parse(s.s.time_utc) / 864e5)}%"></i>`
+      : s.kind === "radar" ? s.R.map((L_, k) => bar1(L_.observed[0], L_.observed[1], "qt-radar", k, s.R.length)).join("") + shockMark
+      : bar1(s.from, s.L.observed[1], "qt-damage", 0, 1) + (s.L.assessed ? `<i class="qt-tick" style="left:${x(day(s.L.assessed) + 0.5)}%"></i>` : "") + shockMark;
+    const first = stops.reduce((m, s) => (s.from < m ? s.from : m), stops[0].from), last = stops.reduce((m, s) => (s.to > m ? s.to : m), stops[0].to);
+    const ticks = [...new Set([first, meta.shocks.length ? meta.shocks[0].time_utc.slice(0, 10) : null, last].filter(Boolean))];
+    bar.innerHTML = `<div class="st-head q-head" aria-live="polite">${qStopHead(stops[state.qStop])}</div>`;
+    ctrl.hidden = false;
+    ctrl.innerHTML = `<div class="qt" role="group" aria-label="${esc(t("Timeline: shocks and observations"))}"><div class="qt-rows">` +
+      stops.map((s, i) => `<button type="button" class="qt-row qt-k-${s.kind}" data-i="${i}" aria-pressed="${i === state.qStop}">` +
+        `<span class="qt-lab">${lab(s)}</span><span class="qt-track" aria-hidden="true">${mark(s)}</span></button>`).join("") + `</div>` +
+      `<div class="qt-axis" aria-hidden="true"><span class="qt-lab"></span><span class="qt-track">` +
+        ticks.map((d) => `<span class="qt-t" style="left:${x(day(d) + 0.5)}%">${esc(fmtShort(d))}</span>`).join("") + `</span></div>` +
+      (meta.shocks.length > 1 && stops.some((s) => s.kind === "radar" && s.both)
+        ? `<p class="qt-note">${esc(t("The two earthquakes were about {s} seconds apart. The radar measurements cover both of them together.", { s: qGap(meta.shocks) }))}</p>` : "") +
+      `</div>`;
+    ctrl.querySelectorAll(".qt-row").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.i);
+      qKeepView(() => { state.qStop = i; renderSimpleBar(); render(); });
+      const nb = $("stage-ctrl").querySelector(`.qt-row[data-i="${i}"]`); if (nb) nb.focus();
+    }));
+  }
+  // "Sources and method" of an earthquake event: every layer with its dates, geometry, numbers, licence and link
+  function renderScienceQuake(box) {
+    const pc = (x) => I.fmt.pct(x, 1), cm = (v) => `${qNumNeg(v)} cm`;
+    const shocks = meta.shocks.length ? `<dt>${esc(t("Earthquakes"))}</dt><dd><ul class="sci-obs">` + meta.shocks.map((s) =>
+      `<li><b>${esc(qMag(s))}</b> · ${esc(fmtDay(s.time_utc.slice(0, 10)))} · ${esc(qClock(s.time_utc))}` +
+      (s.place ? ` · ${esc(I.tx(s.place))}` : "") + (s.depth_km != null ? ` · ${esc(t("Depth {d} km.", { d: I.fmt.num(s.depth_km, 0) }))}` : "") +
+      (s.url ? ` <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.source || t("Source"))} ↗</a>` : "") + `</li>`).join("") + `</ul></dd>` : "";
+    const raster = qRasters().map((L_) => {
+      const g = L_.geometry || {}, st = L_.stats || {}, s = L_.source || {};
+      return `<dt>${esc(t("Ground motion · {track}", { track: qTrackName(L_) }))}</dt><dd>` +
+        `<p>${esc(t("Radar pair {dates}; product version {version}.", { dates: qObs(L_), version: fmtDay(L_.version) }))} ` +
+        `${esc(g.look_side === "right" ? t("Frames {frames}; the radar looks to the right, about {deg}° from vertical.", { frames: (g.frames || []).join(", "), deg: g.incidence_deg_approx })
+          : t("Frames {frames}; the radar looks to the left, about {deg}° from vertical.", { frames: (g.frames || []).join(", "), deg: g.incidence_deg_approx }))}</p>` +
+        `<p>${esc(t("Colours stop at ±{v} {unit}; larger movements get the end colour.", { v: I.fmt.num((L_.scale || {}).max, 0), unit: L_.unit || "cm" }))} ` +
+        `${esc(t("Measured pixels: {p} of the image. Values {min} to {max}; {q} lie outside the ±{v} cm colour scale.", { p: pc(st.valid_share || 0), min: cm(st.min), max: cm(st.max), q: pc(st.beyond_scale_share || 0), v: I.fmt.num((L_.scale || {}).max, 0) }))} ` +
+        `${esc(t("Transparent pixels: no data (not measured), not zero movement."))}</p>` +
+        (g.sign_confirmed === true ? "" : `<p><b>${esc(t("Sign not confirmed."))}</b> ${esc(t("The published description of the sign does not match the values in this area, so the values are shown in cm only, without a direction."))}</p>`) +
+        (L_.covers_both_shocks && meta.shocks.length > 1 ? `<p>${esc(t("The pair spans both shocks: the map is their sum (with any aftershock and later motion until the second pass) and cannot separate them."))}</p>` : "") +
+        `<p class="sci-note">${esc(s.publisher || "")}${s.product_id ? ` · <code>${esc(s.product_id)}</code>` : ""}${s.licence ? " · " + esc(s.licence) : ""}${s.credit ? " · " + esc(s.credit) : ""} ${qSrc(L_)}</p></dd>`;
+    }).join("");
+    const pts = qDamage().find((L_) => L_.kind === "points"), ar = qDamage().find((L_) => L_.kind === "polygon");
+    const dmg = pts ? (() => {
+      const cnt = pts.count || {}, total = Object.values(cnt).reduce((a, b) => a + b, 0), s = pts.source || {}, ac = (ar && ar.count) || {};
+      return `<dt>${esc(t("Building damage grading"))}</dt><dd>` +
+        `<p><b>${esc(t("{n} graded buildings", { n: I.fmt.num(total, 0) }))}</b> · ${esc(t("Preliminary assessment based on satellite images"))}.</p>` +
+        `<ul class="sci-obs">` + Object.keys(pts.classes || cnt).map((k) => `<li>${esc(qClsName(k))}: ${esc(I.fmt.num(cnt[k] || 0, 0))}</li>`).join("") + `</ul>` +
+        `<p>${esc(t("Images {dates} · assessed {date}", { dates: qObs(pts), date: fmtDay(pts.assessed || pts.version) }))}.</p>` +
+        (ar ? `<p>${esc(t("Graded areas: {a}; parts that could not be analysed: {n}. Outside these areas no buildings were graded.", { a: I.fmt.num(ac.assessed_area || 0, 0), n: I.fmt.num(ac.not_analysed || 0, 0) }))}</p>` : "") +
+        `<p>${esc(t("Only marked buildings are drawn. A building without a dot is not shown as undamaged."))}</p>` +
+        `<p class="sci-note">${esc(s.publisher || "")}${s.product_id ? ` · <code>${esc(s.product_id)}</code>` : ""}${s.licence ? " · " + esc(s.licence) : ""}${s.credit ? " · " + esc(s.credit) : ""} ${qSrc(pts)}</p></dd>`;
+    })() : "";
+    const linked = qLinked().length ? `<dt>${esc(t("Not shown on this map"))}</dt><dd><ul class="sci-obs">` + qLinked().map((L_) =>
+      `<li>${esc(qLinkReason(L_))} <a href="${esc(L_.official_url)}" target="_blank" rel="noopener">${esc(t("Official map"))} ↗</a></li>`).join("") + `</ul></dd>` : "";
+    // v80: the shaking estimate used by the story's "Try the shaking" (USGS ShakeMap): source, version and the product's limits
+    const S = meta.shaking, P = (S && S.product) || {}, mg = (x) => `M${Number(x).toLocaleString(I.lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+    const sk = meta.shocks, gap = sk.length > 1 ? Math.round((Date.parse(sk[1].time_utc) - Date.parse(sk[0].time_utc)) / 1000) : null;
+    const shake = S ? `<dt>${esc(t("Shaking estimate (USGS ShakeMap)"))}</dt><dd>` +
+      `<p>${esc(t("USGS ShakeMap of the {mag} earthquake ({id}), version {v} of {date}, status: {status}.", { mag: mg(S.shock.mag), id: S.shock.usgs_id, v: P.version, date: fmtDay(String(P.process_timestamp || "").slice(0, 10)), status: P.map_status === "automatic" ? t("automatic") : (P.map_status || "") }))} ` +
+        `<a href="${esc(P.page)}" target="_blank" rel="noopener">USGS ↗</a></p><ul class="sci-obs">` +
+      `<li>${esc(t("Estimates, not recordings: {n} felt reports (“Did You Feel It?”) and {s} seismic stations, with ground-motion models.", { n: I.fmt.num(P.intensity_observations, 0), s: I.fmt.num(P.seismic_stations, 0) }))}</li>` +
+      `<li>${esc(gap != null ? t("The {m1} shock came {s} seconds before the {m2}; felt reports cannot separate the two, so this map may include shaking from both.", { m1: mg(sk[0].mag), m2: mg(sk[1].mag), s: gap }) : (S.limits || [])[1] || "")}</li>` +
+      `<li>${esc(t("The ground (Vs30) is ShakeMap's estimate for the top 30 m from the slope of the land, not a measurement at the site. No extra soil factor is applied: the values already include the ground."))}</li>` +
+      `<li>${esc(t("The map status is automatic (version {v}); USGS may still revise it.", { v: P.version }))}</li>` +
+      `<li>${esc(t("The buildings are illustrative: no damage share and no safe or unsafe verdict."))}</li></ul>` +
+      `<ul class="sci-obs">` + S.regions.map((r) => `<li><b>${esc(r.name)}</b> · MMI ${esc(I.fmt.num(r.mmi, 1))} · PGA ${esc(I.fmt.num(r.pga_pct_g, 1))} %g · PGV ${esc(I.fmt.num(r.pgv_cm_s, 1))} cm/s</li>`).join("") + `</ul></dd>` : "";
+    box.innerHTML = `<dl class="sci-facts"><dt>${esc(t("Data status"))}</dt><dd>${esc(T.maturity.text)}</dd>` + shocks + raster + dmg + shake + linked + `</dl>`;
+  }
+  // ---------------------------------------------------------------------------------------------------------------
   // v60: "Data and science", right under the map. Every number comes from the event's own files (layers.json, timeline.json);
   // a value the project does not have is named as missing, never computed here.
   const doiOf = (m) => (m === "BETA" ? "10.5067/NIL2GCOV-B1" : "10.5067/NIL2GCOV-P1");
@@ -1528,7 +2140,8 @@
       ? `${esc(fmtDay(x.frame.label))} · ${esc(x.frame.location)} · ${x.frame.sources.map((q) => `<a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.publisher)}</a>`).join(", ")}. ${esc(x.frame.why)} ${esc(x.frame.note)}`
       : x.frame
       ? `${esc(fmtUtc(x.frame.datetime_utc))} · <a href="${esc(x.frame.stac)}" target="_blank" rel="noopener">${esc(x.frame.scene)}</a> · ` +
-        `${esc(lite() ? t("{p} clear inside the image", { p: pc(x.frame.inside_study_area.clear_share) }) : t("{p} clear inside the study area", { p: pc(x.frame.inside_study_area.clear_share) }))} · ${esc(lite() ? t("covers the whole image") : t("covers the whole study area"))} · 10 m. ${esc(x.frame.why)}`
+        `${esc(!x.frame.inside_study_area ? t("{p} cloud in the whole scene", { p: pc((x.frame.scene_cloud_cover || 0) / 100) }) // v69: Landsat frame (scene cloud cover only)
+          : lite() ? t("{p} clear inside the image", { p: pc(x.frame.inside_study_area.clear_share) }) : t("{p} clear inside the study area", { p: pc(x.frame.inside_study_area.clear_share) }))} · ${esc(lite() ? t("covers the whole image") : t("covers the whole study area"))} · 10 m. ${esc(x.frame.why)}`
       : `${esc(t("No clear satellite image was found for this stage."))} ${esc(x.missing)}`) + `</li>`).join("");
     return `<dt>${esc(t("Event period (sources)"))}</dt><dd>${per}</dd>` +
       `<dt>${esc(t("Timeline stages"))}</dt><dd><ul class="sci-obs sci-stages">${rows}</ul><p class="sci-note">${esc(sg.searched)}. ${esc(sg.rule)}</p>` +
@@ -1554,9 +2167,22 @@
   function renderScienceLite(box) {
     const ev = evidence ? I.tx(evidence) : null, op = optical ? I.tx(optical) : null, pc = (x) => I.fmt.pct(x, 0);
     const ms = ev && ev.measurement, f1 = (x) => I.fmt.num(x, 1);
+    const nf = (x, k = 1) => I.fmt.num(x, k);
+    // v69: wildfire evidence: the official perimeter, the incident record's total and the VIIRS detections, each with its source and version
+    const fire = ev && ev.layers ? `<dt>${esc(t("Mapped fire perimeter"))}</dt><dd id="sci-fire">` +
+        `<p>${esc(t("{source}, version of {date}, mapped by {method}: {acres} GIS acres. Measured here on the same outline: {km2} km² (geodesic, WGS84); {islands} unburned islands are cut out; the whole perimeter lies inside the map.", {
+          source: ms.perimeter_source, date: fmtDay(ms.perimeter_version), method: ms.perimeter_map_method, acres: nf(ms.perimeter_gis_acres, 0), km2: nf(ms.perimeter_km2, 2), islands: ms.perimeter_islands }))}
+        <a href="${esc(ms.perimeter_url)}" target="_blank" rel="noopener">NIFC WFIGS ↗</a></p></dd>` +
+      `<dt>${esc(ms.total_label)}</dt><dd><p>${esc(t("{acres} acres, about {km2} km². This is the number in the incident record, not a measurement of the map.", { acres: nf(ms.total_acres, 0), km2: nf(ms.total_km2) }))}
+        <a href="${esc(ms.record_url)}" target="_blank" rel="noopener">CAL FIRE ↗</a></p></dd>` +
+      `<dt>${esc(t("Active fire detections"))}</dt><dd><p>${esc(t("{n} detections kept ({snpp} S-NPP, {noaa} NOAA-20), {from} – {to}. {archive}.", {
+          n: nf(ms.firms_counts.kept, 0), snpp: nf(ms.firms_by_satellite["S-NPP"], 0), noaa: nf(ms.firms_by_satellite["NOAA-20"], 0), from: fmtDay(ms.firms_days[0]), to: fmtDay(ms.firms_days[1]), archive: ms.firms_archive }))}</p>
+        <p>${esc(ms.firms_rule)} ${esc(t("Left out: {before} before the start, {far} farther than 375 m from the perimeter.", { before: nf(ms.firms_counts.before_start, 0), far: nf(ms.firms_counts.farther, 0) }))}
+        <a href="${esc(ms.firms_url)}" target="_blank" rel="noopener">NASA FIRMS ↗</a></p></dd>` +
+      (op && op.variants && op.variants.swir ? `<dt>${esc(op.variants.swir.label)}</dt><dd><p>${esc(op.variants.swir.data_type)}: ${esc(op.variants.swir.pair[0].bands)}; ${esc(op.variants.swir.pair[0].stretch)}. ${esc(op.variants.swir.note)}</p></dd>` : "") : "";
     box.innerHTML = `<dl class="sci-facts">` +
-      `<dt>${esc(t("Data status"))}</dt><dd>${esc(T.maturity.text)}</dd>` +
-      (ms ? `<dt>${esc(t("UNOSAT impact data"))}</dt><dd id="sci-unosat">` +
+      `<dt>${esc(t("Data status"))}</dt><dd>${esc(T.maturity.text)}</dd>` + fire +
+      (ms && !(ev && ev.layers) ? `<dt>${esc(t("UNOSAT impact data"))}</dt><dd id="sci-unosat">` +
         `<p>${esc(t("Data of {version}, published {published}: {b} km² analysed, {a} km² affected (UNOSAT's values). Imagery: {imagery}.", { version: fmtDay(ms.version), published: fmtDay(ms.published), b: f1(ms.analysed_km2), a: f1(ms.affected_km2), imagery: ms.imagery }))}</p>` +
         `<p>${esc(t("Check: the same polygons measured here give {b} km² and {a} km²; all of the affected area lies inside the analysed area.", { b: f1(ms.check.analysed_km2), a: f1(ms.check.affected_km2) }))}</p>` +
         `<p>${esc(ms.scope)}</p><p><b>${esc(ms.status)}</b></p>` +
@@ -1566,18 +2192,27 @@
         scoreBlock(evidence.score) : "") +
       (op ? `<dt>${esc(t("True-colour images"))}</dt><dd><ul class="sci-obs">` + op.pair.map((o) => `<li><b>${esc(fmtDay(o.label))}</b> · Sentinel-${esc((o.platform || "").slice(9).toUpperCase())} · ` +
         `${esc(t("{p} clear inside the image", { p: pc(o.inside_study_area.clear_share) }))} · <a href="${esc(o.stac)}" target="_blank" rel="noopener">${esc(o.scene)}</a></li>`).join("") + `</ul>` +
-        `<p class="sci-note">${esc(t("Copernicus Sentinel-2 L2A, 10 m, the same frame as the Copernicus image of the day. Checked: {checked}.", { checked: op.checked }))}</p></dd>` : "") +
+        `<p class="sci-note">${esc(hazardNow() === "wildfire" ? t("Copernicus Sentinel-2 L2A, 10 m, the same frame for every image. Checked: {checked}.", { checked: op.checked })
+          : t("Copernicus Sentinel-2 L2A, 10 m, the same frame as the Copernicus image of the day. Checked: {checked}.", { checked: op.checked }))}</p></dd>` : "") +
       stageFacts() +
       (ev ? `<dt>${esc(t("Sources"))}</dt><dd><ul class="sci-links">` + ev.sources.map((q) => `<li><a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.publisher)}</a></li>`).join("") + `</ul></dd>` : "") +
       `</dl>`;
   }
+  // v76: "Data and sources" starts with the area the analysis covers (the second part of the event summary, when there is one)
   function renderScience() {
+    renderScienceBody();
+    const box = $("science-body");
+    if (!box || $("science").hidden || isQuake()) return;
+    const rest = splitLede(T.event.lede || "")[1];
+    if (rest) box.insertAdjacentHTML("afterbegin", `<p class="sci-area">${esc(rest)}</p>`);
+  }
+  function renderScienceBody() {
     const sec = $("science"), box = $("science-body");
     if (!sec || !box) return;
     sec.hidden = !(meta && T && state.ui === "simple");
-    $("science-h").textContent = lite() ? t("Sources and method") : t("Data and science");
+    $("science-h").textContent = t("Data and sources"); // v76: one name for the technical details of every event
     if (sec.hidden) return;
-    if (lite()) { renderScienceLite(box); return; }
+    if (lite()) { isQuake() ? renderScienceQuake(box) : renderScienceLite(box); return; }
     const tl0 = timeline || { frames: [] }, tl = { ...tl0, frames: tl0.frames.filter((x) => x.kind !== "optical") };
     const ed = I.tx(tl.event_dates || null), pair = simplePair(), op = optical ? I.tx(optical) : null;
     const f = (x, k = 2) => I.fmt.num(x, k), pc = (x) => I.fmt.pct(x, 2);
@@ -1720,7 +2355,9 @@
   // Card after the map (Simple view): what to do next. The explanation itself is in the block above the map.
   // Events that have data/<event>/follow_water.json. v57: the event is in the query (?event=), not only after #: a new query is always a new
   // page load and a new cache entry, so a scene of one event can never stay on screen (or come from an old cached page) under another event's link.
-  const FOLLOW_WATER = { "bgd-flood-2026-07": "follow.html?event=bgd-flood-2026-07&v=68", "moz-flood-2026-01": "follow.html?event=moz-flood-2026-01&v=68", "npl-flood-2026-08": "follow.html?event=npl-flood-2026-08&v=68" };
+  // v71: no event list in the code. An event has a 3D scene when its events.json entry carries "scene3d" (written by the build when
+  // data/<event>/follow_water.json exists), so a new event needs only its catalog record.
+  const followHref = (id) => { const e = index && index.events.find((x) => x.id === id); return e && e.scene3d ? `follow.html?event=${encodeURIComponent(id)}&v=71` : null; };
   // The scene ends on the satellite layer at this map's own framing of the study area: pass the zoom fitBounds gives here (Leaflet zoom),
   // so the last frame of the scene shows the same centre at the same scale as this map.
   document.addEventListener("click", (e) => {
@@ -1736,7 +2373,7 @@
   }, true);
   function renderSimpleCard() {
     const sv = T.simple, box = $("simple-card");
-    box.hidden = state.ui !== "simple";
+    box.hidden = state.ui !== "simple" || isQuake(); // v73: no event images for an earthquake (nothing to show in the card)
     renderSimpleBar();
     box.innerHTML = `<h2 id="simple-title" class="vh">${esc(t("Event images"))}</h2><div id="sc-media" class="sc-media"></div>`;
     renderSimpleMedia(meta.event_id);
@@ -1759,7 +2396,7 @@
   const mediaCache = {};
   function renderSimpleMedia(id) {
     const box = $("sc-media");
-    if (!box || !FOLLOW_WATER[id]) return;
+    if (!box || !followHref(id)) return;
     const fill = (m0) => {
       const m = I.tx(m0);
       if (!m || !m.items || !m.items.length || !meta || meta.event_id !== id || !$("sc-media")) return;
@@ -1807,16 +2444,19 @@
   const wrap = document.querySelector(".map-wrap");
   const divider = $("divider");
   function splitRect() {
-    if (!bounds) return null;
+    const bb = opticalShown() ? pairBounds() : bounds;
+    if (!bb) return null;
     const size = map.getSize();
-    const a = map.latLngToContainerPoint(bounds.getNorthWest()), b = map.latLngToContainerPoint(bounds.getSouthEast());
+    const a = map.latLngToContainerPoint(bb.getNorthWest()), b = map.latLngToContainerPoint(bb.getSouthEast());
     const l = Math.max(0, a.x), r = Math.min(size.x, b.x), t = Math.max(0, a.y), btm = Math.min(size.y, b.y);
     return r - l >= 24 && btm - t >= 24 ? { l, r, t, b: btm, w: r - l, h: btm - t } : null;
   }
   function placeTags(r) {
     const lb = $("label-before").style, la = $("label-after").style;
     if (!r) { lb.left = lb.top = la.right = la.top = ""; return; }
-    const W = map.getSize().x, top = `${Math.max(r.t + 8, 52)}px`, minLeft = narrow.matches ? 50 : 56;
+    // v74: an image pair narrower than the map (earthquake: La Guaira strip): the dates sit just above it when there is room, so they do not cover it
+    const above = opticalShown() && optical && optical.quake && r.t >= 88;
+    const W = map.getSize().x, top = `${above ? r.t - 32 : Math.max(r.t + 8, document.body.classList.contains("area-switch-on") ? 94 : 52)}px`, minLeft = narrow.matches ? 50 : 56;
     lb.left = `${Math.max(r.l + 8, minLeft)}px`; lb.top = top;
     la.right = `${Math.max(W - r.r + 8, 10)}px`; la.top = top;
   }
@@ -1825,13 +2465,17 @@
     const nw = map.containerPointToLayerPoint([0, 0]);
     const se = map.containerPointToLayerPoint(size);
     const r = splitRect(), single = state.swipe >= 1;
-    const xc = size.x * state.swipe; // divider position in map pixels: a fixed share of the visible map
+    let xc = size.x * state.swipe; // divider position in map pixels: a fixed share of the visible map
+    // v87: when panning, a window resize or turning the phone moves the images so that this share falls outside them, the cut follows
+    // into the images (one handle radius inside) instead of hiding the divider; line, cut and handle stay at one x. state.swipe is
+    // kept, so the line returns to the reader's place when the images come back under it.
+    if (r && !single) { const m = Math.min(20, r.w / 2); xc = Math.min(Math.max(xc, r.l + m), r.r - m); }
     const x = nw.x + xc;
     map.getPane("before").style.clip = `rect(${nw.y}px, ${x}px, ${se.y}px, ${nw.x}px)`;
     map.getPane("after").style.clip = `rect(${nw.y}px, ${se.x}px, ${se.y}px, ${x}px)`;
     map.getPane("pairAfter").style.clip = meta && candOneMap() ? "auto" : map.getPane("after").style.clip;
-    const onImage = !!r && xc >= r.l - 0.5 && xc <= r.r + 0.5;
-    divider.classList.toggle("off", !onImage); // no image at the divider's place (scrolled away): it waits there, hidden
+    const onImage = !!r; // v87: hidden only while no image is on screen at all
+    divider.classList.toggle("off", !onImage);
     if (onImage) { // the 44 px drag strip and the round handle stay inside the images, also at both ends; the line marks the exact position
       const sw = Math.min(44, r.w), el = Math.min(Math.max(xc - sw / 2, r.l), r.r - sw);
       const hr = Math.min(20, sw / 2), hx = Math.min(Math.max(xc, r.l + hr), r.r - hr);
@@ -1841,6 +2485,10 @@
       divider.style.height = `${r.h}px`;
       divider.style.setProperty("--lx", `${xc - el}px`);
       divider.style.setProperty("--hx", `${hx - el}px`);
+      // v74: the round handle sits at the middle of the visible map (not of the image rectangle), so it does not glide up and down
+      // while the map is panned or zoomed; it is only kept inside the images
+      const hy = Math.min(Math.max(size.y / 2, r.t + 24), r.b - 24);
+      divider.style.setProperty("--hy", `${hy - r.t}px`);
     }
     placeTags(r);
     const pct = Math.round(state.swipe * 100);
@@ -1849,7 +2497,7 @@
   }
   const setSwipe = (v) => {
     const r = splitRect(), W = map.getSize().x;
-    if (r && W) v = Math.min(Math.max(v, r.l / W), r.r / W); // the line stays on the images
+    if (r && W) { const m = Math.min(20, r.w / 2); v = Math.min(Math.max(v, (r.l + m) / W), (r.r - m) / W); } // the line stays on the images (v87: one handle radius inside, as clip())
     state.swipe = Math.min(0.999, Math.max(0, v)); // 1 = single-date view; dragging never goes there
     divider.querySelector(".drag-hint")?.remove(); // hint is not needed after first use
     clip();
@@ -1861,13 +2509,28 @@
     if (!r0) return;
     divider.setPointerCapture(e.pointerId);
     divider.classList.add("dragging");
+    // v74: a second finger means a pinch, not a comparison: the drag is cancelled and the line goes back to where this gesture began
+    // (a first finger that happens to land on or near the handle must not move the line while the map is pinch-zoomed)
+    const id = e.pointerId, start = state.swipe;
     const move = (ev) => {
+      if (ev.pointerId !== id) return;
       setSwipe((ev.clientX - map.getContainer().getBoundingClientRect().left) / map.getSize().x);
     };
     const up = () => {
       divider.classList.remove("dragging");
       for (const [k, f] of [["pointermove", move], ["pointerup", up], ["pointercancel", up], ["lostpointercapture", up]]) divider.removeEventListener(k, f);
+      window.removeEventListener("pointerdown", second, true);
+      window.removeEventListener("touchstart", secondTouch, true);
     };
+    const cancel = () => {
+      up();
+      try { divider.releasePointerCapture(id); } catch (err) { /* already released */ }
+      if (state.swipe !== start) { state.swipe = start; clip(); }
+    };
+    const second = (ev) => { if (ev.pointerId !== id) cancel(); };
+    const secondTouch = (ev) => { if (ev.touches && ev.touches.length > 1) cancel(); };
+    window.addEventListener("pointerdown", second, true);
+    window.addEventListener("touchstart", secondTouch, { capture: true, passive: true });
     divider.addEventListener("pointermove", move);
     divider.addEventListener("pointerup", up);
     divider.addEventListener("pointercancel", up);
@@ -1897,6 +2560,9 @@
   // The satellite view's "not necessarily from the event date" warning is shown here only (one place).
   function renderMapLegend() {
     if (!meta || !T) return;
+    qPlaceLegend();
+    $("map-legend").classList.toggle("q-legend", isQuake() && state.ui === "simple" && state.mapMode !== "optical");
+    if (isQuake() && state.ui === "simple" && state.mapMode !== "optical") { renderQuakeLegend(); return; } // v73
     if (state.ui === "simple" && T.simple && T.simple.shows) {
       // v48: short key (same active state as the block above the map); the context sits under "Map notes"
       const sv = T.simple, a = simpleActive(), sat = state.view === "satellite" && !state.satFallback;
@@ -1910,24 +2576,38 @@
       $("map-legend").classList.toggle("ml-hidden", !!stg && !stMap); // Timeline: date and source are on the image and in the caption under it
       if (stMap) { // outlines on an undated background map: what each outline is, and that the background is not from this date
         $("map-legend").classList.add("simple", "collapsed");
-        $("map-legend").innerHTML = `<div class="ml-simple"><i class="k-lake"></i><span>${esc(t("barrier lake"))}</span></div>` +
+        $("map-legend").innerHTML = stg.frame.record
+          ? `<div class="ml-simple"><i class="k-perim"></i><span>${esc(t("Official fire perimeter (NIFC, {date})", { date: fmtShort("2025-01-21", true) }))}</span></div><div class="ml-bg">${esc(t("Background map: not from this date."))}</div>`
+          : `<div class="ml-simple"><i class="k-lake"></i><span>${esc(t("barrier lake"))}</span></div>` +
           `<div class="ml-simple"><i class="k-src"></i><span>${esc(t("collapse area"))}</span></div><div class="ml-bg">${esc(t("Background map: not from this date."))}</div>`;
         return;
       }
       if (stg) { $("map-legend").innerHTML = ""; return; }
+      if (state.mapMode === "unosat" && evidence && evidence.layers) { // v69: one key line per layer that is on
+        const ev = I.tx(evidence), off = state.evOff || {};
+        $("map-legend").classList.add("simple", "collapsed");
+        $("map-legend").innerHTML = ev.layers.filter((L_) => !off[L_.id]).map((L_) => `<div class="ml-simple"><i class="evk evk-${esc(L_.kind)}" style="--c:${esc(L_.color)}"></i><span>${esc(L_.legend)}</span></div>`).join("") ||
+          `<div class="ml-simple"><span>${esc(t("All layers are switched off."))}</span></div>`;
+        return;
+      }
       if (state.mapMode === "unosat") {
         $("map-legend").classList.add("simple", "collapsed");
-        $("map-legend").innerHTML = `<div class="ml-simple"><i style="background:rgba(255,140,26,.35);border:2px solid #ff8c1a"></i><span>${esc(t("UNOSAT affected area · data of {date} (preliminary)", { date: fmtShort(evidence.measurement.version, true) }))}</span></div>`;
+        $("map-legend").innerHTML = views && views.legend // v75: what the orange shows, then the analysed area's outline
+          ? `<div class="ml-simple"><i style="background:rgba(255,140,26,.35);border:2px solid #ff8c1a"></i><span>${esc(t(views.legend))} · ${esc(t("UNOSAT, data of {date} (preliminary)", { date: fmtShort(evidence.measurement.version, true) }))}</span></div>` +
+            (views.overview.coverage && views.overview.coverage.file ? `<div class="ml-simple"><i class="ml-cover"></i><span>${esc(t(views.overview.coverage.label))}</span></div>` : "")
+          : `<div class="ml-simple"><i style="background:rgba(255,140,26,.35);border:2px solid #ff8c1a"></i><span>${esc(t("UNOSAT affected area · data of {date} (preliminary)", { date: fmtShort(evidence.measurement.version, true) }))}</span></div>`;
         return;
       }
       if (opticalShown()) { // true-colour pair: what each side is, where it comes from; no colour key (a photo-like image)
-        const [ob, oa] = optical.pair;
+        const [ob, oa] = opticalPair();
         const open = state.simpleLegendOpen === true;
         $("map-legend").classList.add("simple");
         $("map-legend").classList.toggle("collapsed", !open);
-        $("map-legend").innerHTML = `<div class="ml-simple"><i class="ml-photo"></i><span>${esc(t("True colour: left {before}, right {after}", { before: fmtShort(ob.label, true), after: fmtShort(oa.label, true) }))}</span></div>` +
-          (open ? `<div class="ml-notes"><div class="ml-dates">${esc(t("Copernicus Sentinel-2 · 10 m"))}</div>` +
-            `<div class="ml-dates">${esc(t("Each image pixel is 10 m on the ground; the map stops zooming before the pixels are enlarged into blur."))}</div>` +
+        $("map-legend").innerHTML = (swirOn()
+            ? `<div class="ml-simple"><i class="ml-photo ml-swir"></i><span>${esc(t("Short-wave infrared: left {before}, right {after}", { before: fmtShort(ob.label, true), after: fmtShort(oa.label, true) }))}</span></div>`
+            : `<div class="ml-simple"><i class="ml-photo"></i><span>${esc(t("True colour: left {before}, right {after}", { before: fmtShort(ob.label, true), after: fmtShort(oa.label, true) }))}</span></div>`) +
+          (open ? `<div class="ml-notes"><div class="ml-dates">${esc(swirOn() ? t("Copernicus Sentinel-2 · 20 m · false colour") : t("Copernicus Sentinel-2 · 10 m"))}</div>` +
+            `<div class="ml-dates">${esc(swirOn() ? t("Each image pixel is 20 m on the ground; the map stops zooming before the pixels are enlarged into blur.") : t("Each image pixel is 10 m on the ground; the map stops zooming before the pixels are enlarged into blur."))}</div>` +
             `<div class="ml-bg">${esc(t("Outside the images: background map, not from these dates."))}</div></div>` : "") +
           `<button type="button" class="ml-more" aria-expanded="${open}">${esc(open ? t("Hide map notes ▴") : t("Map notes ▾"))}</button>`;
         $("map-legend").querySelector(".ml-more").addEventListener("click", () => {
@@ -1991,6 +2671,8 @@
     const bg = sat && !state.satFallback
       ? `<div class="ml-bg">${esc(t("Background image — not from the flood date."))}</div>`
       : sat ? `<div class="ml-bg">${esc(t("Satellite imagery unavailable — street map shown"))}</div>` : "";
+    // v75: in the flood map views the dashed study outline is what the satellite data cover (no wider data: nothing outside it is "dry")
+    const cov = floodView() && views.overview.coverage ? `<div class="ml-cov"><i class="ml-cover"></i><span>${esc(t(views.overview.coverage.label))}</span></div>` : "";
     // Short names for the collapsed legend on narrow screens
     const SHORT = { nisar_candidate: t("Possible water — not confirmed flooding"), landsat_support: t("Landsat water"), gfm_support: t("GFM flood map"), multi_source: t("Possible water, also seen by 2 others") };
     const order = [...meta.support.filter((sp) => overlays[sp.id]).map((sp) => SHORT[sp.id] || plainTitle(sp)),
@@ -2009,7 +2691,7 @@
     }
     $("map-legend").innerHTML =
       `<button type="button" class="ml-toggle" aria-expanded="${open}" aria-controls="map-legend" aria-label="${esc(open ? t("Hide legend details") : t("Show legend details"))}">` +
-      `<span>${esc(open ? t("Legend") : title)}</span><span aria-hidden="true">${esc(open ? t("▾ hide") : t("▸ show"))}</span></button>` + body + bg;
+      `<span>${esc(open ? t("Legend") : title)}</span><span aria-hidden="true">${esc(open ? t("▾ hide") : t("▸ show"))}</span></button>` + body + cov + bg;
     $("map-legend").classList.toggle("collapsed", !open);
     $("map-legend").querySelector(".ml-toggle").addEventListener("click", () => { state.legendOpen = !state.legendOpen; renderMapLegend(); });
   }
@@ -2100,7 +2782,7 @@
   });
   document.querySelectorAll('input[name="pol"]').forEach((r) => r.addEventListener("change", (e) => { state.pol = e.target.value; markCustom(); }));
   // On mobile the panel legend starts collapsed (the on-map legend stays visible)
-  narrow.addEventListener("change", () => { if (meta) render(); });
+  narrow.addEventListener("change", () => { if (meta) { if (state.ui === "simple") renderSimpleBar(); render(); } });
 
   const fromHash = (location.hash.match(/(?:event|olay)=([\w-]+)/) || [])[1];
   const viewHash = (location.hash.match(/view=(satellite|analysis)/) || [])[1];
@@ -2144,7 +2826,7 @@
   localizeStatic();
   // Direct links (#event=… or the older #olay=…) open the analysis as before; otherwise the start screen is shown
   if (fromHash || !intro) await loadEvent(fromHash || index.events[0].id);
-  else intro.show();
+  else intro.route(); // v75: start menu, globe (#map) or stories (#stories, #story=…) from the address
 
   // The address changed in the same tab (a pasted/clicked #event=… link, or Back/Forward): show that event and view.
   // The app's own address updates use replaceState/pushState, which do not fire hashchange.
@@ -2152,8 +2834,8 @@
     const id = eventInHash();
     const v = (location.hash.match(/view=(satellite|analysis)/) || [])[1];
     const introOpen = intro && !$("intro").hidden;
-    if (!id) { // address without an event: the start screen (as after "Back to globe")
-      if (intro && !introOpen) intro.show();
+    if (!id) { // address without an event: start menu, globe (#map) or stories, by the address (v75)
+      if (intro) intro.route();
       return;
     }
     if (!index.events.some((e) => e.id === id)) return; // unknown event id: keep what is shown

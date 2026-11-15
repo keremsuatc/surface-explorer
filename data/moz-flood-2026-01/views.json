@@ -1,0 +1,36 @@
+{
+ "event_id": "moz-flood-2026-01",
+ "generated_from": "catalog/events/moz-flood-2026-01.json (web.views) via build_event_web.py views",
+ "applies_to": "evidence",
+ "overview": {
+  "label": "Affected areas",
+  "bounds": [
+   [
+    -24.6547,
+    32.90164
+   ],
+   [
+    -24.39689,
+    33.13732
+   ]
+  ],
+  "coverage": {
+   "outline": "existing",
+   "label": "Satellite data cover this area"
+  }
+ },
+ "closeup": {
+  "label": "Close look",
+  "place": "Chókwè (town)",
+  "bounds": [
+   [
+    -24.547,
+    32.979
+   ],
+   [
+    -24.502,
+    33.028
+   ]
+  ]
+ }
+}

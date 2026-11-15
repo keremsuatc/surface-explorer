@@ -1,0 +1,127 @@
+{
+ "event_id": "usa-wildfire-2025-01",
+ "bounds_latlon": [
+  [
+   34.015,
+   -118.7
+  ],
+  [
+   34.14,
+   -118.49
+  ]
+ ],
+ "source": "Copernicus Sentinel-2 L2A true colour (TCI, 10 m), Earth Search STAC / AWS Open Data",
+ "credit": "Contains modified Copernicus Sentinel data 2026",
+ "checked": "Sentinel-2 scenes 28 December 2024 – 17 January 2025 over the frame (tile 11SLT, all at 18:45 UTC = 10:45 a.m. local time): 28 Dec 93 % cloud; 2 Jan 100 % clear inside the frame; 7 Jan about half cloud or smoke; 12 Jan 99.97 % clear, no smoke plume over the burned area; 17 Jan 25 % cloud. 2 and 12 January are also the dates ESA compared.",
+ "esri_wayback": null,
+ "change": "On 12 January grey-brown burned ground covers the hills from Pacific Palisades westwards; on 2 January the same slopes were dark with vegetation. The brown patch in the south-west corner is older: the Franklin Fire of December 2024, seen on both dates.",
+ "after_timing": "five days after the fire began",
+ "export": {
+  "source_gsd_m": 10.0,
+  "width": 1936,
+  "height": 1391,
+  "ground_m_per_px": [
+   10.0,
+   10.0
+  ],
+  "crs": "EPSG:3857",
+  "resampling": "lanczos",
+  "format": "JPEG quality 90, 4:4:4",
+  "sharpening": "none"
+ },
+ "pair": [
+  {
+   "side": "before",
+   "label": "2025-01-02",
+   "datetime_utc": "2025-01-02T18:45:02.738000Z",
+   "scene": "S2A_11SLT_20250102_0_L2A",
+   "tile": "MGRS-11SLT",
+   "platform": "sentinel-2a",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 3.015763,
+   "inside_study_area": {
+    "clear_share": 1.0,
+    "cloud_share": 0.0,
+    "water_share_scl": 0.1534,
+    "pixels": 671681
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32611",
+   "source_window_px": [
+    1959,
+    1416
+   ],
+   "file": "usa-wildfire-2025-01/optical_2025-01-02.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250102_0_L2A"
+  },
+  {
+   "side": "after",
+   "label": "2025-01-12",
+   "datetime_utc": "2025-01-12T18:45:00.334000Z",
+   "scene": "S2A_11SLT_20250112_0_L2A",
+   "tile": "MGRS-11SLT",
+   "platform": "sentinel-2a",
+   "sensor": "Sentinel-2 MSI (true colour)",
+   "scene_cloud_cover": 0.023079,
+   "inside_study_area": {
+    "clear_share": 0.9997,
+    "cloud_share": 0.0003,
+    "water_share_scl": 0.1528,
+    "pixels": 671681
+   },
+   "source_file": "TCI (visual) COG, 10 m, uint8, EPSG:32611",
+   "source_window_px": [
+    1959,
+    1416
+   ],
+   "file": "usa-wildfire-2025-01/optical_2025-01-12.jpg",
+   "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250112_0_L2A"
+  }
+ ],
+ "hint": "Drag the line and look at the grey-brown burned slopes.",
+ "variants": {
+  "swir": {
+   "label": "Highlight the burn scar",
+   "data_type": "Short-wave infrared false colour (Sentinel-2 B12, B8A, B04)",
+   "note": "Not natural colour: burned ground shows red-brown, plants green. 20 m pixels; the same stretch on both dates.",
+   "pair": [
+    {
+     "side": "before",
+     "label": "2025-01-02",
+     "datetime_utc": "2025-01-02T18:45:02.738000Z",
+     "scene": "S2A_11SLT_20250102_0_L2A",
+     "platform": "sentinel-2a",
+     "sensor": "Sentinel-2 MSI (short-wave infrared false colour)",
+     "bands": "R = B12 (2190 nm), G = B8A (865 nm), B = B04 (665 nm)",
+     "stretch": "surface reflectance 0.0–0.4, linear, same for every band and date",
+     "file": "usa-wildfire-2025-01/swir_2025-01-02.jpg",
+     "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250102_0_L2A"
+    },
+    {
+     "side": "after",
+     "label": "2025-01-12",
+     "datetime_utc": "2025-01-12T18:45:00.334000Z",
+     "scene": "S2A_11SLT_20250112_0_L2A",
+     "platform": "sentinel-2a",
+     "sensor": "Sentinel-2 MSI (short-wave infrared false colour)",
+     "bands": "R = B12 (2190 nm), G = B8A (865 nm), B = B04 (665 nm)",
+     "stretch": "surface reflectance 0.0–0.4, linear, same for every band and date",
+     "file": "usa-wildfire-2025-01/swir_2025-01-12.jpg",
+     "stac": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_11SLT_20250112_0_L2A"
+    }
+   ],
+   "export": {
+    "source_gsd_m": 20.0,
+    "width": 968,
+    "height": 696,
+    "ground_m_per_px": [
+     20.0,
+     19.99
+    ],
+    "crs": "EPSG:3857",
+    "resampling": "lanczos",
+    "format": "JPEG quality 90, 4:4:4",
+    "sharpening": "none"
+   }
+  }
+ }
+}
