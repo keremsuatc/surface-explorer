@@ -652,7 +652,6 @@
  "The buildings are illustrative: no damage share and no safe or unsafe verdict.": "Los edificios son ilustrativos: sin porcentaje de daños ni veredicto seguro o inseguro.",
  "Places: OpenStreetMap (ODbL). The radar ground-motion layers stay on the event map.": "Lugares: OpenStreetMap (ODbL). Las capas de radar del movimiento del suelo siguen en el mapa del evento.",
  "Reduced motion is on: the dashed outlines show how far the top would sway.": "Movimiento reducido activado: los contornos discontinuos muestran cuánto oscilaría la parte superior.",
- "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: nivel de sacudida {l} de 9 · {height}, {frame}.",
  "Shaking estimate (USGS ShakeMap)": "Estimación de la sacudida (ShakeMap del USGS)",
  "← Back to the story": "← Volver a la historia",
  "Try how the fire spreads": "Prueba cómo se propaga el fuego",
@@ -837,5 +836,15 @@
  "Reinforcing wall ordered: workers build it as its own row in front of the dam.": "Muro de refuerzo encargado: los trabajadores lo levantan como una fila aparte delante de la presa.",
  "Building {p}%": "Construcción {p} %",
  "built {p}%": "construida {p} %",
- "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Los aldeanos construyen las presas: una presa o un muro solo retiene la nieve donde está terminado. Cuando la nieve se acerca, dejan el trabajo y corren a terreno alto."
+ "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Los aldeanos construyen las presas: una presa o un muro solo retiene la nieve donde está terminado. Cuando la nieve se acerca, dejan el trabajo y corren a terreno alto.",
+ "See how floods change the land with radar images from the NASA–ISRO NISAR satellite.": "Mira cómo las inundaciones cambian el terreno con imágenes de radar del satélite NISAR de la NASA y la ISRO.",
+ "Project on GitHub": "El proyecto en GitHub",
+ "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: nivel de sacudida {l} de 9 · {height}, {frame}.",
+ "Choose a place and a building type, then start the shaking.": "Elige un lugar y un tipo de edificio, y luego inicia la sacudida.",
+ "Coloured marks show the buildings that were inspected. The condition of buildings without a mark may not be known.": "Las marcas de color muestran los edificios inspeccionados. Puede que no se conozca el estado de los edificios sin marca.",
+ "Satellite radar shows how much the ground changed between two passes.": "El radar por satélite muestra cuánto cambió el suelo entre dos pasadas.",
+ "The direction of motion has not been confirmed.": "La dirección del movimiento no está confirmada.",
+ "The effects of the two earthquakes cannot be shown separately.": "Los efectos de los dos terremotos no se pueden mostrar por separado.",
+ "Two large earthquakes struck {place} a short time apart. On this map you can see how the ground changed and which buildings were inspected.": "En {place} hubo dos grandes terremotos con poco tiempo de diferencia. En este mapa puedes ver cómo cambió el suelo y qué edificios se inspeccionaron.",
+ "{place}: estimated shaking {cls} {mmi} · {height}, {frame}.": "{place}: sacudida estimada {cls} {mmi} · {height}, {frame}."
 }

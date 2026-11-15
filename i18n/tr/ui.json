@@ -652,7 +652,6 @@
  "The buildings are illustrative: no damage share and no safe or unsafe verdict.": "Binalar temsilidir: hasar yüzdesi ya da güvenli/güvensiz sonucu yoktur.",
  "Places: OpenStreetMap (ODbL). The radar ground-motion layers stay on the event map.": "Bölgeler: OpenStreetMap (ODbL). Radar yer hareketi katmanları olay haritasında kalır.",
  "Reduced motion is on: the dashed outlines show how far the top would sway.": "Hareket azaltma açık: kesikli çizgiler, binanın tepesinin ne kadar salınacağını gösterir.",
- "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: sarsıntı düzeyi 9 üzerinden {l} · {height}, {frame}.",
  "Shaking estimate (USGS ShakeMap)": "Sarsıntı tahmini (USGS ShakeMap)",
  "← Back to the story": "← Hikâyeye dön",
  "Try how the fire spreads": "Yangının nasıl yayıldığını dene",
@@ -837,5 +836,15 @@
  "Reinforcing wall ordered: workers build it as its own row in front of the dam.": "Güçlendirme duvarı istendi: işçiler onu barajın önünde ayrı bir sıra olarak kuruyor.",
  "Building {p}%": "İnşaat %{p}",
  "built {p}%": "yapılan %{p}",
- "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Barajları köylüler kurar: baraj ya da duvar yalnızca bitmiş kısımlarında karı tutar. Kar yaklaşınca işi bırakıp yüksek zemine kaçarlar."
+ "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Barajları köylüler kurar: baraj ya da duvar yalnızca bitmiş kısımlarında karı tutar. Kar yaklaşınca işi bırakıp yüksek zemine kaçarlar.",
+ "See how floods change the land with radar images from the NASA–ISRO NISAR satellite.": "NASA–ISRO NISAR uydusunun radar görüntüleriyle sellerin araziyi nasıl değiştirdiğini görün.",
+ "Project on GitHub": "Proje GitHub'da",
+ "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: sarsıntı düzeyi 9 üzerinden {l} · {height}, {frame}.",
+ "Choose a place and a building type, then start the shaking.": "Bir bölge ve bina tipi seç, sonra sarsıntıyı başlat.",
+ "Coloured marks show the buildings that were inspected. The condition of buildings without a mark may not be known.": "Renkli işaretler incelenen binaları gösterir. İşaretsiz binaların durumu bilinmeyebilir.",
+ "Satellite radar shows how much the ground changed between two passes.": "Uydu radarı, iki çekim arasında yerin ne kadar değiştiğini gösterir.",
+ "The direction of motion has not been confirmed.": "Hareketin yönü doğrulanmadı.",
+ "The effects of the two earthquakes cannot be shown separately.": "İki depremin etkisi ayrı ayrı gösterilemiyor.",
+ "Two large earthquakes struck {place} a short time apart. On this map you can see how the ground changed and which buildings were inspected.": "{place}’da kısa arayla iki büyük deprem oldu. Bu haritada yerin nasıl değiştiğini ve hangi binaların incelendiğini görebilirsin.",
+ "{place}: estimated shaking {cls} {mmi} · {height}, {frame}.": "{place}: tahmini sarsıntı {cls} {mmi} · {height}, {frame}."
 }

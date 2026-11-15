@@ -652,7 +652,6 @@
  "The buildings are illustrative: no damage share and no safe or unsafe verdict.": "Die Gebäude sind nur illustrativ: kein Schadensanteil und kein Urteil sicher oder unsicher.",
  "Places: OpenStreetMap (ODbL). The radar ground-motion layers stay on the event map.": "Orte: OpenStreetMap (ODbL). Die Radarebenen der Bodenbewegung bleiben auf der Ereigniskarte.",
  "Reduced motion is on: the dashed outlines show how far the top would sway.": "Reduzierte Bewegung ist an: Die gestrichelten Umrisse zeigen, wie weit die Spitze schwanken würde.",
- "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: Erschütterungsstufe {l} von 9 · {height}, {frame}.",
  "Shaking estimate (USGS ShakeMap)": "Geschätzte Erschütterung (USGS-ShakeMap)",
  "← Back to the story": "← Zurück zur Geschichte",
  "Try how the fire spreads": "Ausprobieren, wie sich das Feuer ausbreitet",
@@ -837,5 +836,15 @@
  "Reinforcing wall ordered: workers build it as its own row in front of the dam.": "Stützmauer bestellt: Die Arbeiter bauen sie als eigene Reihe vor dem Damm.",
  "Building {p}%": "Bau {p} %",
  "built {p}%": "gebaut {p} %",
- "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Die Dorfbewohner bauen die Dämme: Ein Damm oder eine Mauer hält nur dort, wo sie fertig ist. Kommt der Schnee nahe, lassen sie die Arbeit liegen und laufen auf höheren Boden."
+ "Villagers build the dams: a dam or wall only holds where it is finished. When the snow comes close they drop the work and run to high ground.": "Die Dorfbewohner bauen die Dämme: Ein Damm oder eine Mauer hält nur dort, wo sie fertig ist. Kommt der Schnee nahe, lassen sie die Arbeit liegen und laufen auf höheren Boden.",
+ "See how floods change the land with radar images from the NASA–ISRO NISAR satellite.": "Sehen Sie mit Radarbildern des NASA-ISRO-Satelliten NISAR, wie Überschwemmungen das Land verändern.",
+ "Project on GitHub": "Projekt auf GitHub",
+ "{place}: shaking level {l} of 9 · {height}, {frame}.": "{place}: Erschütterungsstufe {l} von 9 · {height}, {frame}.",
+ "Choose a place and a building type, then start the shaking.": "Wählen Sie einen Ort und einen Gebäudetyp, dann starten Sie die Erschütterung.",
+ "Coloured marks show the buildings that were inspected. The condition of buildings without a mark may not be known.": "Farbige Markierungen zeigen die untersuchten Gebäude. Der Zustand von Gebäuden ohne Markierung ist möglicherweise nicht bekannt.",
+ "Satellite radar shows how much the ground changed between two passes.": "Satellitenradar zeigt, wie stark sich der Boden zwischen zwei Überflügen verändert hat.",
+ "The direction of motion has not been confirmed.": "Die Bewegungsrichtung ist nicht bestätigt.",
+ "The effects of the two earthquakes cannot be shown separately.": "Die Wirkung der beiden Erdbeben lässt sich nicht getrennt zeigen.",
+ "Two large earthquakes struck {place} a short time apart. On this map you can see how the ground changed and which buildings were inspected.": "In {place} gab es kurz nacheinander zwei große Erdbeben. Auf dieser Karte sehen Sie, wie sich der Boden verändert hat und welche Gebäude untersucht wurden.",
+ "{place}: estimated shaking {cls} {mmi} · {height}, {frame}.": "{place}: geschätzte Erschütterung {cls} {mmi} · {height}, {frame}."
 }

@@ -1268,6 +1268,12 @@ body.stage-mode #map-hint { display: none; }
 .lang-screen .ls-btn { background: rgba(255, 255, 255, .04); text-align: center; transition: border-color .15s ease, background .15s ease; }
 .lang-screen .ls-btn:hover, .lang-screen .ls-btn:focus-visible { background: var(--accent-soft); }
 .ls-note { margin: 16px 2px 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); text-align: center; }
+/* v91: the box stays centred; a fixed line sits under it at the bottom of the screen (in the flow, so it never covers the buttons) */
+.lang-screen { flex-direction: column; }
+.lang-screen .ls-box { margin: auto 0; flex: none; }
+.ls-foot { flex: none; margin: 18px 0 0; max-width: 100%; font-size: 12px; line-height: 1.5; letter-spacing: .04em; color: var(--muted); text-align: center; }
+.ls-foot span { white-space: nowrap; }
+@media (max-width: 560px) { .ls-foot span { white-space: normal; } .ls-foot { font-size: 11px; letter-spacing: .015em; padding: 0 4px; } } /* a phone: the line wraps once */
 @media (prefers-reduced-motion: reduce) { .lang-screen, .lang-screen .ls-box { transition: none; } }
 
 .home, .stories, .story { position: fixed; inset: 0; z-index: 4500; overflow: auto; overscroll-behavior: contain;
@@ -1292,15 +1298,33 @@ body.story-open { overflow: hidden; }
 .hc-icons { position: absolute; top: 20px; left: 22px; display: flex; gap: 8px; }
 .hc-icons .hz { width: 40px; height: 40px; }
 .hc-icons .hz svg { width: 24px; height: 24px; }
-.hc-globe { position: absolute; top: -40px; right: -40px; width: 190px; height: 190px; border-radius: 50%;
+/* v91: the card's globe is the real Earth (NASA Blue Marble); the blue sphere shows until the image has loaded */
+.hc-map-wrap { position: relative; display: grid; }
+.hc-map-wrap > .home-choice { width: 100%; height: 100%; padding-right: 220px; }
+.hc-globe { position: absolute; top: 18px; right: 18px; width: 180px; height: 180px; border-radius: 50%; touch-action: pan-y;
   background: radial-gradient(circle at 35% 35%, #6fb1ff 0%, #2a6db3 30%, #123a6b 60%, #071a33 100%);
-  box-shadow: inset -24px -18px 40px rgba(0, 0, 0, .55), 0 0 40px rgba(111, 177, 255, .18); opacity: .9; }
+  box-shadow: inset -24px -18px 40px rgba(0, 0, 0, .55), 0 0 40px rgba(111, 177, 255, .22); }
+.hc-globe.earth { background: #05070d; box-shadow: 0 0 34px rgba(111, 177, 255, .28); }
+.hg-canvas { display: block; width: 100%; height: 100%; border-radius: 50%; cursor: grab; }
+.hg-marks { position: absolute; inset: 0; pointer-events: none; }
+.hg-mk { all: unset; box-sizing: border-box; position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; display: grid; place-items: center;
+  border-radius: 50%; cursor: pointer; pointer-events: auto; transition: opacity .2s ease; }
+.hg-mk.off { opacity: 0; pointer-events: none; }
+.hg-mk .hz { width: 22px; height: 22px; box-shadow: 0 0 0 2px rgba(5, 7, 13, .55); }
+.hg-mk .hz svg { width: 14px; height: 14px; }
+.hg-mk:hover .hz, .hg-mk:focus-visible .hz { transform: scale(1.2); }
+.hg-mk:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hg-credit { position: absolute; top: 202px; right: 18px; width: 180px; text-align: center; font-size: 10.5px; line-height: 1.3; color: var(--muted); pointer-events: none; }
 @media (max-width: 719px) {
   .home-choices { grid-template-columns: 1fr; gap: 12px; }
   .home-choice { min-height: 150px; padding: 18px; }
   .hc-icons { top: 16px; left: 18px; }
   .hc-icons .hz { width: 34px; height: 34px; }
-  .hc-globe { width: 130px; height: 130px; top: -30px; right: -30px; }
+  .hc-map-wrap > .home-choice { min-height: 168px; padding-right: 140px; }
+  .hc-globe { width: 118px; height: 118px; top: 12px; right: 12px; }
+  .hg-credit { top: 133px; right: 8px; width: 126px; font-size: 10px; }
+  .hg-mk { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
+  .hg-mk .hz { width: 18px; height: 18px; } .hg-mk .hz svg { width: 12px; height: 12px; }
   .home-sub { margin-bottom: 16px; font-size: 15px; }
 }
 .hz-icerock svg { stroke: #9ad7ff; }
@@ -1646,3 +1670,8 @@ body.area-overview .place-label:not(.cov-label):not(.close-label) { display: non
   .av-types .sh-opt { font-size: 12px; }
   .av-types .sh-opt small { font-size: 10.5px; }
 }
+/* v92: one sentence on NISAR for first-time visitors, and the project's GitHub repository */
+.home-nisar { margin: -4px 0 10px; max-width: 46ch; font-size: clamp(16px, 2vw, 18px); line-height: 1.45; color: var(--text); }
+.home-repo { margin: 18px 0 0; font-size: 13.5px; }
+.home-repo a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.home-repo a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }

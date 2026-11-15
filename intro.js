@@ -791,8 +791,100 @@
       `<button type="button" class="home-choice hc-stories" data-go="stories"><span class="hc-icons" aria-hidden="true">` +
         ["earthquake", "flood", "icerock", "wildfire"].map(storyEmblem).join("") + `</span>` +
         `<span class="hc-title">${esc(t("How do disasters happen?"))}</span><span class="hc-sub">${esc(t("Short illustrated stories, one picture at a time."))}</span></button>` +
-      `<button type="button" class="home-choice hc-map" data-go="map"><span class="hc-globe" aria-hidden="true"></span>` +
-        `<span class="hc-title">${esc(t("Explore on the map"))}</span><span class="hc-sub">${esc(t("Real satellite observations of {n} events.", { n }))}</span></button>`;
+      `<div class="hc-map-wrap"><button type="button" class="home-choice hc-map" data-go="map">` +
+        `<span class="hc-title">${esc(t("Explore on the map"))}</span><span class="hc-sub">${esc(t("Real satellite observations of {n} events.", { n }))}</span></button>` +
+        `<div class="hc-globe" role="group" aria-label="${esc(t("Globe with event locations"))}"><canvas class="hg-canvas" aria-hidden="true"></canvas><div class="hg-marks"></div></div>` +
+        `<span class="hg-credit" lang="en">NASA Blue Marble · GIBS</span></div>`;
+    hgMount();
+  }
+  // ---------------------------------------------------------------------------------------------------------------
+  // v91: the globe on the "Explore on the map" card is the real Earth: NASA Blue Marble Shaded Relief and Bathymetry
+  // (the same NASA GIBS layer as the big globe), one whole-world image wrapped on a small sphere drawn pixel by pixel.
+  // It turns slowly (not with reduced motion) and can be turned by dragging; a tap on it opens the globe screen. The event
+  // markers sit on the sphere and open their own map. Until the image arrives (or if it cannot be loaded) the blue sphere stays.
+  const HG_TEX = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0" +
+    "&LAYERS=BlueMarble_ShadedRelief_Bathymetry&STYLES=&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=1024&HEIGHT=512&FORMAT=image/jpeg";
+  const HG_TILT = 18 * Math.PI / 180; // seen a little from above the equator
+  const hg = { tex: null, texP: null, lon0: 20, raf: 0, last: 0, drag: null, grid: null, n: 0, img: null };
+  function hgLoad() {
+    if (!hg.texP) hg.texP = fetch(HG_TEX, { mode: "cors" }).then((r) => (r.ok ? r.blob() : Promise.reject(new Error(r.status))))
+      .then((b) => createImageBitmap(b)).then((bm) => {
+        const c = document.createElement("canvas"); c.width = bm.width; c.height = bm.height;
+        const x = c.getContext("2d"); x.drawImage(bm, 0, 0);
+        hg.tex = { d: x.getImageData(0, 0, c.width, c.height).data, w: c.width, h: c.height };
+        return hg.tex;
+      }).catch(() => null);
+    return hg.texP;
+  }
+  function hgGrid(n) { // per pixel: texture row, longitude offset (degrees) and light; only the sphere's own pixels
+    const idx = [], row = [], lon = [], lit = [], ct = Math.cos(HG_TILT), st = Math.sin(HG_TILT);
+    for (let py = 0; py < n; py++) for (let px = 0; px < n; px++) {
+      const u = ((px + 0.5) / n) * 2 - 1, v = ((py + 0.5) / n) * 2 - 1, r2 = u * u + v * v; if (r2 > 1) continue;
+      const z = Math.sqrt(1 - r2), w = -v, y = w * ct + z * st, Z = -w * st + z * ct;
+      idx.push(py * n + px); row.push(Math.max(0, Math.min(511, Math.round(((90 - Math.asin(y) * 57.2958) / 180) * 511)))); // texture row (the image is 1024 × 512)
+      lon.push(Math.atan2(u, Z) * 57.2958);
+      const sun = 0.62 + 0.38 * Math.max(0, -0.45 * u + 0.35 * w + 0.82 * z), edge = Math.min(1, 0.35 + 1.4 * z); lit.push(sun * edge);
+    }
+    return { idx: Int32Array.from(idx), row: Int16Array.from(row), lon: Float32Array.from(lon), lit: Float32Array.from(lit) };
+  }
+  function hgProject(lon, lat) { // a place on the sphere → [x, y] in -1..1, and whether it faces us
+    const a = (lon - hg.lon0) * Math.PI / 180, f = lat * Math.PI / 180, x = Math.cos(f) * Math.sin(a), y = Math.sin(f), Z = Math.cos(f) * Math.cos(a);
+    const ct = Math.cos(HG_TILT), st = Math.sin(HG_TILT), w = y * ct - Z * st, z = y * st + Z * ct;
+    return [x, -w, z];
+  }
+  function hgDraw() {
+    const box = $("home-choices") && $("home-choices").querySelector(".hc-globe"); if (!box) return;
+    const cv = box.querySelector(".hg-canvas"), size = box.clientWidth; if (!size) return;
+    if (hg.tex) {
+      const n = Math.min(420, Math.round(size * Math.min(2, window.devicePixelRatio || 1)));
+      if (cv.width !== n) { cv.width = n; cv.height = n; hg.grid = null; }
+      if (!hg.grid || hg.n !== n) { hg.grid = hgGrid(n); hg.n = n; hg.img = cv.getContext("2d").createImageData(n, n); }
+      const G = hg.grid, T = hg.tex, d = hg.img.data, sh = hg.lon0 + 180;
+      for (let k = 0; k < G.idx.length; k++) {
+        let c = Math.floor(((G.lon[k] + sh) / 360) * T.w) % T.w; if (c < 0) c += T.w;
+        const ti = (G.row[k] * T.w + c) * 4, o = G.idx[k] * 4, l = G.lit[k];
+        d[o] = T.d[ti] * l; d[o + 1] = T.d[ti + 1] * l; d[o + 2] = T.d[ti + 2] * l; d[o + 3] = 255;
+      }
+      cv.getContext("2d").putImageData(hg.img, 0, 0);
+      box.classList.add("earth");
+    }
+    // markers on the side that faces us (hidden and skipped by Tab on the far side); places close together (Nepal and
+    // Bangladesh) are pushed apart a little on screen so each marker can be tapped on its own
+    const R = size / 2, gap = 22, P = [...box.querySelectorAll(".hg-mk")].map((m) => { const [x, y, z] = hgProject(+m.dataset.lon, +m.dataset.lat); return { m, x: R + x * R, y: R + y * R, on: z > 0.12 }; });
+    for (let it = 0; it < 3; it++) for (let a = 0; a < P.length; a++) for (let b = a + 1; b < P.length; b++) {
+      const A = P[a], B = P[b]; if (!A.on || !B.on) continue;
+      let dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy); if (d >= gap) continue;
+      if (d < 0.01) { dx = 1; dy = 0; d = 1; } const k = (gap - d) / 2 / d; A.x -= dx * k; A.y -= dy * k; B.x += dx * k; B.y += dy * k;
+    }
+    for (const { m, x, y, on } of P) {
+      m.style.left = `${x}px`; m.style.top = `${y}px`;
+      if (m.classList.contains("off") === on) { m.classList.toggle("off", !on); m.tabIndex = on ? 0 : -1; }
+    }
+  }
+  function hgLoop(now) {
+    hg.raf = 0;
+    if ($("home").hidden) return; // only while the start menu is shown
+    const dt = hg.last ? Math.min(0.1, (now - hg.last) / 1000) : 0; hg.last = now;
+    if (!hg.drag && !reducedMotion.matches) hg.lon0 = (hg.lon0 + dt * 7) % 360; // a slow turn, west to east
+    hgDraw();
+    hg.raf = requestAnimationFrame(hgLoop);
+  }
+  function hgMount() {
+    const box = $("home-choices").querySelector(".hc-globe"); if (!box) return;
+    const marks = box.querySelector(".hg-marks");
+    marks.innerHTML = items.map((it) => `<button type="button" class="hg-mk off" tabindex="-1" data-id="${esc(it.id)}" data-lon="${it.center[0]}" data-lat="${it.center[1]}"` +
+      ` aria-label="${esc(t("{place}: open this event", { place: it.text.event.place }))}">${emblem(hazardOf(it), "hg-emblem")}</button>`).join("");
+    marks.addEventListener("click", (e) => { const b = e.target.closest(".hg-mk"); if (!b) return; e.stopPropagation(); goMap(); openCard(b.dataset.id); });
+    const cv = box.querySelector(".hg-canvas");
+    cv.addEventListener("pointerdown", (e) => { hg.drag = { x: e.clientX, y: e.clientY, lon: hg.lon0, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch (_) {} });
+    cv.addEventListener("pointermove", (e) => { const D = hg.drag; if (!D) return; const dx = e.clientX - D.x; if (Math.abs(dx) + Math.abs(e.clientY - D.y) > 6) D.moved = true;
+      hg.lon0 = D.lon - (dx / Math.max(40, box.clientWidth)) * 180; if (reducedMotion.matches) hgDraw(); });
+    const up = (e, cancel) => { const D = hg.drag; hg.drag = null; if (D && !D.moved && !cancel) goMap(); }; // a tap opens the globe screen
+    cv.addEventListener("pointerup", (e) => up(e, false));
+    cv.addEventListener("pointercancel", (e) => up(e, true));
+    hgLoad().then(() => { hgDraw(); });
+    hgDraw();
+    if (!hg.raf) { hg.last = 0; hg.raf = requestAnimationFrame(hgLoop); }
   }
   function showHome(push) {
     if (push) history.pushState(null, "", location.pathname + location.search);
@@ -990,7 +1082,7 @@
     const p = d.product || {}, gap = shocks.length > 1 ? Math.round((Date.parse(shocks[1].time_utc) - Date.parse(shocks[0].time_utc)) / 1000) : null;
     const mag = (x) => `M${Number(x).toLocaleString(I.lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
     panel.innerHTML = `<div class="sh-head"><h2 id="sh-h" tabindex="-1">${esc(t("Try the shaking"))}</h2><span class="sv-badge sh-badge">${esc(t("Illustrative animation"))}</span></div>` +
-      `<p class="sh-intro">${esc(t("Estimated shaking of the {mag} earthquake in three places, from the USGS ShakeMap.", { mag: mag(d.shock.mag) }))}</p>` +
+      `<p class="sh-intro">${esc(t("Choose a place and a building type, then start the shaking."))}</p>` + // v91: the first action, in one line
       `<ol class="sh-steps">` +
       `<li class="sh-step"><h3>${esc(t("1. Choose a place"))}</h3><div class="sh-map" aria-hidden="true"></div>` +
         `<div class="sh-regions" role="radiogroup" aria-label="${esc(t("Places"))}">` + d.regions.map((r) =>
@@ -1004,6 +1096,7 @@
         `<p class="sh-cap" id="sh-cap"></p>` +
         `<button type="button" class="btn sh-play">${esc(t("Start the shaking"))}</button></li></ol>` +
       `<details class="sh-data"><summary>${esc(t("Data and sources"))}</summary>` +
+        `<p>${esc(t("Estimated shaking of the {mag} earthquake in three places, from the USGS ShakeMap.", { mag: mag(d.shock.mag) }))}</p>` +
         `<p>${esc(t("USGS ShakeMap of the {mag} earthquake ({id}), version {v} of {date}, status: {status}.", { mag: mag(d.shock.mag), id: d.shock.usgs_id, v: p.version, date: I.fmt.day(String(p.process_timestamp || "").slice(0, 10)), status: p.map_status === "automatic" ? t("automatic") : (p.map_status || "") }))} ` +
           `<a href="${esc(p.page)}" target="_blank" rel="noopener">USGS ↗</a></p>` +
         `<ul class="sh-limits">` +
@@ -1057,9 +1150,12 @@
     shInfo(d);
     shDraw(d);
   }
+  // v91: one label for the place's estimated shaking, used the same way in the info box and under the drawing
+  const shClass = (r) => `${r.mmi_class} · ${shakeWord(r.shaking)}`;
+  const shMmi = (r) => `(MMI ${I.fmt.num(r.mmi, 1)})`;
   function shInfo(d) {
     const r = shRegion(d), box = $("story").querySelector(".sh-info");
-    box.innerHTML = `<dt>${esc(t("Estimated shaking"))}</dt><dd><b>${esc(r.mmi_class)} · ${esc(shakeWord(r.shaking))}</b> <span class="sh-mmi">(MMI ${esc(I.fmt.num(r.mmi, 1))})</span></dd>` +
+    box.innerHTML = `<dt>${esc(t("Estimated shaking"))}</dt><dd><b>${esc(shClass(r))}</b> <span class="sh-mmi">${esc(shMmi(r))}</span></dd>` +
       `<dt>${esc(t("Estimated ground"))}</dt><dd>${esc(shSoil(r))}</dd>`;
   }
   // mini map: the same satellite background as the analysis map, the epicentre and the places (a tap chooses a place)
@@ -1122,7 +1218,7 @@
     const height = sh.tall ? t("High-rise") : t("Low-rise"), frame = sh.flexible ? t("More flexible") : t("Stiffer");
     $("story").querySelector(".sh-cap").textContent = (still
       ? t("Reduced motion is on: the dashed outlines show how far the top would sway.") + " "
-      : "") + t("{place}: shaking level {l} of 9 · {height}, {frame}.", { place: r.name, l: lv, height, frame }); // labels as written (German nouns keep their capital)
+      : "") + t("{place}: estimated shaking {cls} {mmi} · {height}, {frame}.", { place: r.name, cls: shClass(r), mmi: shMmi(r), height, frame }); // v91: same label as above; the internal animation level is not shown
     const btn = $("story").querySelector(".sh-play");
     btn.hidden = still;
     btn.disabled = false; // v80c: a choice made during the animation stops it; the new choice can be started at once

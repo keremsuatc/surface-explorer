@@ -90,7 +90,7 @@
       const pad = opts.padding ? L.point(opts.padding).multiplyBy(2)   // v75: also uneven padding (top / bottom kept clear of the map controls)
         : L.point(opts.paddingTopLeft || [0, 0]).add(L.point(opts.paddingBottomRight || [0, 0]));
       const want = Math.min(map.getBoundsZoom(b, false, pad), opts.maxZoom ?? Infinity);
-      const off = Math.abs(map.getZoom() - want) > 0.6 || !map.getBounds().contains(b.getCenter());
+      const off = Math.abs(map.getZoom() - want) > 0.2 || !map.getBounds().contains(b.getCenter()); // v92: 0.2 (one zoom step of 0.25 off is not "there")
       if (off) { map.stop(); map.fitBounds(b, { ...opts, animate: false }); }
     }, m.duration * 1000 + 500);
   }
@@ -356,12 +356,18 @@
   }
   // the whole area stays clear of the area switch (top) and of the legend (bottom); the close look keeps the usual small margin
   function areaGo() {
-    const b = L.latLngBounds(views[state.areaView].bounds);
-    if (state.areaView !== "overview") { goTo(b, { padding: [12, 12] }); return; }
+    // v92: "study" (when the evidence steps open) frames the study area itself, with the same room for the switch and the legend
+    const b = state.areaView === "study" ? viewBounds : L.latLngBounds(views[state.areaView].bounds);
+    if (state.areaView === "closeup") { goTo(b, { padding: [12, 12] }); return; }
     const mr = map.getContainer().getBoundingClientRect(), sw = $("area-switch").getBoundingClientRect(), lg = $("map-legend").getBoundingClientRect();
     const top = sw.height ? Math.max(12, sw.bottom - mr.top + 8) : 12, bottom = lg.height ? Math.max(12, mr.bottom - lg.top + 8) : 12;
     // phones: the key sits under the map (f-below), so only the switch needs room; a key still on the map keeps its own room
     const onMap = $("map-legend").parentElement === map.getContainer().parentElement;
+    if (state.areaView === "study") { // the study area as large as it can be: the key in the lower-left corner takes room at the side, not the bottom
+      const side = onMap && lg.width ? Math.max(12, lg.right - mr.left + 10) : 12, wide = mr.width - side - 12 > mr.height - top - 12;
+      goTo(b, wide ? { paddingTopLeft: [side, top], paddingBottomRight: [12, 12] } : { paddingTopLeft: [12, top], paddingBottomRight: [12, onMap && top + bottom < mr.height * 0.6 ? bottom : 12] });
+      return;
+    }
     goTo(b, { paddingTopLeft: [12, top], paddingBottomRight: [12, onMap && top + bottom < mr.height * 0.6 ? bottom : 12] });
   }
   function setAreaView(k, focus) {
@@ -1103,7 +1109,7 @@
       const st = { ...COVERAGE_LINE, pane: "regions", interactive: false };
       overlays.evCover = (meta.study_area ? L.geoJSON(meta.study_area.outline, { style: () => st, interactive: false, pane: "regions" }) : L.rectangle(bounds, st)).addTo(map);
     }
-    if (floodView() && state.areaView === "overview" && views.overview.coverage) { // v75: what the data cover, named on its outline
+    if (floodView() && state.areaView !== "closeup" && views.overview.coverage) { // v75: what the data cover, named on its outline
       const cb = L.latLngBounds(views.overview.bounds);
       if (views.overview.coverage.file) overlays.covLabel = L.marker(views.overview.coverage.label_at || cb.getNorthWest(), { pane: "regions", keyboard: false, interactive: false,
         icon: L.divIcon({ className: "place-label cov-label", html: `<span>${esc(t(views.overview.coverage.label))}</span>`, iconSize: [0, 0] }) }).addTo(map);
@@ -1395,6 +1401,7 @@
     stopPlay();
     if (step === undefined) step = finding() ? finding().step : 0;
     state.ui = "evidence";
+    if (views && views.applies_to === "evidence") state.areaView = "study"; // v92: the radar steps open on the study area (no area button pressed)
     document.body.classList.remove("ui-simple");
     placeGroup.clearLayers();
     $("simple-card").hidden = true;
@@ -1404,6 +1411,7 @@
     renderFinding();
     renderAreaSwitch();
     if (floodView()) areaGo(); // v75: the area view, after the step's own framing
+    if (floodView() && state.areaView === "study") setTimeout(() => { if (state.ui === "evidence" && state.areaView === "study") areaGo(); }, 120); // v92: again once the key has its final size
     $("to-simple").focus({ preventScroll: true });
     if (narrow.matches && finding()) $("ev-finding").scrollIntoView({ block: "start" }); // phones: finding first, the map right under it
   }
@@ -1798,14 +1806,17 @@
       ...base, _quake: true,
       event: { ...bev, place, dates: bev.dates || (day ? fmtDay(day) : ""),
         title: bev.title || (sh.length > 1 ? t("Earthquakes in {place}", { place }) : t("Earthquake in {place}", { place })),
-        area_name: bev.area_name || I.tx(e.area_name || ""), lede: bev.lede || qLead(sh), facts: bev.facts || [] },
+        area_name: bev.area_name || I.tx(e.area_name || ""), lede: bev.lede || qLead(sh, ml, place), facts: bev.facts || [] },
       maturity: base.maturity || { text: t("Published products of other organisations, shown without new analysis by this project. They are preliminary.") },
       steps: [], layers: {}, regions: {}, sources: base.sources || [], reference_maps: base.reference_maps || [], uncertainty: base.uncertainty || [],
       simple: { ...(base.simple || {}), shows: {} },
     };
   }
   // v74: the one sentence a first-time reader starts with (the number of shocks comes from the event's own list)
-  const qLead = (sh) => (sh.length === 2 ? t("Two strong earthquakes struck the same area a short time apart.")
+  // v91: with both map layers, the sentence also says what the map lets the reader see
+  const qLead = (sh, ml, place) => (sh.length === 2 && (ml.layers || []).some((L_) => L_.group === "damage" && qOn(L_)) && (ml.layers || []).some((L_) => L_.kind === "raster" && qOn(L_))
+    ? t("Two large earthquakes struck {place} a short time apart. On this map you can see how the ground changed and which buildings were inspected.", { place })
+    : sh.length === 2 ? t("Two strong earthquakes struck the same area a short time apart.")
     : sh.length > 2 ? t("{n} strong earthquakes struck the same area a short time apart.", { n: sh.length })
     : t("A strong earthquake struck this area."));
   // v74: two "image" layers of map_layers.json with the same "pair" and sides before / after → the existing Before / After slider.
@@ -1992,14 +2003,18 @@
     if (state.mapMode !== "qtimeline") { ctrl.hidden = true; ctrl.innerHTML = ""; }
     const lead = ""; // v76: the lead sentence is in the header, under the event name
     if (state.mapMode === "damage") {
-      bar.innerHTML = lead + `<p class="sb-text">${esc(qDamage().length ? t("Coloured marks show buildings examined from satellite images.") : t("No building damage layer is available for this event."))}</p>` +
+      bar.innerHTML = lead + `<p class="sb-text">${esc(qDamage().length ? t("Coloured marks show the buildings that were inspected. The condition of buildings without a mark may not be known.") : t("No building damage layer is available for this event."))}</p>` +
         (qDamage().length ? `<p class="sb-action"><span aria-hidden="true">＋</span> ${esc(t("Zoom in on the coloured marks to see single buildings."))}</p>` : "");
       return;
     }
     if (state.mapMode === "motion") {
       const R = qRasters(), cur = qShown().raster;
-      bar.innerHTML = lead + `<p class="sb-text">${esc(meta.shocks.length > 1 ? t("This map compares radar measurements taken before and after the two earthquakes.")
-          : t("This map compares radar measurements taken before and after the earthquake."))}</p>` +
+      // v91: what the colours are, then what they cannot tell (both shocks together; the direction of motion)
+      const signOk = R.length && R.every((L_) => (L_.geometry || {}).sign_confirmed === true);
+      const limits = [meta.shocks.length > 1 ? t("The effects of the two earthquakes cannot be shown separately.") : "",
+        signOk ? "" : t("The direction of motion has not been confirmed.")].filter(Boolean).join(" ");
+      bar.innerHTML = lead + `<p class="sb-text">${esc(t("Satellite radar shows how much the ground changed between two passes."))}</p>` +
+        (limits ? `<p class="sb-pair">${esc(limits)}</p>` : "") +
         (R.length > 1 ? `<div class="q-pairs" role="group" aria-label="${esc(t("Radar measurement pair shown on the map"))}"><span class="q-pairs-k">${esc(t("Radar pair"))}</span>` + R.map((L_) =>
           `<button type="button" class="btn q-track" data-id="${esc(L_.id)}" aria-pressed="${cur && cur.id === L_.id}">${esc(L_.observed ? `${fmtShort(L_.observed[0])} → ${fmtShort(L_.observed[1])}` : L_.id)}</button>`).join("") + `</div>` : "");
       bar.querySelectorAll(".q-track").forEach((b) => b.addEventListener("click", () => {

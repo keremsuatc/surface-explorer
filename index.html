@@ -29,7 +29,7 @@
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
         onerror="showLoadError('The Leaflet stylesheet (cdnjs) could not be loaded; check your internet connection.')">
-  <link rel="stylesheet" href="style.css?v=94" onerror="showLoadError('<code>style.css</code> could not be loaded.')">
+  <link rel="stylesheet" href="style.css?v=98" onerror="showLoadError('<code>style.css</code> could not be loaded.')">
 </head>
 <body>
   <a data-i18n class="skip" href="#explore">Skip to the explanation panel</a>
@@ -76,8 +76,10 @@
     <div class="home-top"><p class="home-brand">Surface Explorer</p><div class="lang-pick-slot home-lang"></div></div>
     <div class="home-body">
       <h1 data-i18n id="home-h" tabindex="-1">Explore how Earth changes.</h1>
+      <p data-i18n class="home-nisar">See how floods change the land with radar images from the NASA–ISRO NISAR satellite.</p>
       <p data-i18n class="home-sub">Choose how you want to start.</p>
       <div class="home-choices" id="home-choices"></div>
+      <p class="home-repo"><a href="https://github.com/keremsuatc/surface-explorer" target="_blank" rel="noopener"><span data-i18n>Project on GitHub</span> ↗</a></p>
     </div>
   </section>
   <!-- v75: "How do disasters happen?" — the story list, then one story at a time (content: web/data/stories.json) -->
@@ -276,10 +278,10 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
           onerror="showLoadError('The Leaflet library (cdnjs) could not be loaded; check your internet connection.')"></script>
-  <script src="i18n.js?v=94"></script>
-  <script src="intro.js?v=94"></script>
+  <script src="i18n.js?v=98"></script>
+  <script src="intro.js?v=98"></script>
   <!-- Public settings (optional ArcGIS API key restricted to this site) -->
   <script src="config.js"></script>
-  <script src="app.js?v=94" onerror="showLoadError('<code>app.js</code> could not be loaded.')"></script>
+  <script src="app.js?v=98" onerror="showLoadError('<code>app.js</code> could not be loaded.')"></script>
 </body>
 </html>
